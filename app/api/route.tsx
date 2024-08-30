@@ -1,3 +1,5 @@
-export async function GET(request: Request) {
+import { type NextRequest } from 'next/server'
+
+export async function GET(request: NextRequest) {
   return Response.json({message: "Success!"})
 }
