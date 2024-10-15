@@ -1,3 +1,4 @@
+"use client";
 import { useState } from 'react';
 
 export default function SingleTickets() {
@@ -27,10 +28,8 @@ export default function SingleTickets() {
         });
     
         if (response.ok) {
-            // Handle successful response
-            console.log('Form submitted successfully');
+            alert((await response.json()).message ?? "An error occurred");
         } else {
-            // Handle error response
             console.error('Form submission error');
         }
     }
