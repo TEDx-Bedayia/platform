@@ -1,3 +1,4 @@
+import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -12,9 +13,15 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  // EXTRA CHECKS + EMAIL DOESN'T EXIST IN DB
-  // DATA BASE SAVE LOGIC
+  //TODO EXTRA CHECKS + EMAIL DOESN'T EXIST IN DB
+  //TODO DATA BASE SAVE LOGIC
   return Response.json({
     message: `Ticket submitted successfully for ${name} / ${email}`,
   });
+}
+
+export async function GET() {
+  let query = await sql`SELECT * FROM attendees WHERE id = 1;`;
+  let name = query.rows[0];
+  return Response.json(name);
 }
