@@ -1,5 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import "./book.css";
+
+import {
+  Field,
+  PaymentMethod,
+} from "../api/tickets/payment-methods/payment-methods";
 
 export default function SingleTickets() {
   const [formData, setFormData] = useState({
@@ -7,24 +13,88 @@ export default function SingleTickets() {
     name: "",
     phone: "",
     paymentMethod: "",
+    additionalFields: {} as { [key: string]: string },
   });
+
+  const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
+  const [selectedPaymentFields, setSelectedPaymentFields] = useState(
+    [] as Field[]
+  );
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const response = await fetch("/api/tickets/payment-methods");
+        if (response.ok) {
+          const data = (await response.json()) as {
+            paymentMethods: PaymentMethod[];
+          };
+
+          const methods: PaymentMethod[] = data.paymentMethods.map(
+            (method) => ({
+              displayName: method.displayName,
+              identifier: method.identifier,
+              to: method.to,
+              fields: method.fields,
+            })
+          );
+
+          setPaymentOptions(methods);
+        } else {
+          console.error("Failed to fetch payment methods");
+        }
+      } catch (error) {
+        console.error("Error fetching payment methods:", error);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
+
+  const handleAdditionalFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    if (name == "tlda" && value.includes("@")) {
+      return;
+    }
+    setFormData({
+      ...formData,
+      additionalFields: {
+        ...formData.additionalFields,
+        [name]: value,
+      },
+    });
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    if (name == "phone" && isNaN(Number(value))) {
+      return;
+    }
+
     setFormData({
       ...formData,
       [name]: value,
     });
+
+    // Set additional fields for the selected payment method
+    if (name === "paymentMethod") {
+      const selectedOption = paymentOptions.find(
+        (option) => option.identifier === value
+      );
+      setSelectedPaymentFields(selectedOption?.fields || []);
+    }
   };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const response = await fetch("/api/submit-ticket", {
+    const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: JSON.stringify(formData),
     });
@@ -32,7 +102,7 @@ export default function SingleTickets() {
     if (response.ok) {
       alert((await response.json()).message ?? "An error occurred");
     } else {
-      console.error("Form submission error");
+      console.log(await response.json());
     }
   }
 
@@ -42,6 +112,7 @@ export default function SingleTickets() {
         <input
           type="email"
           name="email"
+          placeholder="Enter your email"
           id="email-input"
           value={formData.email}
           onChange={handleChange}
@@ -50,6 +121,7 @@ export default function SingleTickets() {
           type="text"
           name="name"
           id="name-input"
+          placeholder="Enter your name"
           value={formData.name}
           onChange={handleChange}
         />
@@ -57,6 +129,8 @@ export default function SingleTickets() {
           type="text"
           name="phone"
           id="phone-input"
+          placeholder="Enter your phone number"
+          maxLength={11}
           value={formData.phone}
           onChange={handleChange}
         />
@@ -67,11 +141,37 @@ export default function SingleTickets() {
           value={formData.paymentMethod}
           onChange={handleChange}
         >
-          <option value="telda">Telda</option>
-          <option value="instapay">Instapay</option>
-          <option value="mobile-wallet">Mobile Wallet (VF Cash, etc.)</option>
-          <option value="school-cash">School Office</option>
+          <option value="" disabled>
+            Select Payment Method
+          </option>
+          {paymentOptions.map((option) => (
+            <option key={option.identifier} value={option.identifier}>
+              {option.displayName}
+            </option>
+          ))}
         </select>
+
+        {/* Dynamically render additional fields based on selected payment method */}
+        <div className="additional-field-container">
+          {selectedPaymentFields.length > 0 &&
+            selectedPaymentFields.map((field, index) => (
+              <div className="additional-field" key={index}>
+                <label htmlFor={`additional-field-${index}`}>
+                  {field.label}
+                </label>
+                <input
+                  type={field.type}
+                  name={field.id}
+                  id={`additional-field-${index}`}
+                  placeholder={field.placeholder}
+                  required={field.required}
+                  value={formData.additionalFields[field.id] || ""}
+                  onChange={handleAdditionalFieldChange}
+                />
+              </div>
+            ))}
+        </div>
+
         <button type="submit">Submit</button>
       </form>
     </section>

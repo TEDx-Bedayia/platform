@@ -1,0 +1,130 @@
+/* book.css */
+
+/* Base styles */
+body {
+  background-color: #000; /* Black background */
+  font-family: Arial, sans-serif;
+  color: #fff; /* White text for readability */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Form Section */
+#book-one-ticket {
+  width: 100%;
+  max-width: 400px;
+  background-color: #1e1e1e; /* Dark gray background for the form */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); /* Soft white shadow */
+}
+
+/* Form Elements */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+input[type="email"],
+input[type="text"],
+input[type="number"],
+select {
+  background-color: #333; /* Darker input background */
+  color: #fff; /* White text inside inputs */
+  border: none;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Labels */
+label {
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #ccc; /* Slightly lighter color for labels */
+}
+
+/* Input focus state */
+input:focus,
+select:focus {
+  outline: none;
+  background-color: #444; /* Slightly lighter when focused */
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+/* Button styles */
+button[type="submit"] {
+  background-color: #007bff; /* Blue button */
+  color: #fff;
+  padding: 12px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+  #book-one-ticket {
+    padding: 15px;
+  }
+}
+
+/* Additional Field Styles */
+#book-one-ticket .additional-field {
+  margin-top: 5px;
+}
+
+/* Additional field labels */
+#book-one-ticket .additional-field label {
+  font-size: 0.9rem;
+  color: #ccc; /* Light gray text for labels */
+  margin-bottom: 5px;
+  margin-top: 0;
+  display: block;
+  margin-left: 5px;
+}
+
+/* Additional field inputs */
+#book-one-ticket .additional-field input[type="text"],
+#book-one-ticket .additional-field input[type="string"] {
+  background-color: #333; /* Darker background for input fields */
+  color: #fff; /* White text inside the inputs */
+  border: none;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Additional field input focus state */
+#book-one-ticket .additional-field input:focus {
+  outline: none;
+  background-color: #444; /* Lighter background on focus */
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+/* Additional field container */
+#book-one-ticket .additional-field-container {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #2b2b2b; /* Slightly lighter container background for visual grouping */
+  border-radius: 5px;
+}
