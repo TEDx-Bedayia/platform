@@ -1,0 +1,111 @@
+/* Dashboard Container */
+.dashboard {
+  padding: 2rem;
+  background-color: #f7f9fc; /* Light background color for contrast */
+  min-height: 100vh; /* Full height for better alignment */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header */
+.dashboard h1 {
+  font-family: "Roboto", sans-serif;
+  font-size: 2.5rem;
+  color: #2c3e50; /* Darker, professional color */
+  margin-bottom: 2rem;
+}
+
+/* Applicant List Container */
+.applicantList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px; /* Constrain the width for better readability */
+}
+
+/* Applicant Card */
+.applicantCard {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px; /* Softer, rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Hover effect on applicant card */
+.applicantCard:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow */
+}
+
+/* Typography for card content */
+.applicantCard p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: #34495e; /* Dark grey for text */
+}
+
+/* Strong emphasis on labels */
+.applicantCard p strong {
+  color: #2c3e50; /* Stronger contrast for labels */
+}
+
+/* Admit Button */
+.admitButton {
+  background-color: #27ae60; /* Elegant green for admit action */
+  color: white;
+  border: none;
+  border-radius: 8px; /* Rounded button */
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 1rem;
+}
+
+/* Admit Button Hover */
+.admitButton:hover {
+  background-color: #219150; /* Slightly darker green on hover */
+  transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Revoke Admission Button (Red) */
+.admitButton.revoke {
+  background-color: #e74c3c; /* Red color for revoke action */
+}
+
+/* Hover for Revoke Button */
+.admitButton.revoke:hover {
+  background-color: #c0392b;
+}
+
+/* Continue Button */
+.continueButton {
+  display: block;
+  margin: 2rem auto;
+  padding: 0.75rem 2rem;
+  background-color: #0070f3; /* Primary blue color */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover for Continue Button */
+.continueButton:hover {
+  background-color: #005bb5;
+  transform: translateY(-3px); /* Lift on hover */
+}
+
+/* Loading Indicator */
+p.loading {
+  font-size: 1.2rem;
+  font-style: italic;
+  color: #95a5a6;
+  text-align: center;
+}

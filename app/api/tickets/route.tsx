@@ -7,7 +7,7 @@ import { checkSafety, verifyEmail, verifyPaymentMethod } from "./verifyFields";
 export async function POST(request: NextRequest) {
   let body: any;
   try {
-    body = await request.formData();
+    body = await request.json();
   } catch (error) {
     return Response.json(
       { message: "Please provide a valid JSON body.", error: error },
@@ -17,9 +17,6 @@ export async function POST(request: NextRequest) {
 
   let paymentMethod: string, name, email, phone, add;
   try {
-    body.forEach((value: any, key: any) => {
-      body = JSON.parse(key);
-    });
     name = body.name?.toString().trim();
     email = body.email?.toString().trim();
     phone = body.phone?.toString().trim();
@@ -49,7 +46,6 @@ async function submitOneTicket(
   paymentMethod: string | undefined
 ) {
   if (!verifyEmail(email)) {
-    console.log(email);
     return Response.json(
       {
         message: "Please enter a valid email address.",
@@ -70,9 +66,7 @@ async function submitOneTicket(
     );
   }
 
-  console.log(paymentMethod);
   paymentMethod = await verifyPaymentMethod(paymentMethod);
-  console.log(paymentMethod);
   if (paymentMethod === undefined) {
     return Response.json(
       { message: "Please enter a valid payment method." },

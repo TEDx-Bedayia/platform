@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     // This function accepts a username and password, and returns a token (process.env.ADMIN_KEY) if the credentials are valid.
 
     // Artificial delay to simulate a slow server
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     let params = await request.formData();
 
@@ -42,16 +42,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (
-      params.get(process.env.SECBUTTON_FIELD?.toString()!)?.toString() !==
-      process.env.SECBUTTON_VALUE
-    ) {
-      return Response.json(
-        { message: "Invalid Credentials." },
-        { status: 403 }
-      );
-    }
-
     return Response.json({ token: process.env.ADMIN_KEY }, { status: 200 });
   } catch (error) {
     return Response.json(
@@ -62,17 +52,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-export async function GET(request: NextRequest) {
-  if (request.nextUrl.searchParams.get("huh") === "hax") {
-    return Response.json(
-      {
-        secname: process.env.SECBUTTON_FIELD,
-        secvalue: process.env.SECBUTTON_VALUE,
-      },
-      { status: 200 }
-    );
-  }
-  return Response.json({ message: "Unauthorized" }, { status: 401 });
 }

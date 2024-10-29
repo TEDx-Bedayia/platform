@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import "./book.css";
 
+import { customAlert } from "../admin/custom-alert";
 import {
   Field,
   PaymentMethod,
@@ -94,15 +95,22 @@ export default function SingleTickets() {
     const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
     });
 
     if (response.ok) {
-      alert((await response.json()).message ?? "An error occurred");
+      setFormData({
+        email: "",
+        name: "",
+        phone: "",
+        paymentMethod: "",
+        additionalFields: {} as { [key: string]: string },
+      });
+      customAlert((await response.json()).message ?? "An error occurred");
     } else {
-      console.log(await response.json());
+      customAlert((await response.json()).message ?? "An error occurred");
     }
   }
 

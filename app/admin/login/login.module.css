@@ -1,0 +1,104 @@
+/* Heading style */
+.formContainer h2 {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+/* Center the form on the page */
+.pageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Style for the login form container */
+.formContainer {
+  background-color: white;
+  padding: 3rem;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  max-width: 100%;
+  border: 1px solid #eaeaea;
+}
+
+/* Floating label wrapper */
+.formGroup {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+/* Floating label styling */
+.formGroup label {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  padding-left: 10px;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: #aaa;
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+/* Input styling */
+.formGroup input {
+  width: 100%;
+  padding: 0.75rem 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+}
+
+/* Input focus effect */
+.formGroup input:focus {
+  border-color: #0070f3;
+  outline: none;
+  background-color: white;
+}
+
+/* Move the label upwards when input is focused or filled */
+.formGroup input:focus + label,
+.formGroup input:not(:placeholder-shown) + label {
+  top: 0;
+  transform: translateY(-100%);
+  font-size: 0.8rem;
+  color: #0070f3;
+  padding-left: 5px;
+}
+
+/* Button style */
+.formContainer button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #0070f3;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+.formContainer button:hover {
+  background-color: #005bb5;
+}
+
+/* Responsive design */
+@media (max-width: 500px) {
+  .formContainer {
+    padding: 2rem;
+  }
+  .formContainer h2 {
+    font-size: 1.5rem;
+  }
+}

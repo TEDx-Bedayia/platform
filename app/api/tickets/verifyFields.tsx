@@ -6,7 +6,7 @@ export function verifyEmail(email: string | undefined): boolean {
   }
 
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (emailRegex.test(email)) {
+  if (emailRegex.test(email.trim())) {
     return true;
   }
 
@@ -31,6 +31,7 @@ export async function verifyPaymentMethod(
       (c.charCodeAt(0) - 0x0660).toString()
     );
     if (vfcash.test(metadata)) return method + "@" + metadata;
+    else return;
   }
   if (checkSafety(metadata)) return paymentMethod;
   return;
