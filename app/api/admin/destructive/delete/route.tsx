@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     await sql`DELETE FROM pay_backup`;
     await sql`DELETE FROM groups`;
     await sql`ALTER SEQUENCE attendees_id_seq RESTART WITH 1`;
-    await sql`ALTER SEQUENCE groups_id_seq RESTART WITH 1`;
+    await sql`ALTER SEQUENCE groups_grpid_seq RESTART WITH 1`;
     return NextResponse.json({ message: "Data deleted." }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: "Error occurred." }, { status: 400 });
