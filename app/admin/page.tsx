@@ -191,7 +191,11 @@ export default function AdminDashboard() {
       }
       setApplicants((prevApplicants) => [...prevApplicants, ...data]);
     } else {
-      alert("Failed to load data");
+      if (response.status === 401) {
+        customAlert("Unauthorized");
+        localStorage.removeItem("admin-token");
+        window.location.href = "/admin/login";
+      } else customAlert("Failed to fetch applicants.");
     }
 
     setLoading(false);
