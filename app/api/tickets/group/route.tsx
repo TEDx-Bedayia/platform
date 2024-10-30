@@ -1,7 +1,11 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
-import { generateRandomString } from "../route";
-import { checkSafety, verifyEmail, verifyPaymentMethod } from "../verifyFields";
+import {
+  checkSafety,
+  generateRandomString,
+  verifyEmail,
+  verifyPaymentMethod,
+} from "../utils";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod

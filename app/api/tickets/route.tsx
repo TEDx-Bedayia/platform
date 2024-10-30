@@ -1,7 +1,12 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { pay } from "../admin/payment-reciever/main";
-import { checkSafety, verifyEmail, verifyPaymentMethod } from "./verifyFields";
+import {
+  checkSafety,
+  generateRandomString,
+  verifyEmail,
+  verifyPaymentMethod,
+} from "./utils";
 
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {
@@ -113,13 +118,4 @@ async function submitOneTicket(
   } catch (error) {
     return Response.json({ message: "Error occurred." }, { status: 400 });
   }
-}
-
-export function generateRandomString(length: number) {
-  const characters = "abcdefghijklmnopqrstuvwxyz";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
 }
