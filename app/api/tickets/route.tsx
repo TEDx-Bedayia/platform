@@ -1,4 +1,4 @@
-import { IPN, PHONE, TELDA, YEAR } from "@/app/layout";
+import { IPN, PHONE, TELDA, YEAR } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import { type NextRequest } from "next/server";

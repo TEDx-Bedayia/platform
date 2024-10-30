@@ -15,11 +15,28 @@ export async function GET(
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
   const uuid = (await params).uuid; // Extract the 'uuid' parameter
+  const admitted = request.nextUrl.searchParams.get("admitted") === "true";
 
-  // Check Against Database
-  let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
+  try {
+    // Update the admitted status for the specified applicant
+    const result = await sql.query(
+      "UPDATE attendees SET admitted = $1 WHERE paid = true AND uuid = $2 RETURNING *",
+      [admitted, uuid]
+    );
 
-  if (query.rowCount === 0) {
-    return NextResponse.json({ error: "Applicant not found" }, { status: 400 });
+    if (result.rowCount === 0) {
+      return NextResponse.json(
+        { error: "Applicant not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, applicant: result.rows[0] },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    return NextResponse.json({ error: "An Error Occurred" }, { status: 502 });
   }
 }

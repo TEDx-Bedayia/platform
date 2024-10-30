@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import type { Author } from "next/dist/lib/metadata/types/metadata-types";
 import "./globals.css";
+import { YEAR } from "./metadata";
 import NavBar from "./navbar";
 
 const support: Author = {
   name: "Aly Mobarak", // Change with your name (head)
   url: "mailto:alymmobarak@hotmail.com", // Change with your public email
 };
-
-export const YEAR = 25; // Change to current year
-export const PHONE = "+20 1XX XXX XXXX"; // Change to Wallet Enabled phone number
-export const TELDA = "@alymob"; // Change to Telda username
-export const IPN = "XXXXXX"; // Change to Instapay details
 
 /* DO NOT EDIT */
 export const metadata: Metadata = {
