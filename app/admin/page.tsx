@@ -174,15 +174,12 @@ export default function AdminDashboard() {
   // Fetch applicants from API
   const fetchApplicants = async (index: number) => {
     setLoading(true);
-    const response = await fetch(
-      `/api/admin/tickets/${index}?name=Aly+Mohamed&paid=true`,
-      {
-        method: "GET",
-        headers: {
-          key: `${localStorage.getItem("admin-token")}`,
-        },
-      }
-    );
+    const response = await fetch(`/api/admin/tickets/${index}`, {
+      method: "GET",
+      headers: {
+        key: `${localStorage.getItem("admin-token")}`,
+      },
+    });
 
     if (response.ok) {
       const data = await response.json();
