@@ -1,5 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
+import QRCode from "qrcode";
 import { price } from "../../tickets/price/prices";
 import { sendEmail } from "./eTicketEmail";
 
@@ -114,10 +115,12 @@ export async function pay(from: string, amount: string, date: string) {
 
     try {
       for (let i = 0; i < paidFor.length; i++) {
+        let qr = await QRCode.toDataURL(paidFor[i].uuid);
         await sendEmail(
           paidFor[i].email,
           paidFor[i].full_name,
-          paidFor[i].uuid
+          paidFor[i].uuid,
+          qr
         );
       }
     } catch (e) {

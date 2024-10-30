@@ -4,15 +4,19 @@ import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
 
-export async function sendEmail(email: string, name: string, uuid: string) {
+export async function sendEmail(
+  email: string,
+  name: string,
+  uuid: string,
+  base64: string
+) {
   const filePath = path.join(process.cwd(), "public/eTicket-template.html");
   const htmlContent = await promises.readFile(filePath, "utf8");
 
-  let qrcodeurl = `https://tedxbedayia.com/api/qr/?size=150x150&uuid=${uuid}`;
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent
     .replace("${name}", name)
-    .replace("${qrcodeurl}", qrcodeurl)
+    .replace("${qrcodeurl}", base64)
     .replace("${uuid}", uuid)
     .replaceAll("${year}", YEAR.toString());
 
