@@ -162,6 +162,9 @@ export default function AdminDashboard() {
   const [pageIndex, setPageIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [search, setSearch] = useState("");
+  const [variable, setVariable] = useState("clear");
+  const [filter, setFilter] = useState("");
   const observer = useRef<IntersectionObserver | null>(null);
 
   // Redirect if no token is found
@@ -174,7 +177,7 @@ export default function AdminDashboard() {
   // Fetch applicants from API
   const fetchApplicants = async (index: number) => {
     setLoading(true);
-    const response = await fetch(`/api/admin/tickets/${index}`, {
+    const response = await fetch(`/api/admin/tickets/${index}${filter}`, {
       method: "GET",
       headers: {
         key: `${localStorage.getItem("admin-token")}`,
@@ -245,6 +248,92 @@ export default function AdminDashboard() {
   return (
     <section id="admin-dashboard" className={styles.dashboard}>
       <h1 style={{ ...title.style, fontWeight: 700 }}>All Tickets</h1>
+      <div
+        style={{
+          marginBottom: "2rem",
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          {/* DropDown Menu: "Email", "PaidStatus", "AdmittedStatus", "Name" */}
+          <select
+            style={{
+              padding: "8px",
+              borderRadius: "8px",
+              border: "1px solid #000",
+              marginRight: "1rem",
+              paddingRight: "1rem",
+              backgroundColor: "transparent",
+            }}
+            value={variable}
+            onChange={(e) => setVariable(e.target.value)}
+          >
+            <option value="clear">All</option>
+            <option value="email">Email</option>
+            <option value="tosend">Pending eTicket</option>
+            <option value="sent">Sent</option>
+            <option value="paid">Paid</option>
+            <option value="admitted">Admitted</option>
+            <option value="name">Name</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              padding: "8px",
+              borderRadius: "0px",
+              borderBottom: "2px solid #333",
+              backgroundColor: "transparent",
+              marginRight: "1rem",
+              width: "250px",
+            }}
+          />
+          <button
+            style={{
+              padding: "8px",
+              borderRadius: "8px",
+              border: "1px solid #000",
+              backgroundColor: "#000",
+              color: "#fff",
+            }}
+            onClick={() => {
+              if (variable === "clear") {
+                setFilter("");
+              } else if (variable === "tosend") {
+                setFilter(`?sent=false&paid=true`);
+              } else setFilter(`?${variable}=${encodeURIComponent(search)}`);
+
+              setApplicants([]);
+              setPageIndex(0);
+              setLoading(false);
+              setHasMore(true);
+            }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3.04505 18.8942L9.93934 11.9999L3.04505 5.10565C2.75216 4.81275 2.75216 4.33788 3.04505 4.04499C3.33794 3.75209 3.81282 3.75209 4.10571 4.04499L11.5303 11.4696C11.8232 11.7625 11.8232 12.2374 11.5303 12.5303L4.10571 19.9549C3.81282 20.2478 3.33794 20.2478 3.04505 19.9549C2.75216 19.662 2.75215 19.1871 3.04505 18.8942Z"
+                fill="#fff"
+              />
+              <path
+                d="M11.25 19.4999C10.8358 19.4999 10.5 19.8357 10.5 20.2499C10.5 20.6642 10.8358 20.9999 11.25 20.9999H20.75C21.1642 20.9999 21.5 20.6642 21.5 20.2499C21.5 19.8357 21.1642 19.4999 20.75 19.4999L11.25 19.4999Z"
+                fill="#fff"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
 
       <div className={styles.applicantList}>
         {applicants.map((applicant) => TicketCard(applicant, admitApplicant))}
