@@ -15,7 +15,7 @@ export async function GET(
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
   const uuid = (await params).uuid; // Extract the 'uuid' parameter
-  const admitted = request.nextUrl.searchParams.get("admitted") === "true";
+  const admitted = request.nextUrl.searchParams.get("admitted") !== "false";
 
   try {
     // Update the admitted status for the specified applicant
