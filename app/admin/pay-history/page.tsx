@@ -43,7 +43,7 @@ function Entry(
           width: "300px",
         }}
       >
-        {stream.replaceAll("@", "—").replace(" ", "@").replaceAll("—", " — ")}
+        {stream}
       </span>
       <span
         style={{

@@ -1,6 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
-import { pay } from "../admin/payment-reciever/main";
+import nodemailer from "nodemailer";
 import {
   checkSafety,
   generateRandomString,
@@ -111,8 +111,24 @@ async function submitOneTicket(
       [email, name, paymentMethod, phone, "individual"]
     );
 
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+    transporter.sendMail({
+      from: '"TEDx\'25 eTicket System" <tedxyouth@bedayia.com>',
+      to: email,
+      subject: "Regarding your eTicket",
+      text: `Hey ${name}!\n\nThank you for booking your eTicket. We are pleased to welcome you onboard! Your QR-enabled eTicket will be sent to you after you pay.\n\nIf you have any questions, please don't hesitate to contact us.\n\n\nBest Regards,\nTEDx'25 Team`,
+    });
     return Response.json(
-      { message: "Ticket submitted.", success: true },
+      {
+        message: "Ticket Booked! Please check your email for confirmation.",
+        success: true,
+      },
       { status: 200 }
     );
   } catch (error) {
