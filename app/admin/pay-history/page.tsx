@@ -27,12 +27,62 @@ function Entry(
   recieved: number,
   recieved_at: string
 ) {
-  return <div></div>;
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "60vw",
+        gap: "1rem",
+      }}
+      className={styles.transaction}
+    >
+      <span
+        style={{
+          width: "300px",
+        }}
+      >
+        {stream.replaceAll("@", "—").replace(" ", "@").replaceAll("—", " — ")}
+      </span>
+      <span
+        style={{
+          color: incurred > recieved ? "#95190D" : "#107E7D",
+          marginRight: "auto",
+          width: 130,
+          textAlign: "left",
+        }}
+      >
+        +{recieved} EGP
+      </span>
+
+      <span
+        style={{
+          color: recieved - incurred != 0 ? "#95190D" : "#107E7D",
+          marginRight: "auto",
+          width: 100,
+          textAlign: "left",
+        }}
+      >
+        {recieved - incurred} EGP
+      </span>
+      <span style={{ width: "132px" }}>
+        {new Date(recieved_at).toDateString()}
+      </span>
+    </div>
+  );
+}
+
+interface Transaction {
+  stream: string;
+  incurred: number;
+  recieved: number;
+  recieved_at: string;
 }
 
 export default function History() {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Transaction[]>([]);
   // Redirect if no token is found
   useEffect(() => {
     if (!localStorage.getItem("admin-token")) {
@@ -41,7 +91,7 @@ export default function History() {
   }, []);
 
   // Fetch applicants from API
-  const fetchData = async (index: number) => {
+  const fetchData = async () => {
     setLoading(true);
     const response = await fetch(`/api/admin/payments-history`, {
       method: "GET",
@@ -64,10 +114,59 @@ export default function History() {
     setLoading(false);
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <section id="pay-history" className={styles.dashboard}>
-      <h1 style={{ ...title.style, fontWeight: 700 }}>Payment Data</h1>
-      <p>Not that important right now. It&apos;s safely stored.</p>
+      <h1 style={{ ...title.style, fontWeight: 700 }}>Transactions</h1>
+      <div className={styles.transactionList}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "60vw",
+            gap: "1rem",
+          }}
+          className={styles.heading}
+        >
+          <span style={{ fontWeight: 700, width: "300px" }}>Stream</span>
+          <span
+            style={{
+              marginRight: "auto",
+              fontWeight: 700,
+              width: 130,
+              textAlign: "left",
+            }}
+          >
+            Recieved Money
+          </span>
+          <span
+            style={{
+              marginRight: "auto",
+              fontWeight: 700,
+              width: 100,
+              textAlign: "left",
+            }}
+          >
+            To Refund
+          </span>
+          <span style={{ width: "132px", textAlign: "left", fontWeight: 700 }}>
+            Recieved At
+          </span>
+        </div>
+        {data.map((transaction) =>
+          Entry(
+            transaction.stream,
+            transaction.incurred,
+            transaction.recieved,
+            transaction.recieved_at
+          )
+        )}
+      </div>
+      {/* <p>Not that important right now. It&apos;s safely stored.</p>
       <br />
       <p style={{ color: "grey" }}>
         P.S. refund digital payment differences at the end of the ticket
@@ -75,7 +174,7 @@ export default function History() {
       </p>
       <p style={{ color: "grey" }}>
         AND refund cash payment differences on the spot.
-      </p>
+      </p> */}
       {loading && <p>Loading...</p>}
     </section>
   );

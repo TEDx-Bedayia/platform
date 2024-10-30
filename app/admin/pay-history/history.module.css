@@ -131,3 +131,27 @@ p.loading {
   color: #95a5a6;
   text-align: center;
 }
+
+.transaction {
+  padding: 0.25em 1em;
+  /* margin: em 0; */
+  border-bottom: 1px solid #dfe6e9;
+}
+
+.transaction:last-child {
+  border-bottom: none;
+}
+
+.transactionList {
+  border: 1px solid #dfe6e9;
+}
+
+.heading {
+  padding: 0.25em 1em;
+  border-bottom: 1.5px solid #333;
+}
+
+.heading > *,
+.transaction > * {
+  padding: 0em 0.1em;
+}
