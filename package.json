@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "qrcode": "^1.5.4",
     "react": "^18",
     "react-dom": "^18",
     "next": "14.1.4"
@@ -17,6 +18,7 @@
     "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
+    "@types/qrcode": "^1.5.5",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
     "postcss": "^8",
