@@ -3,6 +3,7 @@ import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
+const BASE64 = false;
 
 export async function sendEmail(
   email: string,
@@ -16,7 +17,10 @@ export async function sendEmail(
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent
     .replace("${name}", name)
-    .replace("${qrcodeurl}", base64)
+    .replace(
+      "${qrCodeURL}",
+      BASE64 ? base64 : `https://tedxbedayiaschool.com/api/qr?uuid=${uuid}`
+    )
     .replace("${uuid}", uuid)
     .replaceAll("${year}", YEAR.toString());
 
@@ -31,7 +35,7 @@ export async function sendEmail(
     transporter.sendMail({
       from: `"TEDx'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
       to: email,
-      subject: "Your eTicket has Arrived!",
+      subject: "Your eTicket has Arrived!!",
       html: personalizedHtml,
     });
 
@@ -42,7 +46,7 @@ export async function sendEmail(
     );
 
     if (qq.rowCount === 0) {
-      console.error("SQL ERROR");
+      console.error("SQL ERROR; sent = false but it's sent.");
       return false;
     }
 
