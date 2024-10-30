@@ -1,4 +1,4 @@
-import { IPN, PHONE, TELDA, YEAR } from "@/app/metadata";
+import { IPN, PHONE, TELDA, TICKET_WINDOW, YEAR } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import { type NextRequest } from "next/server";
@@ -13,6 +13,12 @@ import {
 
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {
+  if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
+    return Response.json(
+      { message: "Ticket sales are currently closed." },
+      { status: 400 }
+    );
+  }
   let body: any;
   try {
     body = await request.json();
