@@ -67,7 +67,7 @@ export default function History() {
   return (
     <section id="pay-history" className={styles.dashboard}>
       <h1 style={{ ...title.style, fontWeight: 700 }}>Payment Data</h1>
-      <p>Not that important right now. It's safely stored.</p>
+      <p>Not that important right now. It&apos;s safely stored.</p>
       <br />
       <p style={{ color: "grey" }}>
         P.S. refund digital payment differences at the end of the ticket

@@ -18,7 +18,7 @@ export default function RootLayout({
     if (localStorage.getItem("admin-token")) {
       setMode("admin");
     }
-  });
+  }, []);
   return (
     <div className={styles.adminContainer}>
       {pathname != "/admin/login" && mode == "admin" && (
