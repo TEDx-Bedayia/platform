@@ -120,7 +120,7 @@ export default function Payments() {
             (parseInt(amount) - paid) +
             " EGP."
         );
-        formData.method = "";
+        formData.method = type == "admin" ? "" : "CASH";
         formData.from = "";
         formData.amount = "";
         formData.date = "";

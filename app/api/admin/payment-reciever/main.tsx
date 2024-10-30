@@ -1,5 +1,7 @@
 import { sql } from "@vercel/postgres";
+import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
+import { sendEmail } from "./eTicketEmail";
 
 export async function pay(from: string, amount: string, date: string) {
   if (parseInt(amount) < 0) {
@@ -74,7 +76,16 @@ export async function pay(from: string, amount: string, date: string) {
 
       paid += unpaid[i].price;
       if (paid <= parseInt(amount)) {
-        await sql`UPDATE attendees SET paid = true WHERE id = ${unpaid[i].id}`;
+        let randUUID = randomUUID();
+        try {
+          await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
+        } catch (e) {
+          paid -= unpaid[i].price;
+          return Response.json(
+            { message: "Err #7109. Contact Support or Try Again." },
+            { status: 500 }
+          );
+        }
         paidFor.push(unpaid[i]);
       } else {
         paid -= unpaid[i].price;
@@ -97,6 +108,21 @@ export async function pay(from: string, amount: string, date: string) {
             " EGP. Paying for only one ticket (or an entire group ticket) is accepted as well.",
         },
         { status: 400 }
+      );
+    }
+
+    try {
+      for (let i = 0; i < paidFor.length; i++) {
+        await sendEmail(
+          paidFor[i].email,
+          paidFor[i].full_name,
+          paidFor[i].uuid
+        );
+      }
+    } catch (e) {
+      return Response.json(
+        { message: "Err #9184. Contact Support or Try Again." },
+        { status: 500 }
       );
     }
     return Response.json({ paid, accepted: paidFor }, { status: 200 });

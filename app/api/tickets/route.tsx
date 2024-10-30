@@ -121,7 +121,7 @@ async function submitOneTicket(
     if (paymentMethod.split("@")[0] === "VFCASH") {
       paymentDetails = `Please proceed with your Mobile Wallet payment to ${PHONE}.`;
     } else if (paymentMethod.split("@")[0] === "CASH") {
-      paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion.`;
+      paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion, <strong>${email}</strong>.`;
     } else if (paymentMethod.split("@")[0] === "TLDA") {
       paymentDetails = `Please proceed with your Telda transfer to the following account: ${TELDA}.`;
     } else if (paymentMethod.split("@")[0] === "IPN") {
@@ -132,7 +132,7 @@ async function submitOneTicket(
     const personalizedHtml = htmlContent
       .replace("${name}", name)
       .replace("${vfcash}", paymentDetails)
-      .replace("${year}", YEAR.toString());
+      .replaceAll("${year}", YEAR.toString());
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -156,7 +156,7 @@ async function submitOneTicket(
     );
   } catch (error) {
     await sql`DELETE FROM attendees WHERE email = ${email}`;
-    console.error("LESS SECURE APP NOT TURNED ON FOR GMAIL");
+    console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
     return Response.json(
       { message: "Error Occurred. Please try again or contact us for help." },
       { status: 400 }

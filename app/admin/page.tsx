@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "./custom-alert";
@@ -57,126 +57,30 @@ const group = (
 
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
-function TicketCard(applicant: Applicant, admitApplicant: any) {
-  return (
-    <div
-      key={applicant.id}
-      className={styles.applicantCard}
-      style={ubuntu.style}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "start",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: "12px",
-            alignItems: "center",
-          }}
-        >
-          <div style={{ position: "relative", width: "32px", height: "32px" }}>
-            {applicant.ticket_type === "individual" ? onePerson : group}
-            <span
-              style={{
-                fontSize: ".5rem",
-                fontWeight: 700,
-                position: "absolute",
-                width: applicant.ticket_type == "individual" ? "100%" : "71.5%",
-                textAlign: "center",
-                top: "20px",
-              }}
-            >
-              {applicant.id}
-            </span>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0px" }}>
-            <span className={styles.applicantName}>{applicant.full_name}</span>
-            <span className={styles.applicantEmail}>{applicant.email}</span>
-          </div>
-        </div>
-        <span
-          className={`${styles.paidStatus} ${
-            applicant.paid ? styles.paid : styles.unpaid
-          }`}
-        >
-          $$
-        </span>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "end",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "4px",
-          }}
-        >
-          <span style={{ fontSize: ".7rem" }}>
-            +2
-            {applicant.phone[0] +
-              " " +
-              applicant.phone.slice(1, 4) +
-              " " +
-              applicant.phone.slice(4, 7) +
-              " " +
-              applicant.phone.slice(7)}
-          </span>
-          <span style={{ fontSize: ".7rem" }}>
-            <span style={{ fontWeight: "700" }}>
-              {applicant.payment_method.split("@")[0]}
-            </span>
-            {applicant.payment_method.split("@")[1] != undefined &&
-              ": " + applicant.payment_method.split("@")[1]}
-          </span>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: "12px",
-          }}
-        >
-          {applicant.paid && (
-            <button
-              className={`${styles.admitButton} ${
-                applicant.admitted ? styles.deadmit : styles.admit
-              }`}
-              onClick={() => admitApplicant(applicant.id, applicant.admitted)}
-            >
-              {applicant.admitted ? "De Admit" : "Admit"}
-            </button>
-          )}
-          {applicant.paid && (
-            <button
-              className={styles.sendButton}
-              onClick={() => sendTicket(applicant)}
-            >
-              Send Ticket
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+const sendTicket = async (
+  id: number,
+  setApplicants: Dispatch<SetStateAction<Applicant[]>>
+) => {
+  const response = await fetch(
+    `/api/admin/send-ticket/?id=${encodeURIComponent(id)}`,
+    {
+      method: "GET",
+      headers: {
+        key: `${localStorage.getItem("admin-token")}`,
+      },
+    }
   );
-}
 
-function sendTicket(applicant: Applicant) {
-  customAlert(`Ticket sent to ${applicant.email}`);
-}
+  let resp = await response.json();
+  customAlert(resp.message);
+  if (response.ok) {
+    setApplicants((prevApplicants) =>
+      prevApplicants.map((applicant) =>
+        applicant.id === id ? { ...applicant, sent: true } : applicant
+      )
+    );
+  }
+};
 
 export default function AdminDashboard() {
   const [applicants, setApplicants] = useState<Applicant[]>([]);
@@ -187,6 +91,130 @@ export default function AdminDashboard() {
   const [variable, setVariable] = useState("clear");
   const [filter, setFilter] = useState("");
   const observer = useRef<IntersectionObserver | null>(null);
+
+  function TicketCard(applicant: Applicant, admitApplicant: any) {
+    return (
+      <div
+        key={applicant.id}
+        className={styles.applicantCard}
+        style={ubuntu.style}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "start",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "12px",
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{ position: "relative", width: "32px", height: "32px" }}
+            >
+              {applicant.ticket_type === "individual" ? onePerson : group}
+              <span
+                style={{
+                  fontSize: ".5rem",
+                  fontWeight: 700,
+                  position: "absolute",
+                  width:
+                    applicant.ticket_type == "individual" ? "100%" : "71.5%",
+                  textAlign: "center",
+                  top: "20px",
+                }}
+              >
+                {applicant.id}
+              </span>
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "0px" }}
+            >
+              <span className={styles.applicantName}>
+                {applicant.full_name}
+              </span>
+              <span className={styles.applicantEmail}>{applicant.email}</span>
+            </div>
+          </div>
+          <span
+            className={`${styles.paidStatus} ${
+              applicant.paid ? styles.paid : styles.unpaid
+            }`}
+          >
+            $$
+          </span>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "end",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "4px",
+            }}
+          >
+            <span style={{ fontSize: ".7rem" }}>
+              +2
+              {applicant.phone[0] +
+                " " +
+                applicant.phone.slice(1, 4) +
+                " " +
+                applicant.phone.slice(4, 7) +
+                " " +
+                applicant.phone.slice(7)}
+            </span>
+            <span style={{ fontSize: ".7rem" }}>
+              <span style={{ fontWeight: "700" }}>
+                {applicant.payment_method.split("@")[0]}
+              </span>
+              {applicant.payment_method.split("@")[1] != undefined &&
+                ": " + applicant.payment_method.split("@")[1]}
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "12px",
+            }}
+          >
+            {applicant.paid && (
+              <button
+                className={`${styles.admitButton} ${
+                  applicant.admitted ? styles.deadmit : styles.admit
+                }`}
+                onClick={() => admitApplicant(applicant.id, applicant.admitted)}
+              >
+                {applicant.admitted ? "De Admit" : "Admit"}
+              </button>
+            )}
+            {applicant.paid && !applicant.sent && (
+              <button
+                className={styles.sendButton}
+                onClick={() => sendTicket(applicant.id, setApplicants)}
+              >
+                Send Ticket
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Redirect if no token is found
   useEffect(() => {
