@@ -127,16 +127,16 @@ async function submitOneTicket(
 
     let paymentDetails = "";
     if (paymentMethod.split("@")[0] === "VFCASH") {
-      paymentDetails = `Please proceed with your Mobile Wallet payment to ${PHONE}.`;
+      paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>.`;
     } else if (paymentMethod.split("@")[0] === "CASH") {
       paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion, <strong>${email}</strong>.`;
     } else if (paymentMethod.split("@")[0] === "TLDA") {
-      paymentDetails = `Please proceed with your Telda transfer to the following account: ${TELDA}.`;
+      paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>.`;
     } else if (paymentMethod.split("@")[0] === "IPN") {
-      paymentDetails = `Please proceed with your Instapay Transfer to the following account: ${IPN}.`;
+      paymentDetails = `Please proceed with your Instapay Transfer to the following account: <strong>${IPN}</strong>.`;
     }
 
-    paymentDetails += ` The price for your ticket is: ${price.individual} EGP. Make sure to pay the exact due amount at once to avoid delays.`;
+    paymentDetails += ` The price for your ticket is: <strong>${price.individual} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays.`;
 
     // Replace placeholders in the HTML
     const personalizedHtml = htmlContent

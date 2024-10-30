@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
         ELSE 0
     END
     ) AS total_price
-    FROM attendees;`);
+    FROM attendees WHERE paid = true;`);
 
     return Response.json({ total: query.rows[0].total_price });
   } catch (error) {
