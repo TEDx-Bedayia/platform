@@ -4,14 +4,17 @@ import { pay } from "../main";
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
-  if (request.headers.get("key") !== process.env.ADMIN_KEY) {
+  if (
+    request.headers.get("key") !== process.env.ADMIN_KEY &&
+    request.headers.get("key") !== process.env.SKL_OFFICE
+  ) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   let from = params.get("from");
   if (from === null) {
     return Response.json(
-      { message: "Username of Sender is required." },
+      { message: "Email of Sender is required." },
       { status: 400 }
     );
   }
@@ -26,7 +29,7 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Date is required." }, { status: 400 });
   }
 
-  from = "VFCASH@" + from.trim();
+  from = "CASH@" + from.trim();
 
   return await pay(from, amount, date);
 }

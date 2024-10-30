@@ -24,6 +24,9 @@ export default function AdminLogin() {
   };
 
   useEffect(() => {
+    if (localStorage.getItem("school-token")) {
+      window.location.href = "/admin/payments";
+    }
     if (localStorage.getItem("admin-token")) {
       window.location.href = "/admin";
     }
@@ -50,10 +53,11 @@ export default function AdminLogin() {
       // Hide Loader
 
       if (response.ok) {
-        const { token } = await response.json();
+        const { token, type } = await response.json();
         if (token) {
-          localStorage.setItem("admin-token", token);
-          window.location.href = "/admin";
+          localStorage.setItem(type + "-token", token);
+          if (type == "admin") window.location.href = "/admin";
+          else window.location.href = "/admin/payments";
         }
       } else {
         const { message } = await response.json();

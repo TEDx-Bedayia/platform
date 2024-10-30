@@ -13,6 +13,7 @@ type Applicant = {
   admitted: boolean;
   id: number;
   sent: boolean;
+  phone: string;
 };
 
 const title = Poppins({ weight: "700", subsets: ["latin"] });
@@ -86,7 +87,8 @@ function TicketCard(applicant: Applicant, admitApplicant: any) {
                 fontSize: ".5rem",
                 fontWeight: 700,
                 position: "absolute",
-                left: applicant.ticket_type == "individual" ? "12px" : "8px",
+                width: applicant.ticket_type == "individual" ? "100%" : "71.5%",
+                textAlign: "center",
                 top: "20px",
               }}
             >
@@ -115,12 +117,31 @@ function TicketCard(applicant: Applicant, admitApplicant: any) {
           alignItems: "end",
         }}
       >
-        <span style={{ fontSize: ".7rem" }}>
-          <span style={{ fontWeight: "700" }}>
-            {applicant.payment_method.split("@")[0]}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px",
+          }}
+        >
+          <span style={{ fontSize: ".7rem" }}>
+            +2
+            {applicant.phone[0] +
+              " " +
+              applicant.phone.slice(1, 4) +
+              " " +
+              applicant.phone.slice(4, 7) +
+              " " +
+              applicant.phone.slice(7)}
           </span>
-          : {applicant.payment_method.split("@")[1]}
-        </span>
+          <span style={{ fontSize: ".7rem" }}>
+            <span style={{ fontWeight: "700" }}>
+              {applicant.payment_method.split("@")[0]}
+            </span>
+            {applicant.payment_method.split("@")[1] != undefined &&
+              ": " + applicant.payment_method.split("@")[1]}
+          </span>
+        </div>
 
         <div
           style={{
@@ -192,9 +213,14 @@ export default function AdminDashboard() {
       setApplicants((prevApplicants) => [...prevApplicants, ...data]);
     } else {
       if (response.status === 401) {
-        customAlert("Unauthorized");
         localStorage.removeItem("admin-token");
-        window.location.href = "/admin/login";
+        if (localStorage.getItem("school-token")) {
+          window.location.href = "/admin/payments";
+          return;
+        } else {
+          window.location.href = "/admin/login";
+          return;
+        }
       } else customAlert("Failed to fetch applicants.");
     }
 
@@ -263,7 +289,6 @@ export default function AdminDashboard() {
         }}
       >
         <div style={{ display: "flex", flexDirection: "row" }}>
-          {/* DropDown Menu: "Email", "PaidStatus", "AdmittedStatus", "Name" */}
           <select
             style={{
               padding: "8px",

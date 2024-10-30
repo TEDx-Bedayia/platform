@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (add != undefined)
+  if (add != undefined && add[paymentMethod.toLowerCase()] != undefined)
     paymentMethod += "@" + add[paymentMethod.toLowerCase()].trim();
 
   try {
@@ -72,7 +72,7 @@ async function submitOneTicket(
   }
 
   paymentMethod = await verifyPaymentMethod(paymentMethod);
-  if (paymentMethod === undefined) {
+  if (paymentMethod === undefined || paymentMethod.split("@").length > 2) {
     return Response.json(
       { message: "Please enter a valid payment method." },
       { status: 400 }
@@ -97,7 +97,7 @@ async function submitOneTicket(
   if (query.rows.length > 0) {
     return Response.json(
       {
-        message: `An attendee with this email already exists. If you'd still like to book a ticket with the same email, please set the email to: ${email1}+${add}@${email2}.`,
+        message: `An attendee with this email already exists. If you'd still like to book a ticket with the same email, please set the email to: ${email1}+${add}@${email2}. You will recieve your ticket on ${email1}@${email2} normally. If you'll pay through Bedayia's Office, please make sure to save this email somewhere to present it to them.`,
       },
       { status: 400 }
     );

@@ -21,7 +21,12 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Amount is required." }, { status: 400 });
   }
 
+  let date = params.get("date");
+  if (date === null) {
+    return Response.json({ message: "Date is required." }, { status: 400 });
+  }
+
   from = "IPN@" + from.trim();
 
-  return await pay(from, amount);
+  return await pay(from, amount, date);
 }

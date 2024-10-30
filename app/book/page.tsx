@@ -56,7 +56,7 @@ export default function SingleTickets() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
-    if (name == "tlda" && value.includes("@")) {
+    if (value.includes("@")) {
       return;
     }
     setFormData({
@@ -72,7 +72,7 @@ export default function SingleTickets() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    if (name == "phone" && isNaN(Number(value))) {
+    if (name == "phone" && (isNaN(Number(value)) || value.includes(" "))) {
       return;
     }
 

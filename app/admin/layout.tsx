@@ -1,4 +1,9 @@
+"use client";
 import { Ubuntu } from "next/font/google";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import styles from "./admin.module.css";
 
 const ubuntu = Ubuntu({ weight: ["400", "700"], subsets: ["latin"] });
 
@@ -7,9 +12,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const [mode, setMode] = useState<"school" | "admin">("school");
+  useEffect(() => {
+    if (localStorage.getItem("admin-token")) {
+      setMode("admin");
+    }
+  });
   return (
-    <div>
-      {/* Loader */}
+    <div className={styles.adminContainer}>
+      {pathname != "/admin/login" && mode == "admin" && (
+        <nav className={styles.nav}>
+          <Link href={"/admin/payments"}>New Payment</Link>
+          <Link href={"/admin"}>Dashboard</Link>
+          <Link href={"/admin/pay-history"}>Payment Logs</Link>
+        </nav>
+      )}
 
       <div style={ubuntu.style}>{children}</div>
     </div>

@@ -1,0 +1,133 @@
+/* Dashboard Container */
+.dashboard {
+  padding: 2rem;
+  background-color: #f7f9fc; /* Light background color for contrast */
+  min-height: 100vh; /* Full height for better alignment */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header */
+.dashboard h1 {
+  font-size: 2.5rem;
+  color: #333; /* Darker, professional color */
+  margin-bottom: 0.5rem;
+}
+
+.applicantName {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 27px;
+  /* identical to box height */
+
+  color: #000;
+
+  /* Inside auto layout */
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.applicantEmail {
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 18px;
+  /* identical to box height */
+
+  color: #000000;
+
+  /* Inside auto layout */
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* Applicant List Container */
+.applicantList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px; /* Constrain the width for better readability */
+}
+
+.paidStatus {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 27px;
+  /* identical to box height */
+}
+
+.paidStatus.paid {
+  color: #107e7d; /* Green color for paid status */
+}
+
+.paidStatus.unpaid {
+  color: #95190d; /* Red color for unpaid status */
+}
+
+.admitButton,
+.sendButton {
+  color: #ffffff; /* White text color */
+  padding: 0.5em 1em; /* Padding for better clickability */
+  border-radius: 0.75em; /* Rounded corners for softer look */
+  border: none; /* No border for cleaner look */
+  cursor: pointer; /* Pointer cursor for better UX */
+  transition: all 0.2s ease-in-out; /* Smooth color transition */
+  font-weight: 700;
+  font-style: normal;
+  font-size: 1rem;
+}
+
+.admitButton:hover,
+.sendButton:hover {
+  transform: translateY(-2px); /* Slight lift on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow on hover */
+}
+
+.admitButton.admit {
+  background-color: #107e7d; /* Green color for admit button */
+}
+
+.admitButton.admit:hover {
+  background-color: #0c6b6a; /* Darker green color on hover */
+}
+
+.admitButton.deadmit {
+  background-color: #95190d; /* Red color for deadmit button */
+}
+
+.sendButton {
+  background-color: #014f86;
+}
+
+/* Applicant Card */
+.applicantCard {
+  background-color: #ffffff;
+  padding: 1.3em;
+  border-radius: 20px; /* Softer, rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 200px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+}
+
+/* Loading Indicator */
+p.loading {
+  padding-top: 5em;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: #95a5a6;
+  text-align: center;
+}

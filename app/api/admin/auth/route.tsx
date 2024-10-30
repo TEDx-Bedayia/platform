@@ -26,8 +26,23 @@ export async function POST(request: NextRequest) {
     }
 
     if (
+      params.get("name")?.toString().toLowerCase() === "school office" &&
+      username === process.env.SKLOFFICE &&
+      password === process.env.SKLOFFICEPASS
+    ) {
+      return Response.json(
+        { token: process.env.SKL_OFFICE, type: "school" },
+        { status: 200 }
+      );
+    }
+
+    if (
       username !== process.env.ADMIN_USERNAME ||
-      password !== process.env.ADMIN_PASSWORD
+      password !== process.env.ADMIN_PASSWORD ||
+      process.env.ADMIN_KEY === undefined ||
+      process.env.ADMIN_KEY === "" ||
+      process.env.ADMIN_KEY === null ||
+      params.get("name")?.toString() !== process.env.MAINTAINER
     ) {
       return Response.json(
         { message: "Invalid Credentials." },
@@ -35,14 +50,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (params.get("name")?.toString() !== process.env.MAINTAINER) {
-      return Response.json(
-        { message: "Invalid Credentials." },
-        { status: 403 }
-      );
-    }
-
-    return Response.json({ token: process.env.ADMIN_KEY }, { status: 200 });
+    return Response.json(
+      { token: process.env.ADMIN_KEY, type: "admin" },
+      { status: 200 }
+    );
   } catch (error) {
     return Response.json(
       {

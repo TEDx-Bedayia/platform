@@ -1,9 +1,23 @@
 import { sql } from "@vercel/postgres";
-import { type NextRequest } from "next/server";
 import { price } from "../../tickets/price/prices";
 
-export async function pay(from: string, amount: string) {
-  let query = await sql`SELECT * FROM attendees WHERE payment_method = ${from}`;
+export async function pay(from: string, amount: string, date: string) {
+  if (parseInt(amount) < 0) {
+    return Response.json(
+      { message: "Amount must be positive." },
+      { status: 400 }
+    );
+  }
+  let identification = "";
+  let toAdd = "";
+  if (from.split("@")[0] === "CASH") {
+    identification = from.split("@").splice(1).join("@");
+    from = "CASH";
+    toAdd = ` AND email = '${identification}'`;
+  }
+  let query = await sql.query(
+    `SELECT * FROM attendees WHERE payment_method = '${from}'` + toAdd
+  );
 
   if (query.rows.length === 0) {
     return Response.json(
@@ -11,7 +25,24 @@ export async function pay(from: string, amount: string) {
         message:
           "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
       },
-      { status: 404 }
+      { status: 400 }
+    );
+  }
+
+  if (from === "CASH" && query.rows[0].type == "group") {
+    let xx =
+      await sql`SELECT * FROM groups WHERE email1 = ${query.rows[0].email} OR email2 = ${query.rows[0].email} OR email3 = ${query.rows[0].email} OR email4 = ${query.rows[0].email}`;
+    if (xx.rows.length === 0) {
+      return Response.json(
+        {
+          message:
+            "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
+        },
+        { status: 400 }
+      );
+    }
+    query = await sql.query(
+      `SELECT * FROM attendees WHERE payment_method = 'CASH' AND email = '${xx.rows[0].email1}' OR email = '${xx.rows[0].email2}' OR email = '${xx.rows[0].email3}' OR email = '${xx.rows[0].email4}'`
     );
   }
 
@@ -25,7 +56,7 @@ export async function pay(from: string, amount: string) {
   }
 
   if (unpaid.length === 0) {
-    return Response.json({ message: "Nobody to pay for." }, { status: 200 });
+    return Response.json({ message: "Nobody to pay for." }, { status: 400 });
   }
 
   let total = 0;
@@ -51,9 +82,24 @@ export async function pay(from: string, amount: string) {
       }
     }
 
+    if (from == "CASH") {
+      from = "CASH@" + identification.replaceAll("@", " ");
+    }
+
     if (paid != 0)
-      await sql`INSERT INTO pay_backup (stream, incurred, recieved) VALUES (${from}, ${paid}, ${amount})`;
-    return Response.json(paidFor, { status: 200 });
+      await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
+    if (paid == 0) {
+      return Response.json(
+        {
+          message:
+            "Nothing was paid. To pay for all tickets: " +
+            total +
+            " EGP. Paying for only one ticket (or an entire group ticket) is accepted as well.",
+        },
+        { status: 400 }
+      );
+    }
+    return Response.json({ paid, accepted: paidFor }, { status: 200 });
   } catch (e) {
     return Response.json(e, { status: 500 });
   }
