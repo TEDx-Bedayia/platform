@@ -18,7 +18,10 @@ export async function GET(request: NextRequest) {
     ) AS total_price
     FROM attendees WHERE paid = true;`);
 
-    return Response.json({ total: query.rows[0].total_price });
+    return Response.json({
+      total:
+        query.rows[0].total_price != undefined ? query.rows[0].total_price : 0,
+    });
   } catch (error) {
     return Response.json({ message: "Error occurred." }, { status: 400 });
   }

@@ -151,7 +151,7 @@ async function sendBookingConfirmation(
     },
   });
   transporter.sendMail({
-    from: `"TEDx'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
+    from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
     to: email,
     subject: "Regarding your eTicket.",
     html: personalizedHtml,
