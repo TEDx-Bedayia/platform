@@ -86,6 +86,7 @@ export async function pay(from: string, amount: string, date: string) {
             { status: 500 }
           );
         }
+        unpaid[i].uuid = randUUID;
         paidFor.push(unpaid[i]);
       } else {
         paid -= unpaid[i].price;
