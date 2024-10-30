@@ -1,4 +1,4 @@
-import { YEAR } from "@/app/metadata";
+import { HOST, YEAR } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import nodemailer from "nodemailer";
@@ -17,10 +17,7 @@ export async function sendEmail(
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent
     .replace("${name}", name)
-    .replace(
-      "${qrCodeURL}",
-      BASE64 ? base64 : `https://tedxbedayiaschool.com/api/qr?uuid=${uuid}`
-    )
+    .replace("${qrCodeURL}", BASE64 ? base64 : `${HOST}/api/qr?uuid=${uuid}`)
     .replace("${uuid}", uuid)
     .replaceAll("${year}", YEAR.toString());
 
@@ -33,9 +30,11 @@ export async function sendEmail(
       },
     });
     transporter.sendMail({
-      from: `"TEDx'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
+      from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
       to: email,
-      subject: "Your eTicket has Arrived!!",
+      subject: `${
+        name.split(" ")[0]
+      }, your TEDxBedayia'${YEAR} eTicket has Arrived!`,
       html: personalizedHtml,
     });
 
