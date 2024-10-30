@@ -1,5 +1,10 @@
+import { IPN, PHONE, TELDA, TICKET_WINDOW, YEAR } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
+import { promises } from "fs";
 import { type NextRequest } from "next/server";
+import nodemailer from "nodemailer";
+import path from "path";
+import { price } from "../price/prices";
 import {
   checkSafety,
   generateRandomString,
@@ -10,9 +15,17 @@ import {
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod
 export async function POST(request: NextRequest) {
+  if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
+    if (process.env.ADMIN_KEY !== "dev")
+      return Response.json(
+        { message: "Ticket sales are currently closed." },
+        { status: 400 }
+      );
+  }
+
   let body;
   try {
-    body = await request.formData();
+    body = await request.json();
   } catch (error) {
     return Response.json(
       { message: "Please provide a valid JSON body.", error: error },
@@ -27,17 +40,20 @@ export async function POST(request: NextRequest) {
   let email4, name4;
 
   try {
-    name1 = body.get("name1")?.toString().trim();
-    email1 = body.get("email1")?.toString().trim().toLowerCase();
-    name2 = body.get("name2")?.toString().trim();
-    email2 = body.get("email2")?.toString().trim().toLowerCase();
-    name3 = body.get("name3")?.toString().trim();
-    email3 = body.get("email3")?.toString().trim().toLowerCase();
-    name4 = body.get("name4")?.toString().trim();
-    email4 = body.get("email4")?.toString().trim().toLowerCase();
+    name1 = body.name1?.toString().trim();
+    email1 = body.email1?.toString().trim().toLowerCase();
+    name2 = body.name2?.toString().trim();
+    email2 = body.email2?.toString().trim().toLowerCase();
+    name3 = body.name3?.toString().trim();
+    email3 = body.email3?.toString().trim().toLowerCase();
+    name4 = body.name4?.toString().trim();
+    email4 = body.email4?.toString().trim().toLowerCase();
 
-    phone = body.get("phone")?.toString().trim();
-    paymentMethod = body.get("paymentMethod")?.toString().trim();
+    phone = body.phone?.toString().trim();
+    paymentMethod = body.paymentMethod?.toString().trim();
+    let add = body.additionalFields;
+    if (add != undefined && add[paymentMethod.toLowerCase()] != undefined)
+      paymentMethod += "@" + add[paymentMethod.toLowerCase()].trim();
   } catch (error) {
     return Response.json(
       { message: "Please fill out all required fields." },
@@ -70,10 +86,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return Response.json(
-      { message: "Tickets submitted.", success: true },
-      { status: 200 }
-    );
+    try {
+      await sendBookingConfirmation(email1, name1, paymentMethod);
+      await sendBookingConfirmation(email2, name2, paymentMethod);
+      await sendBookingConfirmation(email3, name3, paymentMethod);
+      await sendBookingConfirmation(email4, name4, paymentMethod);
+    } catch (e) {
+      console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
+      return Response.json(
+        { message: "Error Occurred. Please try again or contact us for help." },
+        { status: 400 }
+      );
+    }
   } catch (error) {
     console.log(error);
     await sql`DELETE FROM attendees WHERE email = ${email1} OR email = ${email2} OR email = ${email3} OR email = ${email4};`;
@@ -82,6 +106,67 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  return Response.json({
+    success: true,
+    message:
+      "Tickets Submitted Successfully! Please check your emails for confirmations and payment details.",
+  });
+}
+
+async function sendBookingConfirmation(
+  email: string,
+  name: string,
+  paymentMethod: string
+) {
+  const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
+  const htmlContent = await promises.readFile(filePath, "utf8");
+
+  let paymentDetails = "";
+  if (paymentMethod.split("@")[0] === "VFCASH") {
+    paymentDetails = `Please proceed with your Mobile Wallet payment to ${PHONE}. The price for your entire group ticket (4 people) is: ${
+      price.group * 4
+    } EGP. Make sure to pay the exact due amount at once to avoid delays.`;
+  } else if (paymentMethod.split("@")[0] === "CASH") {
+    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion, <strong>${email}</strong>. The price for your entire group ticket (4 people) is: ${
+      price.group * 4
+    } EGP. Make sure to pay the exact due amount at once to avoid delays.`;
+  } else if (paymentMethod.split("@")[0] === "TLDA") {
+    paymentDetails = `Please proceed with your Telda transfer to the following account: ${TELDA}. The price for your entire group ticket (4 people) is: ${
+      price.group * 4
+    } EGP. Make sure to pay the exact due amount at once to avoid delays.`;
+  } else if (paymentMethod.split("@")[0] === "IPN") {
+    paymentDetails = `Please proceed with your Instapay Transfer to the following account: ${IPN}. The price for your entire group ticket (4 people) is: ${
+      price.group * 4
+    } EGP. Make sure to pay the exact due amount at once to avoid delays.`;
+  }
+
+  // Replace placeholders in the HTML
+  const personalizedHtml = htmlContent
+    .replace("${name}", name)
+    .replace("${vfcash}", paymentDetails)
+    .replaceAll("${year}", YEAR.toString());
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+  transporter.sendMail({
+    from: `"TEDx'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
+    to: email,
+    subject: "Regarding your eTicket.",
+    html: personalizedHtml,
+  });
+  return Response.json(
+    {
+      message: "Ticket Booked! Please check your email for confirmation.",
+      success: true,
+    },
+    { status: 200 }
+  );
 }
 
 async function submitTickets(

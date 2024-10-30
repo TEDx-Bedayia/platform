@@ -113,13 +113,15 @@ export default function Payments() {
       // Hide Loader
 
       if (response.ok) {
-        let { paid } = await response.json();
-        customAlert(
-          paid +
-            " EGP were accepted successfully. Refund " +
-            (parseInt(amount) - paid) +
-            " EGP."
-        );
+        let { refund, paid } = await response.json();
+        if (!refund)
+          customAlert(
+            paid +
+              " EGP were accepted successfully. Refund " +
+              (parseInt(amount) - paid) +
+              " EGP."
+          );
+        else customAlert("Refund Inserted.");
         formData.method = type == "admin" ? "" : "CASH";
         formData.from = "";
         formData.amount = "";
@@ -212,7 +214,9 @@ export default function Payments() {
             width: "100%",
           }}
         >
-          Developed by Aly Mohamed Salah with ❤️
+          For Refunds, enter a negative amount.
+          <br />
+          <strong>Developed by Aly Mohamed Salah with ❤️</strong>
         </span>
 
         {formData.method == "CASH" && (

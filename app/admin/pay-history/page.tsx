@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Poppins, Space_Grotesk, Ubuntu } from "next/font/google";
+import { totalmem } from "os";
 import { customAlert } from "../custom-alert";
 import styles from "./history.module.css"; // Import CSS styles
 
@@ -53,12 +54,13 @@ function Entry(
           textAlign: "left",
         }}
       >
-        +{recieved} EGP
+        {recieved > 0 ? "+" : ""}
+        {recieved} EGP
       </span>
 
       <span
         style={{
-          color: recieved - incurred != 0 ? "#95190D" : "#107E7D",
+          color: recieved - incurred >= 0 ? "#95190D" : "#107E7D",
           marginRight: "auto",
           width: 100,
           textAlign: "left",
@@ -83,6 +85,7 @@ interface Transaction {
 export default function History() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<Transaction[]>([]);
+  const [total, setTotal] = useState<number>(0);
   // Redirect if no token is found
   useEffect(() => {
     if (!localStorage.getItem("admin-token")) {
@@ -108,7 +111,21 @@ export default function History() {
         customAlert("Unauthorized");
         localStorage.removeItem("admin-token");
         window.location.href = "/admin/login";
-      } else customAlert("Failed to fetch applicants.");
+      } else customAlert("Failed to fetch payments.");
+    }
+
+    const response2 = await fetch(`/api/admin/payments-total`, {
+      method: "GET",
+      headers: {
+        key: `${localStorage.getItem("admin-token")}`,
+      },
+    });
+
+    if (response2.ok) {
+      const data = await response2.json();
+      setTotal(data.total);
+    } else {
+      customAlert("Failed to fetch total.");
     }
 
     setLoading(false);
@@ -121,6 +138,25 @@ export default function History() {
   return (
     <section id="pay-history" className={styles.dashboard}>
       <h1 style={{ ...title.style, fontWeight: 700 }}>Transactions</h1>
+      <p
+        style={{
+          ...ubuntu.style,
+          fontSize: ".75rem",
+          fontWeight: 300,
+          color: "grey",
+          marginBottom: "1rem",
+        }}
+      >
+        Expected Ticket Inflows: {total} EGP. <br /> Total Recieved:{" "}
+        {data.reduce((acc, curr) => acc + curr.recieved, 0)} EGP.
+        <br />
+        Errors:{" "}
+        {data.reduce(
+          (acc, curr) => acc + curr.recieved - curr.incurred,
+          0
+        )}{" "}
+        EGP.
+      </p>
       <div className={styles.transactionList}>
         <div
           style={{
@@ -166,15 +202,6 @@ export default function History() {
           )
         )}
       </div>
-      {/* <p>Not that important right now. It&apos;s safely stored.</p>
-      <br />
-      <p style={{ color: "grey" }}>
-        P.S. refund digital payment differences at the end of the ticket
-        purchasing period, after this section becomes active.
-      </p>
-      <p style={{ color: "grey" }}>
-        AND refund cash payment differences on the spot.
-      </p> */}
       {loading && <p>Loading...</p>}
     </section>
   );

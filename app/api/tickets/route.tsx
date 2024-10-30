@@ -4,6 +4,7 @@ import { promises } from "fs";
 import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import path from "path";
+import { price } from "./price/prices";
 import {
   checkSafety,
   generateRandomString,
@@ -14,10 +15,11 @@ import {
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {
   if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
-    return Response.json(
-      { message: "Ticket sales are currently closed." },
-      { status: 400 }
-    );
+    if (process.env.ADMIN_KEY !== "dev")
+      return Response.json(
+        { message: "Ticket sales are currently closed." },
+        { status: 400 }
+      );
   }
   let body: any;
   try {
@@ -125,13 +127,13 @@ async function submitOneTicket(
 
     let paymentDetails = "";
     if (paymentMethod.split("@")[0] === "VFCASH") {
-      paymentDetails = `Please proceed with your Mobile Wallet payment to ${PHONE}.`;
+      paymentDetails = `Please proceed with your Mobile Wallet payment to ${PHONE}. The price for your ticket is: ${price.individual} EGP. Make sure to pay the exact due amount at once to avoid delays.`;
     } else if (paymentMethod.split("@")[0] === "CASH") {
-      paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion, <strong>${email}</strong>.`;
+      paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion, <strong>${email}</strong>. The price for your ticket is: ${price.individual} EGP. Make sure to pay the exact due amount at once to avoid delays.`;
     } else if (paymentMethod.split("@")[0] === "TLDA") {
-      paymentDetails = `Please proceed with your Telda transfer to the following account: ${TELDA}.`;
+      paymentDetails = `Please proceed with your Telda transfer to the following account: ${TELDA}. The price for your ticket is: ${price.individual} EGP. Make sure to pay the exact due amount at once to avoid delays.`;
     } else if (paymentMethod.split("@")[0] === "IPN") {
-      paymentDetails = `Please proceed with your Instapay Transfer to the following account: ${IPN}.`;
+      paymentDetails = `Please proceed with your Instapay Transfer to the following account: ${IPN}. The price for your ticket is: ${price.individual} EGP. Make sure to pay the exact due amount at once to avoid delays.`;
     }
 
     // Replace placeholders in the HTML
