@@ -1,9 +1,5 @@
 import { NextRequest } from "next/server";
-
-export let price = {
-  individual: 100,
-  group: 90,
-};
+import { price } from "./prices";
 
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
