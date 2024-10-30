@@ -1,10 +1,10 @@
 "use client";
-import { Space_Grotesk } from "next/font/google";
+import { Poppins, Space_Grotesk } from "next/font/google";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
 import styles from "./login.module.css"; // Importing the CSS module
 
-const space = Space_Grotesk({ weight: "700", subsets: ["latin"] });
+const title = Poppins({ weight: "700", subsets: ["latin"] });
 
 export default function AdminLogin() {
   const [formData, setFormData] = useState({
@@ -67,7 +67,7 @@ export default function AdminLogin() {
   return (
     <div className={styles.pageContainer}>
       <form onSubmit={handleSubmit} className={styles.formContainer}>
-        <h2 style={{ ...space.style, fontWeight: 700 }}>eTickets v1.0</h2>
+        <h2 style={{ ...title.style, fontWeight: 700 }}>eTickets v1.0</h2>
 
         <div className={styles.formGroup}>
           <input

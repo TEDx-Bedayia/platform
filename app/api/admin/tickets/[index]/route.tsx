@@ -25,12 +25,36 @@ export async function GET(
     );
   }
 
+  const searchParams = request.nextUrl.searchParams.keys();
+
+  const filters: { [key: string]: string } = {
+    sent: `sent = ${request.nextUrl.searchParams.get("sent")}`,
+    email: `email = '${request.nextUrl.searchParams.get("email")}'`,
+    name: `full_name ILIKE '%${request.nextUrl.searchParams.get("name")}%'`,
+    paid: `paid = ${request.nextUrl.searchParams.get("paid")}`,
+    admitted: `admitted = ${request.nextUrl.searchParams.get("admitted")}`,
+  };
+
+  let filterQuery = "WHERE ";
+  for (const param of searchParams) {
+    if (filters[param]) {
+      filterQuery += filters[param] + " AND ";
+    }
+  }
+  if (filterQuery === "WHERE ") {
+    filterQuery = "";
+  }
+  filterQuery = filterQuery.slice(0, -5);
+
   try {
     // SQL query to fetch paginated applicants using LIMIT and OFFSET
     const result = await sql.query(
       `SELECT id, full_name, email, type AS "ticket_type", 
-              payment_method, paid, admitted
+              payment_method, paid, admitted, sent
        FROM attendees
+       ` +
+        filterQuery +
+        `
        ORDER BY id ASC
        LIMIT $1 OFFSET $2`,
       [itemsPerPage, index * itemsPerPage]

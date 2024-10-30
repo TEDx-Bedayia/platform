@@ -1,6 +1,6 @@
-import { price } from "@/app/api/tickets/price/route";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { price } from "../../tickets/price/prices";
 
 export async function pay(from: string, amount: string) {
   let query = await sql`SELECT * FROM attendees WHERE payment_method = ${from}`;

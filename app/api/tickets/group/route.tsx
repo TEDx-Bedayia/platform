@@ -193,9 +193,3 @@ async function submitTickets(
     return Response.json({ success: false }, { status: 500 });
   }
 }
-
-export async function GET(req: NextRequest) {
-  return Response.json({
-    response: verifyEmail(req.nextUrl.searchParams.get("email")!),
-  });
-}
