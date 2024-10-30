@@ -28,13 +28,13 @@ export async function POST(request: NextRequest) {
 
   try {
     name1 = body.get("name1")?.toString().trim();
-    email1 = body.get("email1")?.toString().trim();
+    email1 = body.get("email1")?.toString().trim().toLowerCase();
     name2 = body.get("name2")?.toString().trim();
-    email2 = body.get("email2")?.toString().trim();
+    email2 = body.get("email2")?.toString().trim().toLowerCase();
     name3 = body.get("name3")?.toString().trim();
-    email3 = body.get("email3")?.toString().trim();
+    email3 = body.get("email3")?.toString().trim().toLowerCase();
     name4 = body.get("name4")?.toString().trim();
-    email4 = body.get("email4")?.toString().trim();
+    email4 = body.get("email4")?.toString().trim().toLowerCase();
 
     phone = body.get("phone")?.toString().trim();
     paymentMethod = body.get("paymentMethod")?.toString().trim();

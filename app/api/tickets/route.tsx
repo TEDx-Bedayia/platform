@@ -1,6 +1,9 @@
+import { IPN, PHONE, TELDA, YEAR } from "@/app/layout";
 import { sql } from "@vercel/postgres";
+import { promises } from "fs";
 import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
+import path from "path";
 import {
   checkSafety,
   generateRandomString,
@@ -23,7 +26,7 @@ export async function POST(request: NextRequest) {
   let paymentMethod: string, name, email, phone, add;
   try {
     name = body.name?.toString().trim();
-    email = body.email?.toString().trim();
+    email = body.email?.toString().trim().toLowerCase();
     phone = body.phone?.toString().trim();
     paymentMethod = body.paymentMethod?.toString().trim()!;
     add = body.additionalFields;
@@ -111,6 +114,26 @@ async function submitOneTicket(
       [email, name, paymentMethod, phone, "individual"]
     );
 
+    const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
+    const htmlContent = await promises.readFile(filePath, "utf8");
+
+    let paymentDetails = "";
+    if (paymentMethod.split("@")[0] === "VFCASH") {
+      paymentDetails = `Please proceed with your Mobile Wallet payment to ${PHONE}.`;
+    } else if (paymentMethod.split("@")[0] === "CASH") {
+      paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion.`;
+    } else if (paymentMethod.split("@")[0] === "TLDA") {
+      paymentDetails = `Please proceed with your Telda transfer to the following account: ${TELDA}.`;
+    } else if (paymentMethod.split("@")[0] === "IPN") {
+      paymentDetails = `Please proceed with your Instapay Transfer to the following account: ${IPN}.`;
+    }
+
+    // Replace placeholders in the HTML
+    const personalizedHtml = htmlContent
+      .replace("${name}", name)
+      .replace("${vfcash}", paymentDetails)
+      .replace("${year}", YEAR.toString());
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -119,10 +142,10 @@ async function submitOneTicket(
       },
     });
     transporter.sendMail({
-      from: '"TEDx\'25 eTicket System" <tedxyouth@bedayia.com>',
+      from: `"TEDx'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
       to: email,
-      subject: "Regarding your eTicket",
-      text: `Hey ${name}!\n\nThank you for booking your eTicket. We are pleased to welcome you onboard! Your QR-enabled eTicket will be sent to you after you pay.\n\nIf you have any questions, please don't hesitate to contact us.\n\n\nBest Regards,\nTEDx'25 Team`,
+      subject: "Regarding your eTicket.",
+      html: personalizedHtml,
     });
     return Response.json(
       {
@@ -132,6 +155,11 @@ async function submitOneTicket(
       { status: 200 }
     );
   } catch (error) {
-    return Response.json({ message: "Error occurred." }, { status: 400 });
+    await sql`DELETE FROM attendees WHERE email = ${email}`;
+    console.error("LESS SECURE APP NOT TURNED ON FOR GMAIL");
+    return Response.json(
+      { message: "Error Occurred. Please try again or contact us for help." },
+      { status: 400 }
+    );
   }
 }
