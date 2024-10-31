@@ -11,7 +11,7 @@ export async function GET(
   }
 ) {
   // Check if the request is coming from official app.
-  if (request.headers.get("key") !== process.env.APP_KEY) {
+  if (request.nextUrl.searchParams.get("key") !== process.env.APP_KEY) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
   const uuid = (await params).uuid; // Extract the 'uuid' parameter
