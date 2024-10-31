@@ -28,7 +28,7 @@ export async function GET(
   try {
     // Update the admitted status for the specified applicant
     const result = await sql.query(
-      "UPDATE attendees SET admitted = true WHERE paid = true AND admitted = false AND uuid = $2 RETURNING *",
+      "UPDATE attendees SET admitted = true WHERE paid = true AND admitted = false AND uuid = $1 RETURNING *",
       [uuid]
     );
 
@@ -74,7 +74,7 @@ export async function OPTIONS() {
   // Handle preflight OPTIONS request
   const headers = new Headers();
   headers.set("Access-Control-Allow-Origin", "*"); // Allow all origins
-  headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE"); // Allow specific methods
+  headers.set("Access-Control-Allow-Methods", "GET"); // Allow specific methods
   headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allow specific headers
 
   return new Response(null, {
