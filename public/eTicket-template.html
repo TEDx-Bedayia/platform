@@ -8,7 +8,12 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui"
     />
     <meta name="color-scheme" content="light" />
+    <meta name="supported-color-schemes" content="light" />
     <meta name="Content-Transfer-Encoding" content="quoted-printable" />
+    <meta name="Content-Language" content="en" />
+    <meta name="author" content="Aly Mohamed Salah" />
+    <meta name="description" content="TEDx'${year} eTicket" />
+    <meta name="keywords" content="TEDx, eTicket, QR Code, Bedayia, School" />
     <title>TEDx'${year} eTicket</title>
     <style>
       body {
@@ -106,6 +111,36 @@
         .button {
           font-size: 14px;
           padding: 10px 20px;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #f4f4f4;
+          color: #333;
+        }
+
+        .email-container {
+          background-color: #ffffff;
+        }
+
+        .header {
+          background-color: #e62b1e;
+          color: white;
+        }
+
+        .content h1 {
+          color: #e62b1e;
+        }
+
+        .button {
+          background-color: #e62b1e;
+          color: white;
+        }
+
+        .footer {
+          color: #777;
+          background-color: #f9f9f9;
         }
       }
     </style>
