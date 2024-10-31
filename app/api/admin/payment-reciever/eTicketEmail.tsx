@@ -3,7 +3,7 @@ import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
-const BASE64 = false;
+const BASE64 = true;
 
 export async function sendEmail(
   email: string,
@@ -32,6 +32,7 @@ export async function sendEmail(
     transporter.sendMail({
       from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
       to: email,
+      attachDataUrls: true,
       subject: `${
         name.split(" ")[0]
       }, your TEDxBedayia'${YEAR} eTicket has Arrived!`,

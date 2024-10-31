@@ -202,7 +202,7 @@ export async function pay(from: string, amount: string, date: string) {
 
     try {
       for (let i = 0; i < paidFor.length; i++) {
-        let qr = await QRCode.toDataURL(paidFor[i].uuid);
+        let qr = await QRCode.toDataURL(paidFor[i].uuid, { width: 400 });
         await sendEmail(
           paidFor[i].email,
           paidFor[i].full_name,

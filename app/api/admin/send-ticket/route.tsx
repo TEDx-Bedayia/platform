@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       return Response.json({ message: "Attendee not found." }, { status: 404 });
     }
 
-    let qr = await QRCode.toDataURL(q.rows[0].uuid);
+    let qr = await QRCode.toDataURL(q.rows[0].uuid, { width: 400 });
     await sendEmail(q.rows[0].email, q.rows[0].full_name, q.rows[0].uuid, qr);
     return Response.json(
       { message: `Email sent to ${q.rows[0].email}.` },
