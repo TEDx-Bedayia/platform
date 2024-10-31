@@ -36,7 +36,7 @@ export async function GET(
       let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
       if (query.rowCount === 0) {
         return NextResponse.json(
-          { error: "Applicant not found" },
+          { error: "Applicant not found. Send to Aly." },
           { status: 404, headers: headers }
         );
       } else if (query.rows[0].admitted) {
