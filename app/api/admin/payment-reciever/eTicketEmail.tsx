@@ -3,7 +3,7 @@ import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
-const BASE64 = true;
+const BASE64 = false;
 
 export async function sendEmail(
   email: string,
