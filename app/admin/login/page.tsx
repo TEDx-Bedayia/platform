@@ -125,7 +125,7 @@ export default function AdminLogin() {
           width: "100%",
         }}
       >
-        Developed by Aly Mohamed Salah with ❤️
+        <strong>Developed by Aly Mohamed Salah with ❤️</strong>
       </span>
     </div>
   );
