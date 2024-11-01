@@ -10,25 +10,21 @@ export async function POST(request: NextRequest) {
     let params = await request.formData();
 
     let username = params.get("username")?.toString();
-    if (username === null) {
-      return Response.json(
-        { message: "Username is required." },
-        { status: 400 }
-      );
+    if (username === null || username === "" || username === undefined) {
+      return Response.json({ message: "Error." }, { status: 400 });
     }
 
     let password = params.get("password")?.toString();
-    if (password === null) {
-      return Response.json(
-        { message: "Password is required." },
-        { status: 400 }
-      );
+    if (password === null || password === "" || password === undefined) {
+      return Response.json({ message: "Error." }, { status: 400 });
     }
 
     if (
       params.get("name")?.toString().toLowerCase() === "school office" &&
       username === process.env.SKLOFFICE &&
-      password === process.env.SKLOFFICEPASS
+      password === process.env.SKLOFFICEPASS &&
+      process.env.SKLOFFICE &&
+      process.env.SKLOFFICEPASS
     ) {
       return Response.json(
         { token: process.env.SKL_OFFICE, type: "school" },
@@ -37,23 +33,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (
-      username !== process.env.ADMIN_USERNAME ||
-      password !== process.env.ADMIN_PASSWORD ||
-      process.env.ADMIN_KEY === undefined ||
-      process.env.ADMIN_KEY === "" ||
-      process.env.ADMIN_KEY === null ||
-      params.get("name")?.toString() !== process.env.MAINTAINER
+      username === process.env.ADMIN_USERNAME &&
+      password === process.env.ADMIN_PASSWORD &&
+      params.get("name")?.toString() !== process.env.MAINTAINER &&
+      process.env.ADMIN_KEY &&
+      process.env.ADMIN_USERNAME &&
+      process.env.ADMIN_PASSWORD
     ) {
       return Response.json(
-        { message: "Invalid Credentials." },
-        { status: 403 }
+        { token: process.env.ADMIN_KEY, type: "admin" },
+        { status: 200 }
       );
     }
-
-    return Response.json(
-      { token: process.env.ADMIN_KEY, type: "admin" },
-      { status: 200 }
-    );
+    return Response.json({ message: "Invalid Credentials." }, { status: 403 });
   } catch (error) {
     return Response.json(
       {
