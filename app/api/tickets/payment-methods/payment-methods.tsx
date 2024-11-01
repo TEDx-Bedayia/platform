@@ -1,3 +1,5 @@
+import { IPN, TELDA } from "@/app/metadata";
+
 export interface PaymentMethod {
   displayName: string;
   identifier: string;
@@ -16,7 +18,7 @@ export interface Field {
 const TLDA: PaymentMethod = {
   displayName: "Telda",
   identifier: "TLDA",
-  to: "@alymob",
+  to: TELDA,
   fields: [
     {
       type: "string",
@@ -31,7 +33,7 @@ const TLDA: PaymentMethod = {
 const INSTAPAY: PaymentMethod = {
   displayName: "Instapay",
   identifier: "IPN",
-  to: "XXXXXXXX",
+  to: IPN,
   fields: [
     {
       type: "string",
