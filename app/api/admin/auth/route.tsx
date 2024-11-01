@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     if (
       username === process.env.ADMIN_USERNAME &&
       password === process.env.ADMIN_PASSWORD &&
-      params.get("name")?.toString() !== process.env.MAINTAINER &&
+      params.get("name")?.toString() === process.env.MAINTAINER &&
       process.env.ADMIN_KEY &&
       process.env.ADMIN_USERNAME &&
       process.env.ADMIN_PASSWORD
