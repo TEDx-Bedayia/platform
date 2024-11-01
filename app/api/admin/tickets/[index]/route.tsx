@@ -13,6 +13,13 @@ export async function GET(
   const index = parseInt((await params).index, 10) - 1; // Extract and parse the 'index' parameter
   const itemsPerPage = 10; // Number of rows per request
 
+  if (process.env.ADMIN_KEY === undefined || !process.env.ADMIN_KEY) {
+    return Response.json(
+      { message: "Key is not set. Contact the maintainer." },
+      { status: 500 }
+    );
+  }
+
   if (request.headers.get("key") !== process.env.ADMIN_KEY) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }

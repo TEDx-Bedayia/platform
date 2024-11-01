@@ -2,8 +2,6 @@ import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    // This function accepts a username and password, and returns a token (process.env.ADMIN_KEY) if the credentials are valid.
-
     // Artificial delay to simulate a slow server
     await new Promise((resolve) => setTimeout(resolve, 2000));
 

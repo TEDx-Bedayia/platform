@@ -5,6 +5,18 @@ import { price } from "../../tickets/price/prices";
 import { sendEmail } from "./eTicketEmail";
 
 export async function pay(from: string, amount: string, date: string) {
+  if (
+    process.env.ADMIN_KEY === undefined ||
+    !process.env.ADMIN_KEY ||
+    !process.env.SKL_OFFICE ||
+    process.env.SKL_OFFICE === undefined
+  ) {
+    return Response.json(
+      { message: "Key is not set. Contact the maintainer." },
+      { status: 500 }
+    );
+  }
+
   if (parseInt(amount) < 0) {
     await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, 0, ${amount}, ${date})`;
     return Response.json(
