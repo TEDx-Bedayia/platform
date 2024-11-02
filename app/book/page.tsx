@@ -86,6 +86,13 @@ export default function SingleTickets() {
       const selectedOption = paymentOptions.find(
         (option) => option.identifier === value
       );
+
+      setFormData({
+        ...formData,
+        paymentMethod: value,
+        additionalFields: {},
+      });
+
       setSelectedPaymentFields(selectedOption?.fields || []);
     }
   };
