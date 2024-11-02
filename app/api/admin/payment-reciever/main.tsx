@@ -224,14 +224,14 @@ export async function pay(from: string, amount: string, date: string) {
       }
     } catch (e) {
       return Response.json(
-        { message: "Err #9184. Contact Support or Try Again." },
+        { message: "Err #9194. Contact Support or Try Again." },
         { status: 500 }
       );
     }
     const totalPrice = paidFor.reduce((sum, item) => sum + item.price, 0);
     if (totalPrice != paid) {
       console.error(
-        "OH NO! INSANE ERROR! HUGE ERROR! MASSIVE ERRO! main.tsx line 220"
+        "OH NO! INSANE ERROR! HUGE ERROR! MASSIVE ERROR! main.tsx line 220"
       );
       return Response.json(
         {
