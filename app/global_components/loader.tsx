@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import React from "react";
 import { createRoot } from "react-dom/client";
 
@@ -21,7 +22,7 @@ export function Loader() {
         pointerEvents: "none",
       }}
     >
-      <h1>Loading...</h1>
+      <Image src="/loading.gif" alt="Loading..." width={50} height={50} />
     </div>
   );
 }
