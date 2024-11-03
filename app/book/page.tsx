@@ -7,6 +7,7 @@ import {
   Field,
   PaymentMethod,
 } from "../api/tickets/payment-methods/payment-methods";
+import { addLoader, removeLoader } from "../global_components/loader";
 
 export default function SingleTickets() {
   const [formData, setFormData] = useState({
@@ -99,6 +100,7 @@ export default function SingleTickets() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    addLoader();
     const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
@@ -119,6 +121,7 @@ export default function SingleTickets() {
     } else {
       customAlert((await response.json()).message ?? "An error occurred");
     }
+    removeLoader();
   }
 
   return (
@@ -129,6 +132,7 @@ export default function SingleTickets() {
           name="email"
           placeholder="Enter your email"
           id="email-input"
+          required={true}
           value={formData.email}
           onChange={handleChange}
         />
@@ -138,6 +142,7 @@ export default function SingleTickets() {
           id="name-input"
           placeholder="Enter your name"
           value={formData.name}
+          required={true}
           onChange={handleChange}
         />
         <input
@@ -146,6 +151,8 @@ export default function SingleTickets() {
           id="phone-input"
           placeholder="Enter your phone number"
           maxLength={11}
+          minLength={11}
+          required={true}
           value={formData.phone}
           onChange={handleChange}
         />
@@ -153,6 +160,7 @@ export default function SingleTickets() {
         <select
           name="paymentMethod"
           id="payment-method"
+          required={true}
           value={formData.paymentMethod}
           onChange={handleChange}
         >
@@ -167,25 +175,27 @@ export default function SingleTickets() {
         </select>
 
         {/* Dynamically render additional fields based on selected payment method */}
-        <div className="additional-field-container">
-          {selectedPaymentFields.length > 0 &&
-            selectedPaymentFields.map((field, index) => (
-              <div className="additional-field" key={index}>
-                <label htmlFor={`additional-field-${index}`}>
-                  {field.label}
-                </label>
-                <input
-                  type={field.type}
-                  name={field.id}
-                  id={`additional-field-${index}`}
-                  placeholder={field.placeholder}
-                  required={field.required}
-                  value={formData.additionalFields[field.id] || ""}
-                  onChange={handleAdditionalFieldChange}
-                />
-              </div>
-            ))}
-        </div>
+        {selectedPaymentFields.length > 0 && (
+          <div className="additional-field-container">
+            {selectedPaymentFields.length > 0 &&
+              selectedPaymentFields.map((field, index) => (
+                <div className="additional-field" key={index}>
+                  <label htmlFor={`additional-field-${index}`}>
+                    {field.label}
+                  </label>
+                  <input
+                    type={field.type}
+                    name={field.id}
+                    id={`additional-field-${index}`}
+                    placeholder={field.placeholder}
+                    required={field.required}
+                    value={formData.additionalFields[field.id] || ""}
+                    onChange={handleAdditionalFieldChange}
+                  />
+                </div>
+              ))}
+          </div>
+        )}
 
         <button type="submit">Submit</button>
       </form>

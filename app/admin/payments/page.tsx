@@ -1,5 +1,6 @@
 "use client";
 import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods";
+import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
@@ -89,6 +90,7 @@ export default function Payments() {
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
+    addLoader();
     e.preventDefault();
     if (formData.method && formData.from && formData.amount && formData.date) {
       const { method, from, amount, date } = formData;
@@ -134,6 +136,7 @@ export default function Payments() {
     } else {
       customAlert("All fields are required.");
     }
+    removeLoader();
   };
 
   return (
