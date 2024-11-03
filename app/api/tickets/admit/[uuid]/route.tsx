@@ -26,7 +26,7 @@ export async function GET(
   }
   const uuid = (await params).uuid; // Extract the 'uuid' parameter
 
-  const THRESHOLD = 12 * 60 * 60 * 1000;
+  const THRESHOLD = 36 * 60 * 60 * 1000;
   const currentDate = new Date();
   const eventDate = EVENT_DATE;
 
