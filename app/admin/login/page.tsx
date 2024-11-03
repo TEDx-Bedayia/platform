@@ -1,4 +1,5 @@
 "use client";
+import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { Poppins, Space_Grotesk } from "next/font/google";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
@@ -33,6 +34,7 @@ export default function AdminLogin() {
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
+    addLoader();
     e.preventDefault();
     if (formData.username && formData.password && formData.name) {
       const { username, password, name } = formData;
@@ -66,6 +68,7 @@ export default function AdminLogin() {
     } else {
       customAlert("All fields are required.");
     }
+    removeLoader();
   };
 
   return (
