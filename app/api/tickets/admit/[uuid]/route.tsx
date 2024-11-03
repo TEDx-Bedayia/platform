@@ -1,3 +1,4 @@
+import { EVENT_DATE } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,6 +25,18 @@ export async function GET(
     );
   }
   const uuid = (await params).uuid; // Extract the 'uuid' parameter
+
+  const THRESHOLD = 12 * 60 * 60 * 1000;
+  const currentDate = new Date();
+  const eventDate = EVENT_DATE;
+
+  // Calculate the absolute difference between the current date and the event date
+  if (Math.abs(currentDate.getTime() - eventDate.getTime()) > THRESHOLD) {
+    return NextResponse.json(
+      { error: `Event not started yet. ${currentDate} - ${eventDate}` },
+      { status: 400, headers: headers }
+    );
+  }
 
   try {
     // Update the admitted status for the specified applicant
