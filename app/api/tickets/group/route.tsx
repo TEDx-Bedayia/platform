@@ -124,13 +124,15 @@ async function sendBookingConfirmation(
 
   let paymentDetails = "";
   if (paymentMethod.split("@")[0] === "VFCASH") {
-    paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>.`;
+    paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. Send us a WhatsApp message from <strong>${
+      paymentMethod.split("@")[1]
+    }</strong> with your email address: <strong>${email}</strong> to confirm your payment.`;
   } else if (paymentMethod.split("@")[0] === "CASH") {
     paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion, <strong>${email}</strong>.`;
   } else if (paymentMethod.split("@")[0] === "TLDA") {
-    paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>.`;
+    paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>.`;
   } else if (paymentMethod.split("@")[0] === "IPN") {
-    paymentDetails = `Please proceed with your Instapay Transfer to the following account: <strong>${IPN}</strong>.`;
+    paymentDetails = `Please proceed with your Instapay Transfer to the following account: <strong>${IPN}</strong>. Make sure to include a comment with your email address if possible: <strong>${email}</strong>.`;
   }
 
   paymentDetails += ` The price for your entire group ticket (4 people) is: <strong>${
