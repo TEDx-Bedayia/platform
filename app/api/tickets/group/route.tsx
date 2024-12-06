@@ -94,7 +94,10 @@ export async function POST(request: NextRequest) {
     } catch (e) {
       console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
       return Response.json(
-        { message: "Error Occurred. Please try again or contact us for help." },
+        {
+          message:
+            "Error Occurred. Please try again or contact us for help: SMTP_ERR_001.",
+        },
         { status: 400 }
       );
     }

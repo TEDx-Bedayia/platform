@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import type { Author } from "next/dist/lib/metadata/types/metadata-types";
 import "./globals.css";
-import { YEAR } from "./metadata";
+import { YEAR, support } from "./metadata";
 import NavBar from "./navbar";
-
-const support: Author = {
-  name: "Aly Mobarak", // Change with your name (head)
-  url: "mailto:alymmobarak@hotmail.com", // Change with your public email
-};
 
 /* DO NOT EDIT */
 export const metadata: Metadata = {

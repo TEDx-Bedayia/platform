@@ -60,6 +60,16 @@ export default function SingleTickets() {
     if (value.includes("@")) {
       return;
     }
+    if (name == "vfcash" && (isNaN(Number(value)) || value.includes(" "))) {
+      if (value != "+") return;
+    }
+    if (name == "vfcash") {
+      if (value.includes("+")) {
+        if (value.length > 13) return;
+      } else if (value.length > 11) {
+        return;
+      }
+    }
     setFormData({
       ...formData,
       additionalFields: {
@@ -73,8 +83,16 @@ export default function SingleTickets() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
     if (name == "phone" && (isNaN(Number(value)) || value.includes(" "))) {
-      return;
+      if (value != "+") return;
+    }
+    if (name == "phone") {
+      if (value.includes("+")) {
+        if (value.length > 13) return;
+      } else if (value.length > 11) {
+        return;
+      }
     }
 
     setFormData({
@@ -101,6 +119,15 @@ export default function SingleTickets() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     addLoader();
+    if (
+      formData.additionalFields.vfcash &&
+      formData.additionalFields.vfcash.length < 11
+    ) {
+      customAlert("Please enter a valid phone number");
+      removeLoader();
+      return;
+    }
+
     const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
@@ -117,6 +144,7 @@ export default function SingleTickets() {
         paymentMethod: "",
         additionalFields: {} as { [key: string]: string },
       });
+      setSelectedPaymentFields([]);
       customAlert((await response.json()).message ?? "An error occurred");
     } else {
       customAlert((await response.json()).message ?? "An error occurred");
@@ -128,6 +156,15 @@ export default function SingleTickets() {
     <section id="book-one-ticket">
       <form onSubmit={handleSubmit}>
         <input
+          type="text"
+          name="name"
+          id="name-input"
+          placeholder="Enter your name"
+          value={formData.name}
+          required={true}
+          onChange={handleChange}
+        />
+        <input
           type="email"
           name="email"
           placeholder="Enter your email"
@@ -138,19 +175,10 @@ export default function SingleTickets() {
         />
         <input
           type="text"
-          name="name"
-          id="name-input"
-          placeholder="Enter your name"
-          value={formData.name}
-          required={true}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
           name="phone"
           id="phone-input"
           placeholder="Enter your phone number"
-          maxLength={11}
+          maxLength={13}
           minLength={11}
           required={true}
           value={formData.phone}

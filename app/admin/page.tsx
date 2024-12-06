@@ -167,14 +167,14 @@ export default function AdminDashboard() {
             }}
           >
             <span style={{ fontSize: ".7rem" }}>
-              +2
-              {applicant.phone[0] +
+              +
+              {applicant.phone.slice(0, 2) +
                 " " +
-                applicant.phone.slice(1, 4) +
+                applicant.phone.slice(2, 5) +
                 " " +
-                applicant.phone.slice(4, 7) +
+                applicant.phone.slice(5, 8) +
                 " " +
-                applicant.phone.slice(7)}
+                applicant.phone.slice(8)}
             </span>
             <span style={{ fontSize: ".7rem" }}>
               <span style={{ fontWeight: "700" }}>

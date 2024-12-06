@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  let from = params.get("from");
+  let from = params.get("email");
   if (from === null) {
     return Response.json(
       { message: "Email of Sender is required." },

@@ -8,10 +8,18 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  let from = params.get("from");
+  let from = params.get("username");
   if (from === null) {
     return Response.json(
       { message: "Account Number / Name of Sender is required." },
+      { status: 400 }
+    );
+  }
+
+  let email = params.get("email");
+  if (email === null) {
+    return Response.json(
+      { message: "Email of Sender is required." },
       { status: 400 }
     );
   }

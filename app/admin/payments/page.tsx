@@ -13,9 +13,11 @@ export default function Payments() {
     from: "",
     amount: "",
     date: "",
+    username: "",
   });
   const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
   const [type, setType] = useState<"admin" | "school">("school");
+  const [changingFieldTitle, setChangingFieldTitle] = useState("");
 
   useEffect(() => {
     if (localStorage.getItem("admin-token")) {
@@ -61,7 +63,11 @@ export default function Payments() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    if (name == "from" && formData.method != "CASH" && value.includes("@")) {
+    if (
+      name == "username" &&
+      formData.method != "CASH" &&
+      value.includes("@")
+    ) {
       return;
     }
     if (name == "method" && type == "school") {
@@ -74,6 +80,15 @@ export default function Payments() {
     if (type == "school" && formData.method != "CASH") {
       formData.method = "CASH";
     }
+
+    if (name == "method") {
+      formData.username = "";
+      setFormData({
+        ...formData,
+        username: "",
+      });
+    }
+
     setFormData({
       ...formData,
       [name]: value,
@@ -97,11 +112,11 @@ export default function Payments() {
       // Show Loader
 
       const response = await fetch(
-        `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
+        `/api/admin/payment-reciever/${method.toLowerCase()}?email=${encodeURIComponent(
           from
         )}&amount=${encodeURIComponent(amount)}&date=${encodeURIComponent(
           date
-        )}`,
+        )}&username=${encodeURIComponent(formData.username)}`,
         {
           method: "GET",
           headers: {
@@ -175,8 +190,23 @@ export default function Payments() {
               placeholder=" "
               required
             />
-            <label htmlFor="from">Username / Email</label>
+            <label htmlFor="from">Email Address</label>
           </div>
+
+          {formData.method !== "CASH" && formData.method !== "" && (
+            <div className={styles.formGroup}>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                placeholder=" "
+                required
+              />
+              <label htmlFor="from">Username</label>
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <input

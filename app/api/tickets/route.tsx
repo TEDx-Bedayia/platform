@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 import path from "path";
 import { price } from "./price/prices";
 import {
+  checkPhone,
   checkSafety,
   generateRandomString,
   verifyEmail,
@@ -90,7 +91,13 @@ async function submitOneTicket(
     );
   }
 
-  if (!checkSafety(phone)) {
+  if (phone.length === 11) {
+    phone = "2" + phone;
+  } else if (phone.length === 13) {
+    phone = phone.slice(1);
+  }
+
+  if (!checkPhone(phone)) {
     return Response.json({ message: "Invalid Phone Number." }, { status: 400 });
   }
 
@@ -101,14 +108,14 @@ async function submitOneTicket(
   let query = await sql`SELECT * FROM attendees WHERE email = ${email};`;
   const email1 = email.split("@")[0].split("+")[0];
   const email2 = email.split("@")[1];
-  let add = "ot";
+  let add = "a";
   if (email.split("+").length > 1) {
     add = add + generateRandomString(3);
   }
   if (query.rows.length > 0) {
     return Response.json(
       {
-        message: `An attendee with this email already exists. If you'd still like to book a ticket with the same email, please set the email to: ${email1}+${add}@${email2}. You will recieve your ticket on ${email1}@${email2} normally. If you'll pay through Bedayia's Office, please make sure to save this email somewhere to present it to them.`,
+        message: `An attendee with this email already exists. If you'd still like to book a ticket with the same email, please set the email to: ${email1}+${add}@${email2}. You will recieve your ticket on ${email1}@${email2} normally.`,
       },
       { status: 400 }
     );
@@ -127,18 +134,18 @@ async function submitOneTicket(
 
     let paymentDetails = "";
     if (paymentMethod.split("@")[0] === "VFCASH") {
-      paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. Send us a WhatsApp message from <strong>${
+      paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. After your payment, send us a WhatsApp or SMS message from the phone you will pay with, <strong>${
         paymentMethod.split("@")[1]
-      }</strong> with your email address: <strong>${email}</strong> to confirm your payment.`;
+      }</strong>, along with your email address: <strong>${email}</strong> to confirm your payment.`;
     } else if (paymentMethod.split("@")[0] === "CASH") {
-      paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion, <strong>${email}</strong>.`;
+      paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion: <strong>${email}</strong>.`;
     } else if (paymentMethod.split("@")[0] === "TLDA") {
       paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>.`;
     } else if (paymentMethod.split("@")[0] === "IPN") {
-      paymentDetails = `Please proceed with your Instapay Transfer to the following account: <strong>${IPN}</strong>. Make sure to include a comment with your email address if possible: <strong>${email}</strong>.`;
+      paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Make sure to include a comment with your email address if possible: <strong>${email}</strong>.`;
     }
 
-    paymentDetails += ` The price for your ticket is: <strong>${price.individual} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays.`;
+    paymentDetails += ` The price for your ticket is: <strong>${price.individual} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
 
     // Replace placeholders in the HTML
     const personalizedHtml = htmlContent
@@ -170,7 +177,10 @@ async function submitOneTicket(
     await sql`DELETE FROM attendees WHERE email = ${email}`;
     console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
     return Response.json(
-      { message: "Error Occurred. Please try again or contact us for help." },
+      {
+        message:
+          "Error Occurred. Please try again or contact us for help: SMTP_ERR_001.",
+      },
       { status: 400 }
     );
   }

@@ -30,6 +30,9 @@ export async function verifyPaymentMethod(
     metadata = metadata.replace(/[\u0660-\u0669]/g, (c) =>
       (c.charCodeAt(0) - 0x0660).toString()
     );
+    if (metadata.length === 13 && metadata.startsWith("+")) {
+      metadata = metadata.slice(2);
+    }
     if (vfcash.test(metadata)) return method + "@" + metadata;
     else return;
   }
@@ -39,6 +42,12 @@ export async function verifyPaymentMethod(
 
 export function checkSafety(str: string): boolean {
   const alphaNumericAndSymbols = /^[a-zA-Z0-9!@()_+\-=,. ]*$/;
+  if (alphaNumericAndSymbols.test(str)) return true;
+  return false;
+}
+
+export function checkPhone(str: string): boolean {
+  const alphaNumericAndSymbols = /^[0-9+]*$/;
   if (alphaNumericAndSymbols.test(str)) return true;
   return false;
 }
