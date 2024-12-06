@@ -1,5 +1,5 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
-  return Response.json({message: "Success!"})
+  return Response.json({ message: "Success!" + process.env.MAINTAINER });
 }
