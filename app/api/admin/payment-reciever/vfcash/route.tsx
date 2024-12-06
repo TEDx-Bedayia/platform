@@ -8,18 +8,10 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  let from = params.get("username");
+  let from = params.get("from");
   if (from === null) {
     return Response.json(
-      { message: "Username of Sender is required." },
-      { status: 400 }
-    );
-  }
-
-  let email = params.get("email");
-  if (email === null) {
-    return Response.json(
-      { message: "Email of Sender is required." },
+      { message: "Phone Number of Sender is required." },
       { status: 400 }
     );
   }
@@ -36,5 +28,9 @@ export async function GET(request: NextRequest) {
 
   from = "VFCASH@" + from.trim();
 
-  return await pay(from, amount, date);
+  let email_if_needed = params.get("email_id");
+  if (email_if_needed !== null) email_if_needed = email_if_needed.trim();
+  else email_if_needed = "";
+
+  return await pay(from, amount, date, email_if_needed);
 }

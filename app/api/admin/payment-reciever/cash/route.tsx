@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  let from = params.get("email");
+  let from = params.get("from");
   if (from === null) {
     return Response.json(
       { message: "Email of Sender is required." },
@@ -43,5 +43,5 @@ export async function GET(request: NextRequest) {
 
   from = "CASH@" + from.trim();
 
-  return await pay(from, amount, date);
+  return await pay(from, amount, date, "");
 }

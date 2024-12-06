@@ -92,6 +92,9 @@ export default function AdminDashboard() {
   const [filter, setFilter] = useState("");
   const observer = useRef<IntersectionObserver | null>(null);
 
+  const msg =
+    "Hello {name}! Your ticket for the event has been sent to your email. Please check your inbox and spam folder. If you have any questions, feel free to contact us. Thank you!";
+
   function TicketCard(applicant: Applicant, admitApplicant: any) {
     return (
       <div
@@ -210,6 +213,23 @@ export default function AdminDashboard() {
                 Send Ticket
               </button>
             )}
+
+            {applicant.sent && (
+              <button
+                className={styles.sendButton}
+                onClick={() =>
+                  window.open(
+                    `https://web.whatsapp.com/send/?phone=${
+                      applicant.phone
+                    }&text=${encodeURIComponent(
+                      msg.replace("{name}", applicant.full_name.split(" ")[0])
+                    )}&type=phone_number&app_absent=0`
+                  )
+                }
+              >
+                Send WA Notice
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -224,36 +244,6 @@ export default function AdminDashboard() {
   }, []);
 
   // Fetch applicants from API
-  const fetchApplicants = async (index: number) => {
-    setLoading(true);
-    const response = await fetch(`/api/admin/tickets/${index}${filter}`, {
-      method: "GET",
-      headers: {
-        key: `${localStorage.getItem("admin-token")}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.length < 10) {
-        setHasMore(false); // No more data if less than 10 rows are returned
-      }
-      setApplicants((prevApplicants) => [...prevApplicants, ...data]);
-    } else {
-      if (response.status === 401) {
-        localStorage.removeItem("admin-token");
-        if (localStorage.getItem("school-token")) {
-          window.location.href = "/admin/payments";
-          return;
-        } else {
-          window.location.href = "/admin/login";
-          return;
-        }
-      } else customAlert("Failed to fetch applicants.");
-    }
-
-    setLoading(false);
-  };
 
   // Intersection Observer to implement infinite scroll
   useEffect(() => {
@@ -274,10 +264,41 @@ export default function AdminDashboard() {
 
   // Fetch data when pageIndex changes
   useEffect(() => {
+    const fetchApplicants = async (index: number) => {
+      setLoading(true);
+      const response = await fetch(`/api/admin/tickets/${index}${filter}`, {
+        method: "GET",
+        headers: {
+          key: `${localStorage.getItem("admin-token")}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length < 10) {
+          setHasMore(false); // No more data if less than 10 rows are returned
+        }
+        setApplicants((prevApplicants) => [...prevApplicants, ...data]);
+      } else {
+        if (response.status === 401) {
+          localStorage.removeItem("admin-token");
+          if (localStorage.getItem("school-token")) {
+            window.location.href = "/admin/payments";
+            return;
+          } else {
+            window.location.href = "/admin/login";
+            return;
+          }
+        } else customAlert("Failed to fetch applicants.");
+      }
+
+      setLoading(false);
+    };
+
     if (pageIndex > 0) {
       fetchApplicants(pageIndex);
     }
-  }, [pageIndex]);
+  }, [pageIndex, filter]);
 
   // Admit Applicant Handler (toggle admit status)
   const admitApplicant = async (id: number, admitted: boolean) => {
@@ -364,7 +385,11 @@ export default function AdminDashboard() {
                 setFilter("");
               } else if (variable === "tosend") {
                 setFilter(`?sent=false&paid=true`);
-              } else setFilter(`?${variable}=${encodeURIComponent(search)}`);
+              } else {
+                if (variable === "sent" && search === "")
+                  setFilter(`?${variable}=true`);
+                else setFilter(`?${variable}=${encodeURIComponent(search)}`);
+              }
 
               setApplicants([]);
               setPageIndex(0);

@@ -4,7 +4,12 @@ import QRCode from "qrcode";
 import { price } from "../../tickets/price/prices";
 import { sendEmail } from "./eTicketEmail";
 
-export async function pay(from: string, amount: string, date: string) {
+export async function pay(
+  from: string,
+  amount: string,
+  date: string,
+  email_if_needed: string
+) {
   if (
     process.env.ADMIN_KEY === undefined ||
     !process.env.ADMIN_KEY ||
@@ -78,6 +83,49 @@ export async function pay(from: string, amount: string, date: string) {
   let total = 0;
   for (let i = 0; i < unpaid.length; i++) {
     total += unpaid[i].price;
+  }
+
+  if (
+    parseInt(amount) < total &&
+    parseInt(amount) >= price.individual &&
+    email_if_needed === ""
+  ) {
+    return Response.json(
+      {
+        message:
+          "Not enough money to pay for all tickets. Identify using Emails.",
+      },
+      { status: 431 }
+    );
+  }
+
+  if (email_if_needed !== "") {
+    let queryio = "";
+    email_if_needed.split(",").forEach((email) => {
+      queryio += `email = '${email}' OR `;
+    });
+    queryio = queryio.slice(0, -4);
+    query = await sql.query(
+      `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio}`
+    );
+
+    unpaid = [];
+    for (let i = 0; i < query.rows.length; i++) {
+      let row = query.rows[i];
+      if (row.paid === false) {
+        row.price = row.type == "group" ? price.group : price.individual;
+        unpaid.push(row);
+      }
+    }
+
+    if (unpaid.length === 0) {
+      return Response.json({ message: "Nobody to pay for." }, { status: 400 });
+    }
+
+    total = 0;
+    for (let i = 0; i < unpaid.length; i++) {
+      total += unpaid[i].price;
+    }
   }
 
   let paid = 0;

@@ -3,7 +3,7 @@ import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
-import { customAlert } from "../custom-alert";
+import { customAlert, customAlert2 } from "../custom-alert";
 import styles from "./payments.module.css";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
@@ -13,11 +13,10 @@ export default function Payments() {
     from: "",
     amount: "",
     date: "",
-    username: "",
   });
   const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
   const [type, setType] = useState<"admin" | "school">("school");
-  const [changingFieldTitle, setChangingFieldTitle] = useState("");
+  const [changingFieldTitle, setChangingFieldTitle] = useState("Email Address");
 
   useEffect(() => {
     if (localStorage.getItem("admin-token")) {
@@ -82,11 +81,25 @@ export default function Payments() {
     }
 
     if (name == "method") {
-      formData.username = "";
+      formData.from = "";
+      formData.amount = "";
+      formData.date = "";
       setFormData({
         ...formData,
-        username: "",
+        from: "",
+        amount: "",
+        date: "",
       });
+
+      if (value == "VFCASH") {
+        setChangingFieldTitle("Phone Number");
+      } else if (value == "TLDA") {
+        setChangingFieldTitle("Telda");
+      } else if (value == "IPN") {
+        setChangingFieldTitle("InstaPay Number");
+      } else {
+        setChangingFieldTitle("Email Address");
+      }
     }
 
     setFormData({
@@ -112,11 +125,11 @@ export default function Payments() {
       // Show Loader
 
       const response = await fetch(
-        `/api/admin/payment-reciever/${method.toLowerCase()}?email=${encodeURIComponent(
+        `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
           from
         )}&amount=${encodeURIComponent(amount)}&date=${encodeURIComponent(
           date
-        )}&username=${encodeURIComponent(formData.username)}`,
+        )}`,
         {
           method: "GET",
           headers: {
@@ -146,7 +159,55 @@ export default function Payments() {
         setFormData({ ...formData });
       } else {
         const { message } = await response.json();
-        customAlert(message);
+        if (response.status == 431) {
+          customAlert2(async (email: string) => {
+            addLoader();
+            // setTimeout(() => {
+            //   removeLoader();
+            //   customAlert("Email sent to " + email);
+            // }, 1000);
+            const response = await fetch(
+              `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
+                from
+              )}&amount=${encodeURIComponent(amount)}&date=${encodeURIComponent(
+                date
+              )}&email_id=${encodeURIComponent(email)}`,
+              {
+                method: "GET",
+                headers: {
+                  key: localStorage.getItem("school-token")
+                    ? (localStorage.getItem("school-token") as string)
+                    : (localStorage.getItem("admin-token") as string),
+                },
+              }
+            );
+
+            if (response.ok) {
+              let { refund, paid } = await response.json();
+              if (!refund)
+                customAlert(
+                  paid +
+                    " EGP were accepted successfully. Refund " +
+                    (parseInt(amount) - paid) +
+                    " EGP."
+                );
+              else customAlert("Refund Inserted.");
+              if (parseInt(amount) - paid > 0) {
+                formData.amount = (paid - parseInt(amount)).toString();
+              } else {
+                formData.method = type == "admin" ? "" : "CASH";
+                formData.from = "";
+                formData.amount = "";
+                formData.date = "";
+              }
+              setFormData({ ...formData });
+            } else {
+              const { message } = await response.json();
+              customAlert(message);
+            }
+            removeLoader();
+          });
+        } else customAlert(message);
       }
     } else {
       customAlert("All fields are required.");
@@ -190,23 +251,8 @@ export default function Payments() {
               placeholder=" "
               required
             />
-            <label htmlFor="from">Email Address</label>
+            <label htmlFor="from">{changingFieldTitle}</label>
           </div>
-
-          {formData.method !== "CASH" && formData.method !== "" && (
-            <div className={styles.formGroup}>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder=" "
-                required
-              />
-              <label htmlFor="from">Username</label>
-            </div>
-          )}
 
           <div className={styles.formGroup}>
             <input

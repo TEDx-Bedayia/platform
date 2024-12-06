@@ -136,7 +136,7 @@ async function submitOneTicket(
     if (paymentMethod.split("@")[0] === "VFCASH") {
       paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. After your payment, send us a WhatsApp or SMS message from the phone you will pay with, <strong>${
         paymentMethod.split("@")[1]
-      }</strong>, along with your email address: <strong>${email}</strong> to confirm your payment.`;
+      }</strong>, stating your email address: <strong>${email}</strong> to confirm your payment.`;
     } else if (paymentMethod.split("@")[0] === "CASH") {
       paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion: <strong>${email}</strong>.`;
     } else if (paymentMethod.split("@")[0] === "TLDA") {
