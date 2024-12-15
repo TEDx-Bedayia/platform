@@ -160,26 +160,17 @@ async function submitOneTicket(
         pass: process.env.EMAIL_PASSWORD,
       },
     });
-    try {
-      await transporter.sendMail({
-        from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
-        to: email,
-        subject: "Regarding your eTicket.",
-        html: personalizedHtml,
-      });
-    } catch (error) {
-      await sql`DELETE FROM attendees WHERE email = ${email}`;
-      return Response.json(
-        {
-          message: error,
-          success: false,
-        },
-        { status: 502 }
-      );
-    }
+
+    await transporter.sendMail({
+      from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
+      to: email,
+      subject: "Regarding your eTicket.",
+      html: personalizedHtml,
+    });
+
     return Response.json(
       {
-        message: `Ticket Booked! Please check your email ${email} for confirmation.`,
+        message: `Ticket Booked! Please check your email for confirmation.`,
         success: true,
       },
       { status: 200 }
