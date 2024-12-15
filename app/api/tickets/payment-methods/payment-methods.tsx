@@ -1,4 +1,4 @@
-import { IPN, TELDA } from "@/app/metadata";
+import { IPN, PHONE, TELDA } from "@/app/metadata";
 
 export interface PaymentMethod {
   displayName: string;
@@ -38,17 +38,17 @@ const INSTAPAY: PaymentMethod = {
     {
       type: "string",
       id: "ipn",
-      label: "Account Number/Name",
-      placeholder: "Enter your Account Number (IPN)",
+      label: "Account Name",
+      placeholder: "Enter your IPA Name (you@instapay)",
       required: true,
     },
   ],
 };
 
 const VFCASH: PaymentMethod = {
-  displayName: "Mobile Wallet (e.g. Vodafone Cash)",
+  displayName: "E-Wallet (e.g. Vodafone Cash)",
   identifier: "VFCASH",
-  to: "The Phone Number for the wallet will be sent to your Email/WhatsApp",
+  to: PHONE,
   fields: [
     {
       type: "string",
@@ -61,9 +61,9 @@ const VFCASH: PaymentMethod = {
 };
 
 const CASH: PaymentMethod = {
-  displayName: "Bedayia High School Office",
+  displayName: "Bedayia High School Office (Cash)",
   identifier: "CASH",
-  to: "Pay at the School Office",
+  to: "School Office",
   fields: [],
 };
 
