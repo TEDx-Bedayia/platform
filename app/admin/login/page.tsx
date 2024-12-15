@@ -74,7 +74,7 @@ export default function AdminLogin() {
   return (
     <div className={styles.pageContainer}>
       <form onSubmit={handleSubmit} className={styles.formContainer}>
-        <h2 style={{ ...title.style, fontWeight: 700 }}>eTickets v1.0</h2>
+        <h2 className={title.className}>eTickets v1.0</h2>
 
         <div className={styles.formGroup}>
           <input
