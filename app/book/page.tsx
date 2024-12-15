@@ -118,6 +118,7 @@ export default function SingleTickets() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    document.body.focus();
     addLoader();
     if (
       formData.additionalFields.vfcash &&

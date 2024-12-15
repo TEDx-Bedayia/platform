@@ -102,7 +102,7 @@ async function submitOneTicket(
   }
 
   if (!checkSafety(name)) {
-    return Response.json({ message: "Invalid Name." });
+    return Response.json({ message: "Invalid Name." }, { status: 400 });
   }
 
   let query = await sql`SELECT * FROM attendees WHERE email = ${email};`;
