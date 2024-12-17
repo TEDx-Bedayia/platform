@@ -140,7 +140,7 @@ async function sendBookingConfirmation(
 
   paymentDetails += ` The price for your entire group ticket (4 people) is: <strong>${
     price.group * 4
-  } EGP</strong>. Make sure to pay the exact due amount at once to avoid delays.`;
+  } EGP</strong>. Make sure one member pays the exact due amount at once to avoid delays. You can't pay for individual tickets separately.`;
 
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent

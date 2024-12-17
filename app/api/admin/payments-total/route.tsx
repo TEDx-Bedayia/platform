@@ -4,7 +4,10 @@ import { getPaymentMethods } from "../../tickets/payment-methods/payment-methods
 import { price } from "../../tickets/price/prices";
 
 export async function GET(request: NextRequest) {
-  if (request.headers.get("key") !== process.env.ADMIN_KEY) {
+  if (
+    request.headers.get("key") !== process.env.ADMIN_KEY ||
+    !process.env.ADMIN_KEY
+  ) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

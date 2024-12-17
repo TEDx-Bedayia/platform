@@ -4,7 +4,10 @@ import { pay } from "../main";
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
-  if (request.headers.get("key") !== process.env.ADMIN_KEY) {
+  if (
+    request.headers.get("key") !== process.env.ADMIN_KEY ||
+    !process.env.ADMIN_KEY
+  ) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

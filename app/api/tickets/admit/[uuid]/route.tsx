@@ -18,7 +18,11 @@ export async function GET(
   headers.set("Access-Control-Allow-Headers", "Content-Type, key"); // Allow specific headers
 
   // Check if the request is coming from official app.
-  if (request.nextUrl.searchParams.get("key") !== process.env.APP_KEY) {
+  if (
+    request.nextUrl.searchParams.get("key") !== process.env.APP_KEY ||
+    process.env.APP_KEY === undefined ||
+    !process.env.APP_KEY
+  ) {
     return Response.json(
       { message: "Unauthorized" },
       { status: 401, headers: headers }

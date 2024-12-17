@@ -10,7 +10,11 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (req.headers.get("key") !== process.env.ADMIN_KEY) {
+  if (
+    req.headers.get("key") !== process.env.ADMIN_KEY ||
+    !process.env.ADMIN_KEY ||
+    !process.env.DESTRUCTIVE_KEY
+  ) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 

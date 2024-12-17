@@ -279,7 +279,7 @@ export async function pay(
     const totalPrice = paidFor.reduce((sum, item) => sum + item.price, 0);
     if (totalPrice != paid) {
       console.error(
-        "OH NO! INSANE ERROR! HUGE ERROR! MASSIVE ERROR! main.tsx line 220"
+        "OH NO! INSANE ERROR! HUGE ERROR! MASSIVE ERROR! main.tsx line 282"
       );
       return Response.json(
         {
