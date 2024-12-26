@@ -124,8 +124,6 @@ async function submitOneTicket(
     );
   }
 
-  //TODO EXTRA CHECKS IF NEEDED
-
   try {
     await sql.query(
       `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ($1::text, $2::text, $3::text, $4::text, $5::text);`,
@@ -141,55 +139,10 @@ async function submitOneTicket(
   }
 
   try {
-    const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
-    const htmlContent = await promises.readFile(filePath, "utf8");
-
-    let paymentDetails = "";
-    if (paymentMethod.split("@")[0] === "VFCASH") {
-      paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. After your payment, send us a WhatsApp or SMS message from the phone you will pay with, <strong>${
-        paymentMethod.split("@")[1]
-      }</strong>, stating your email address: <strong>${email}</strong> to confirm your payment.`;
-    } else if (paymentMethod.split("@")[0] === "CASH") {
-      paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion: <strong>${email}</strong>.`;
-    } else if (paymentMethod.split("@")[0] === "TLDA") {
-      paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>.`;
-    } else if (paymentMethod.split("@")[0] === "IPN") {
-      paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Please send us a screenshot of your payment along with your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp.`;
-    }
-
-    let pricingDesc = `The price for your ticket is: <strong>${price.individual} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
-
-    // Replace placeholders in the HTML
-    const personalizedHtml = htmlContent
-      .replace("${name}", name)
-      .replace("${vfcash}", paymentDetails)
-      .replace("{pricingDesc}", pricingDesc)
-      .replace("{PHONE}", PHONE)
-      .replaceAll("${year}", YEAR.toString());
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
-      to: email,
-      subject: "Regarding your eTicket.",
-      html: personalizedHtml,
-    });
-
-    return Response.json(
-      {
-        message: `Ticket Booked! Please check your email for confirmation.`,
-        success: true,
-      },
-      { status: 200 }
-    );
+    // send payment details and next steps.
+    await sendSingleBookingConfirmation(email, name, phone, paymentMethod);
   } catch (error) {
+    // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE email = ${email}`;
     console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
     return Response.json(
@@ -202,4 +155,58 @@ async function submitOneTicket(
   }
 }
 
-async function sendSingleBookingConfirmation() {}
+async function sendSingleBookingConfirmation(
+  email: string,
+  name: string,
+  phone: string,
+  paymentMethod: string
+) {
+  const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
+  const htmlContent = await promises.readFile(filePath, "utf8");
+
+  let paymentDetails = "";
+  if (paymentMethod.split("@")[0] === "VFCASH") {
+    paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. After your payment, send us a WhatsApp or SMS message from the phone you will pay with, <strong>${
+      paymentMethod.split("@")[1]
+    }</strong>, stating your email address: <strong>${email}</strong> to confirm your payment.`;
+  } else if (paymentMethod.split("@")[0] === "CASH") {
+    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion: <strong>${email}</strong>.`;
+  } else if (paymentMethod.split("@")[0] === "TLDA") {
+    paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>.`;
+  } else if (paymentMethod.split("@")[0] === "IPN") {
+    paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Please send us a screenshot of your payment along with your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp.`;
+  }
+
+  let pricingDesc = `The price for your ticket is: <strong>${price.individual} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
+
+  // Replace placeholders in the HTML
+  const personalizedHtml = htmlContent
+    .replace("${name}", name)
+    .replace("${vfcash}", paymentDetails)
+    .replace("{pricingDesc}", pricingDesc)
+    .replace("{PHONE}", PHONE)
+    .replaceAll("${year}", YEAR.toString());
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  await transporter.sendMail({
+    from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
+    to: email,
+    subject: "Regarding your eTicket.",
+    html: personalizedHtml,
+  });
+
+  return Response.json(
+    {
+      message: `Ticket Booked! Please check your email for confirmation.`,
+      success: true,
+    },
+    { status: 200 }
+  );
+}

@@ -5,12 +5,7 @@ import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import path from "path";
 import { price } from "../price/prices";
-import {
-  checkSafety,
-  generateRandomString,
-  verifyEmail,
-  verifyPaymentMethod,
-} from "../utils";
+import { checkSafety, verifyEmail, verifyPaymentMethod } from "../utils";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod
@@ -251,8 +246,6 @@ async function submitTickets(
       { status: 400 }
     );
   }
-
-  //TODO EXTRA CHECKS IF NEEDED
 
   let q = "";
   for (let i = 0; i < emails.length; i++) {
