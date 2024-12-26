@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   if (type === "individual") {
     total = price.individual;
   } else if (type === "group") {
-    total = price.group;
+    total = price.group * 4;
   } else {
     return Response.json({ message: "Invalid ticket type." }, { status: 400 });
   }
