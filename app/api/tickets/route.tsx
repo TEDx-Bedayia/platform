@@ -91,6 +91,9 @@ async function submitOneTicket(
     );
   }
 
+  if (phone[0] == "+") {
+    phone = phone.slice(1);
+  }
   if (phone.length === 11) {
     phone = "2" + phone;
   } else if (phone.length === 13) {
@@ -128,7 +131,16 @@ async function submitOneTicket(
       `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ($1::text, $2::text, $3::text, $4::text, $5::text);`,
       [email, name, paymentMethod, phone, "individual"]
     );
+  } catch (error) {
+    return Response.json(
+      {
+        message: "Error occurred. Please try again or contact us for help.",
+      },
+      { status: 400 }
+    );
+  }
 
+  try {
     const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
     const htmlContent = await promises.readFile(filePath, "utf8");
 
@@ -142,15 +154,17 @@ async function submitOneTicket(
     } else if (paymentMethod.split("@")[0] === "TLDA") {
       paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>.`;
     } else if (paymentMethod.split("@")[0] === "IPN") {
-      paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Make sure to include a comment with your email address if possible: <strong>${email}</strong>.`;
+      paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Please send us a screenshot of your payment along with your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp.`;
     }
 
-    paymentDetails += ` The price for your ticket is: <strong>${price.individual} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
+    let pricingDesc = `The price for your ticket is: <strong>${price.individual} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
 
     // Replace placeholders in the HTML
     const personalizedHtml = htmlContent
       .replace("${name}", name)
       .replace("${vfcash}", paymentDetails)
+      .replace("{pricingDesc}", pricingDesc)
+      .replace("{PHONE}", PHONE)
       .replaceAll("${year}", YEAR.toString());
 
     const transporter = nodemailer.createTransport({
@@ -187,3 +201,5 @@ async function submitOneTicket(
     );
   }
 }
+
+async function sendSingleBookingConfirmation() {}

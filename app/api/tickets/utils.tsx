@@ -18,6 +18,9 @@ export async function verifyPaymentMethod(
 ): Promise<string | undefined> {
   const method = paymentMethod.split("@")[0];
   let metadata = paymentMethod.split("@")[1];
+  if (metadata.includes("@")) {
+    return;
+  }
   const options = await getIdentifiersForPaymentMethods();
   if (!paymentMethod || !options.includes(method)) {
     return;

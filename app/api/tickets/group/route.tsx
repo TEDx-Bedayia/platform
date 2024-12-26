@@ -127,25 +127,27 @@ async function sendBookingConfirmation(
 
   let paymentDetails = "";
   if (paymentMethod.split("@")[0] === "VFCASH") {
-    paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. Send us a WhatsApp message from <strong>${
+    paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. After your payment, send us a WhatsApp or SMS message from the phone you will pay with, <strong>${
       paymentMethod.split("@")[1]
-    }</strong> with your email address: <strong>${email}</strong> to confirm your payment.`;
+    }</strong>, stating your email address: <strong>${email}</strong> to confirm your payment.`;
   } else if (paymentMethod.split("@")[0] === "CASH") {
-    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion, <strong>${email}</strong>.`;
+    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion: <strong>${email}</strong>.`;
   } else if (paymentMethod.split("@")[0] === "TLDA") {
     paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>.`;
   } else if (paymentMethod.split("@")[0] === "IPN") {
-    paymentDetails = `Please proceed with your Instapay Transfer to the following account: <strong>${IPN}</strong>. Make sure to include a comment with your email address if possible: <strong>${email}</strong>.`;
+    paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Please send us a screenshot of your payment along with your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp.`;
   }
 
-  paymentDetails += ` The price for your entire group ticket (4 people) is: <strong>${
+  let pricingDesc = `The price for your entire group ticket (4 people) is: <strong>${
     price.group * 4
-  } EGP</strong>. Make sure one member pays the exact due amount at once to avoid delays. You can't pay for individual tickets separately.`;
+  } EGP</strong>. Make sure ONE member pays the exact due amount at once to avoid delays. You can't pay for each ticket separately. P.S. Only one member has to go through the steps outlined above for payment.`;
 
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent
     .replace("${name}", name)
     .replace("${vfcash}", paymentDetails)
+    .replace("{pricingDesc}", pricingDesc)
+    .replace("{PHONE}", PHONE)
     .replaceAll("${year}", YEAR.toString());
 
   const transporter = nodemailer.createTransport({
@@ -155,19 +157,12 @@ async function sendBookingConfirmation(
       pass: process.env.EMAIL_PASSWORD,
     },
   });
-  transporter.sendMail({
+  await transporter.sendMail({
     from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
     to: email,
     subject: "Regarding your eTicket.",
     html: personalizedHtml,
   });
-  return Response.json(
-    {
-      message: "Ticket Booked! Please check your email for confirmation.",
-      success: true,
-    },
-    { status: 200 }
-  );
 }
 
 async function submitTickets(
@@ -184,8 +179,7 @@ async function submitTickets(
   }
 
   paymentMethod = await verifyPaymentMethod(paymentMethod);
-
-  if (paymentMethod === undefined) {
+  if (paymentMethod === undefined || paymentMethod.split("@").length > 2) {
     return Response.json(
       { message: "Please enter a valid payment method." },
       { status: 400 }
@@ -216,6 +210,16 @@ async function submitTickets(
     }
   }
 
+  if (phone[0] == "+") {
+    phone = phone.slice(1);
+  }
+
+  if (phone.length === 11) {
+    phone = "2" + phone;
+  } else if (phone.length === 13) {
+    phone = phone.slice(1);
+  }
+
   if (!checkSafety(phone)) {
     return Response.json({ message: "Invalid Phone Number." }, { status: 400 });
   }
@@ -224,7 +228,6 @@ async function submitTickets(
     await sql`SELECT * FROM attendees WHERE email = ${emails[0]} OR email = ${emails[1]} OR email = ${emails[2]} OR email = ${emails[3]};`;
 
   let errTxt = "";
-  let errTxt2 = "";
   if (query.rows.length > 0) {
     if (query.rows.length == 1) {
       errTxt = "There's a registered attendee with ";
@@ -234,29 +237,16 @@ async function submitTickets(
   }
   for (let i = 0; i < query.rows.length; i++) {
     let email = query.rows[i].email;
-    const email1 = email.split("@")[0].split("+")[0];
-    const email2 = email.split("@")[1];
-    let add = "ot";
-    if (email.split("+").length > 1) {
-      add = add + generateRandomString(3);
-    }
 
     errTxt += `${names[emails.indexOf(email)]}'s email`;
-
-    errTxt2 += `${email1}+${add}@${email2}`;
     if (i != query.rows.length - 1) {
       errTxt += ", ";
-      errTxt2 += ", ";
     }
   }
   if (errTxt != "") {
     return Response.json(
       {
-        message:
-          errTxt +
-          ". Please change their email(s) to " +
-          errTxt2 +
-          " respectively if you wish to proceed.",
+        message: errTxt + ". Contact us if you believe this is a mistake.",
       },
       { status: 400 }
     );
