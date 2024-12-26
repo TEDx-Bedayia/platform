@@ -40,6 +40,7 @@ export function addLoader() {
   loaderContainer.style.pointerEvents = "auto"; // Ensure this container captures all pointer events
 
   document.body.style.pointerEvents = "none"; // Disable pointer events on the body
+  loaderContainer.focus(); // Focus on the loader container
 
   // Append the div to the body
   document.body.appendChild(loaderContainer);
@@ -56,4 +57,5 @@ export function removeLoader() {
     loaderContainer.remove(); // Remove the entire loader root container
   }
   document.body.style.pointerEvents = "auto"; // Re-enable pointer events on the body
+  document.body.focus();
 }
