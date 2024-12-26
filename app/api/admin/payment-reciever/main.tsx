@@ -266,8 +266,7 @@ export async function pay(
         await sendEmail(
           paidFor[i].email,
           paidFor[i].full_name,
-          paidFor[i].uuid,
-          qr
+          paidFor[i].uuid
         );
       }
     } catch (e) {
