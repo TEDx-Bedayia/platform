@@ -54,7 +54,7 @@ const VFCASH: PaymentMethod = {
       type: "string",
       label: "Phone Number",
       id: "vfcash",
-      placeholder: "Enter the Phone Number you'll transfer from",
+      placeholder: "Enter the Phone Number you'll pay with",
       required: true,
     },
   ],
