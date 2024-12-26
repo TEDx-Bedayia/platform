@@ -140,7 +140,7 @@ async function submitOneTicket(
 
   try {
     // send payment details and next steps.
-    await sendSingleBookingConfirmation(email, name, phone, paymentMethod);
+    await sendSingleBookingConfirmation(email, name, paymentMethod);
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE email = ${email}`;
@@ -153,12 +153,18 @@ async function submitOneTicket(
       { status: 400 }
     );
   }
+  return Response.json(
+    {
+      message: `Ticket Booked! Please check your email for confirmation.`,
+      success: true,
+    },
+    { status: 200 }
+  );
 }
 
 async function sendSingleBookingConfirmation(
   email: string,
   name: string,
-  phone: string,
   paymentMethod: string
 ) {
   const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
@@ -201,12 +207,4 @@ async function sendSingleBookingConfirmation(
     subject: "Regarding your eTicket.",
     html: personalizedHtml,
   });
-
-  return Response.json(
-    {
-      message: `Ticket Booked! Please check your email for confirmation.`,
-      success: true,
-    },
-    { status: 200 }
-  );
 }
