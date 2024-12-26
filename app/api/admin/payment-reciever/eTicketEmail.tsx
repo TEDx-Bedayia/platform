@@ -3,21 +3,15 @@ import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
-const BASE64 = false;
 
-export async function sendEmail(
-  email: string,
-  name: string,
-  uuid: string,
-  base64: string
-) {
+export async function sendEmail(email: string, name: string, uuid: string) {
   const filePath = path.join(process.cwd(), "public/eTicket-template.html");
   const htmlContent = await promises.readFile(filePath, "utf8");
 
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent
     .replace("${name}", name)
-    .replace("${qrCodeURL}", BASE64 ? base64 : `${HOST}/api/qr?uuid=${uuid}`)
+    .replace("${qrCodeURL}", `${HOST}/api/qr?uuid=${uuid}`)
     .replace("${uuid}", uuid)
     .replaceAll("${year}", YEAR.toString());
 
@@ -29,7 +23,7 @@ export async function sendEmail(
         pass: process.env.EMAIL_PASSWORD,
       },
     });
-    transporter.sendMail({
+    await transporter.sendMail({
       from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
       to: email,
       attachDataUrls: true,
