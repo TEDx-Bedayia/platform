@@ -282,9 +282,9 @@ export default function SingleTickets() {
           )}
 
           <motion.div
-            initial={{ scale: 2, opacity: 0 }}
+            initial={{ scale: 2, opacity: 0.2 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "tween", ease: "anticipate", duration: 3 }}
+            transition={{ type: "tween", ease: "anticipate", duration: 2 }}
           >
             <button type="submit" style={{ width: "100%" }}>
               Submit
