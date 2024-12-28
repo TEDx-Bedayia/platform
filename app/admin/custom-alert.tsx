@@ -23,7 +23,7 @@ export function customAlert(txt: string, closeable = true) {
   alertBox.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.1)";
   alertBox.style.textAlign = "center";
   alertBox.style.maxWidth = "400px";
-  alertBox.style.width = "100%";
+  alertBox.style.width = "85%";
   alertBox.style.transform = "scale(0.9)"; // Start with a slightly smaller scale
   alertBox.style.transition = "transform 0.3s ease, opacity 0.3s ease"; // Animation on transform and opacity
 
@@ -47,7 +47,7 @@ export function customAlert(txt: string, closeable = true) {
   // Add close button functionality
   closeButton.onclick = () => {
     // Start closing animation
-    alertBox.style.transform = "scale(0.9)";
+    alertBox.style.transform = "scale(0.8)";
     alertBox.style.opacity = "0";
     overlay.style.opacity = "0";
 

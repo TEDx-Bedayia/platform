@@ -133,9 +133,10 @@ async function sendBookingConfirmation(
     paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Please send us a screenshot of your payment along with your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp.`;
   }
 
-  let pricingDesc = `The price for your entire group ticket (4 people) is: <strong>${
-    price.group * 4
-  } EGP</strong>. Make sure ONE member pays the exact due amount at once to avoid delays. You can't pay for each ticket separately. P.S. Only one member has to go through the steps outlined above for payment.`;
+  let pricingDesc = `The price for your entire group ticket (4 people) is: <strong>${price.markup(
+    price.group * 4,
+    paymentMethod.split("@")[0].toLowerCase()
+  )} EGP</strong>. Make sure ONE member pays the exact due amount at once to avoid delays. You can't pay for each ticket separately. P.S. Only one member has to go through the steps outlined above for payment.`;
 
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent

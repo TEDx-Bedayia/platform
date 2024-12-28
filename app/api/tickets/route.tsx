@@ -183,7 +183,10 @@ async function sendSingleBookingConfirmation(
     paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Please send us a screenshot of your payment along with your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp.`;
   }
 
-  let pricingDesc = `The price for your ticket is: <strong>${price.individual} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
+  let pricingDesc = `The price for your ticket is: <strong>${price.markup(
+    price.individual,
+    paymentMethod.split("@")[0].toLowerCase()
+  )} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
 
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent

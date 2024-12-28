@@ -1,8 +1,16 @@
 /* book.css */
 
 /* Base styles */
-body {
-  background-color: #000; /* Black background */
+.containerBOOK {
+  /* background-color: #000; */
+  /* Set Background color to be a grainy gradient between #c33764 and #1d2671 */
+
+  background: linear-gradient(
+    45deg,
+    #c33764,
+    #1d2671
+  ); /* Gradient background for visual interest */
+
   font-family: Arial, sans-serif;
   color: #fff; /* White text for readability */
   margin: 0;
@@ -11,20 +19,40 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  width: 100vw !important;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Form Section */
 #book-one-ticket {
   width: 100%;
   max-width: 400px;
-  background-color: #1e1e1e; /* Dark gray background for the form */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  width: 450px;
+  border-radius: 1rem;
+  background: rgb(255, 255, 255, 0.2);
+  padding: 1.5rem;
+  color: #fff;
+
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); /* Soft white shadow */
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+  width: auto;
+  text-align: center;
+  font-family: "Poppins";
+  font-weight: 700;
 }
 
 /* Form Elements */
 form {
+  /* opacity: 0; */
   display: flex;
   flex-direction: column;
 }
@@ -32,17 +60,27 @@ form {
 input[type="email"],
 input[type="text"],
 input[type="number"],
+.additional-field input[type="string"],
 select {
-  background-color: #333; /* Darker input background */
+  /* background-color: #333; */
+  background: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* Slightly transparent white background */
+
   color: #fff; /* White text inside inputs */
   border: none;
-  padding: 10px;
+  padding: 10px 20px;
   margin: 10px 0;
-  border-radius: 5px;
+  border-radius: 100rem;
+  border: #fff 1px solid;
   font-size: 1rem;
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
   width: 100%;
   box-sizing: border-box;
+  transition: all 0.25s ease;
 }
 
 /* Labels */
@@ -56,7 +94,7 @@ label {
 input:focus,
 select:focus {
   outline: none;
-  background-color: #444; /* Slightly lighter when focused */
+  border-color: #ccc;
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
 }
 
@@ -65,10 +103,15 @@ button[type="submit"] {
   background-color: #007bff; /* Blue button */
   color: #fff;
   padding: 12px;
-  margin-top: 20px;
+  margin-top: 12px;
   border: none;
-  border-radius: 5px;
-  font-size: 1rem;
+  border-radius: 100rem;
+  font-family: "Poppins";
+  font-weight: 700;
+  /* add letter spacing */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 1.1em;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -84,11 +127,6 @@ button[type="submit"]:hover {
   }
 }
 
-/* Additional Field Styles */
-#book-one-ticket .additional-field {
-  margin-top: 5px;
-}
-
 /* Additional field labels */
 #book-one-ticket .additional-field label {
   font-size: 0.9rem;
@@ -102,29 +140,45 @@ button[type="submit"]:hover {
 /* Additional field inputs */
 #book-one-ticket .additional-field input[type="text"],
 #book-one-ticket .additional-field input[type="string"] {
-  background-color: #333; /* Darker background for input fields */
-  color: #fff; /* White text inside the inputs */
-  border: none;
+  /* background-color: transparent;
+  color: #fff;
+  border: #fff 1px solid;
   padding: 10px;
   margin-top: 5px;
   border-radius: 5px;
   font-size: 1rem;
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
   width: 100%;
-  box-sizing: border-box;
+  box-sizing: border-box; */
 }
 
 /* Additional field input focus state */
 #book-one-ticket .additional-field input:focus {
   outline: none;
-  background-color: #444; /* Lighter background on focus */
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
 }
 
 /* Additional field container */
 #book-one-ticket .additional-field-container {
   margin-top: 10px;
-  padding: 10px;
-  background-color: #2b2b2b; /* Slightly lighter container background for visual grouping */
+  background-color: transparent; /* Slightly lighter container background for visual grouping */
   border-radius: 5px;
+}
+
+input:focus + label,
+textarea:focus + label {
+  /* color: white !important; */
+  color: #ca7892 !important;
+  cursor: text !important;
+}
+
+input:focus,
+textarea:focus {
+  cursor: text !important;
+}
+
+label,
+input,
+textarea {
+  transition: all ease 300ms;
 }

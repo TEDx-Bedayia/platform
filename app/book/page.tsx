@@ -1,14 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
-import "./book.css";
+import styles from "./book.module.css";
 
+import { motion } from "framer-motion";
+
+import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
 import {
   Field,
   PaymentMethod,
 } from "../api/tickets/payment-methods/payment-methods";
 import { addLoader, removeLoader } from "../global_components/loader";
-
+const title = Poppins({ weight: "700", subsets: ["latin"] });
+const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 export default function SingleTickets() {
   const [formData, setFormData] = useState({
     email: "",
@@ -57,13 +61,17 @@ export default function SingleTickets() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
-    if (value.includes("@")) {
+    if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
       return;
     }
-    if (name == "vfcash" && (isNaN(Number(value)) || value.includes(" "))) {
+    if (name == "tlda" && value.includes("+")) return;
+    if (
+      (name == "vfcash" || name == "ipn") &&
+      (isNaN(Number(value)) || value.includes(" "))
+    ) {
       if (value != "+") return;
     }
-    if (name == "vfcash") {
+    if (name == "vfcash" || name == "ipn") {
       if (value.includes("+")) {
         if (value.length > 13) return;
       } else if (value.length > 11) {
@@ -154,80 +162,136 @@ export default function SingleTickets() {
   }
 
   return (
-    <section id="book-one-ticket">
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          id="name-input"
-          placeholder="Enter your name"
-          value={formData.name}
-          required={true}
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          id="email-input"
-          required={true}
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="phone"
-          id="phone-input"
-          placeholder="Enter your phone number"
-          maxLength={13}
-          minLength={11}
-          required={true}
-          value={formData.phone}
-          onChange={handleChange}
-        />
-
-        <select
-          name="paymentMethod"
-          id="payment-method"
-          required={true}
-          value={formData.paymentMethod}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Select Payment Method
-          </option>
-          {paymentOptions.map((option) => (
-            <option key={option.identifier} value={option.identifier}>
-              {option.displayName}
-            </option>
-          ))}
-        </select>
-
-        {/* Dynamically render additional fields based on selected payment method */}
-        {selectedPaymentFields.length > 0 && (
-          <div className="additional-field-container">
-            {selectedPaymentFields.length > 0 &&
-              selectedPaymentFields.map((field, index) => (
-                <div className="additional-field" key={index}>
-                  <label htmlFor={`additional-field-${index}`}>
-                    {field.label}
-                  </label>
-                  <input
-                    type={field.type}
-                    name={field.id}
-                    id={`additional-field-${index}`}
-                    placeholder={field.placeholder}
-                    required={field.required}
-                    value={formData.additionalFields[field.id] || ""}
-                    onChange={handleAdditionalFieldChange}
-                  />
-                </div>
-              ))}
+    <section id="book-one-ticket" className={styles.container}>
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ ease: "easeInOut", duration: 0.75 }}
+      >
+        <h1 style={title.style}>Book a Ticket</h1>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ ease: "easeInOut", duration: 1.75 }}
+      >
+        <form onSubmit={handleSubmit} style={ubuntu.style}>
+          <div className={styles.mainTextbox}>
+            <div className={styles.inputWrapper}>
+              <input
+                type="text"
+                name="name"
+                id="name-input"
+                placeholder=""
+                value={formData.name}
+                required={true}
+                onChange={handleChange}
+              />
+              <label htmlFor="name">Full Name</label>
+            </div>
           </div>
-        )}
 
-        <button type="submit">Submit</button>
-      </form>
+          <div className={styles.mainTextbox}>
+            <div className={styles.inputWrapper}>
+              <input
+                type="email"
+                name="email"
+                placeholder=""
+                id="email-input"
+                required={true}
+                value={formData.email}
+                onChange={handleChange}
+              />
+              <label htmlFor="email">Email Address</label>
+            </div>
+          </div>
+
+          <div className={styles.mainTextbox}>
+            <div className={styles.inputWrapper}>
+              <input
+                type="text"
+                name="phone"
+                id="phone-input"
+                placeholder=""
+                maxLength={13}
+                minLength={11}
+                required={true}
+                value={formData.phone}
+                onChange={handleChange}
+              />
+              <label htmlFor="phone">Phone Number</label>
+            </div>
+          </div>
+
+          <div className={styles.paymentMethodContainer}>
+            <select
+              name="paymentMethod"
+              id="payment-method"
+              required={true}
+              value={formData.paymentMethod}
+              onChange={handleChange}
+            >
+              <option value="" disabled selected>
+                Select Payment Method
+              </option>
+              {paymentOptions.map((option) => (
+                <option key={option.identifier} value={option.identifier}>
+                  {option.displayName}
+                </option>
+              ))}
+            </select>
+
+            <svg
+              className={styles.selectArrow}
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 8.825C5.8 8.825 5.6 8.725 5.5 8.625L2.2 5.325C1.9 5.025 1.9 4.525 2.2 4.225C2.5 3.925 3 3.925 3.3 4.225L6 6.925L8.7 4.225C9 3.925 9.5 3.925 9.8 4.225C10.1 4.525 10.1 5.025 9.8 5.325L6.6 8.525C6.4 8.725 6.2 8.825 6 8.825Z"
+                fill="#fff"
+              />
+            </svg>
+          </div>
+
+          {/* Dynamically render additional fields based on selected payment method */}
+          {selectedPaymentFields.length > 0 && (
+            <div className="additional-field-container">
+              {selectedPaymentFields.length > 0 &&
+                selectedPaymentFields.map((field, index) => (
+                  <div className={styles.mainTextbox} key={index}>
+                    <div className={styles.inputWrapper}>
+                      <input
+                        type={field.type}
+                        name={field.id}
+                        id={`additional-field-${index}`}
+                        placeholder=""
+                        required={field.required}
+                        value={formData.additionalFields[field.id] || ""}
+                        onChange={handleAdditionalFieldChange}
+                      />
+                      <label htmlFor={`additional-field-${index}`}>
+                        {field.placeholder}
+                      </label>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+
+          <motion.div
+            initial={{ scale: 2, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "tween", ease: "anticipate", duration: 3 }}
+          >
+            <button type="submit" style={{ width: "100%" }}>
+              Submit
+            </button>
+          </motion.div>
+        </form>
+      </motion.div>
     </section>
   );
 }

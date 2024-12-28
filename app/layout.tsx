@@ -38,10 +38,7 @@ export default function RootLayout({
         />
         <link rel="manifest" href="/site.webmanifest" />
       </head>
-      <body>
-        {NavBar()}
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
