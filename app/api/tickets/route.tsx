@@ -52,10 +52,7 @@ export async function POST(request: NextRequest) {
   try {
     return await submitOneTicket(email!, name!, phone!, paymentMethod);
   } catch (error) {
-    return Response.json(
-      { message: "Error occurred." + error },
-      { status: 400 }
-    );
+    return Response.json({ message: "Error occurred." }, { status: 400 });
   }
 }
 
