@@ -3,6 +3,7 @@
 .container textarea,
 .container select {
   transition: all ease 300ms;
+  z-index: 10 !important;
 }
 
 .container {
@@ -26,7 +27,7 @@
   position: relative;
   background-size: 150% 150%;
   animation: backgroundAnimation 5s ease infinite;
-  z-index: -2;
+  /* z-index: -2; */
 }
 
 @keyframes backgroundAnimation {
@@ -46,8 +47,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   opacity: 0.3;
   pointer-events: none;
   background-image: repeating-radial-gradient(
@@ -57,7 +58,7 @@
     transparent 5%
   );
   filter: blur(3px);
-  z-index: -1;
+  z-index: 1;
 }
 
 .container h1 {
@@ -104,7 +105,6 @@
   /* box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); */
   width: 100%;
   box-sizing: border-box;
-  z-index: 2;
 }
 
 .container input {
@@ -135,7 +135,6 @@
   font-size: 1em;
   pointer-events: none;
   transition: all ease 300ms;
-  z-index: 2;
 }
 
 .inputWrapper input:focus + label,
@@ -204,7 +203,6 @@
   font-size: 1em;
   cursor: pointer;
   transition: background 0.3s ease;
-  z-index: 2;
 }
 
 .container button[type="submit"]:hover {
@@ -228,6 +226,6 @@
       rgba(0, 0, 0, 0.07) 1%,
       transparent 5%
     );
-    filter: blur(2px);
+    filter: blur(4px);
   }
 }

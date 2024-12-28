@@ -163,6 +163,7 @@ export default function SingleTickets() {
 
   return (
     <section id="book-one-ticket" className={styles.container}>
+      <div className="background"></div>
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
