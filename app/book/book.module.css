@@ -216,19 +216,18 @@
   .container form {
     padding: 15px;
     width: 80vw;
-    backdrop-filter: blur(300px) !important;
-    -webkit-backdrop-filter: blur(300px) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
   }
 
   .container::after {
-    opacity: 0.5;
+    opacity: 0.4;
     background-image: repeating-radial-gradient(
       circle at 50% 50%,
       transparent 0%,
       rgba(0, 0, 0, 0.07) 1%,
       transparent 5%
     );
-    filter: blur(1px);
-    z-index: 0;
+    filter: blur(2px);
   }
 }
