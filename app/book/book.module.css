@@ -216,8 +216,8 @@
   .container form {
     padding: 15px;
     width: 80vw;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(300px) !important;
+    -webkit-backdrop-filter: blur(300px) !important;
   }
 
   .container::after {
