@@ -84,8 +84,8 @@
   padding-left: 20px;
   padding-right: 20px;
   box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: #ffffff20 1px solid;
   z-index: 3 !important;
 }
