@@ -26,6 +26,7 @@
   position: relative;
   background-size: 150% 150%;
   animation: backgroundAnimation 5s ease infinite;
+  z-index: 1;
 }
 
 @keyframes backgroundAnimation {
@@ -83,9 +84,10 @@
   padding-left: 20px;
   padding-right: 20px;
   box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  z-index: 2;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: #ffffff20 1px solid;
+  z-index: 3;
 }
 
 .container input,
@@ -214,6 +216,8 @@
   .container form {
     padding: 15px;
     width: 80vw;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
   }
 
   .container::after {
