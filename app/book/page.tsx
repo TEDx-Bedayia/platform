@@ -163,7 +163,6 @@ export default function SingleTickets() {
 
   return (
     <section id="book-one-ticket" className={styles.container}>
-      <div className="background"></div>
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -231,8 +230,9 @@ export default function SingleTickets() {
               required={true}
               value={formData.paymentMethod}
               onChange={handleChange}
+              defaultValue=""
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Select Payment Method
               </option>
               {paymentOptions.map((option) => (
@@ -287,7 +287,7 @@ export default function SingleTickets() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "tween", ease: "anticipate", duration: 2 }}
           >
-            <button type="submit" style={{ width: "100%" }}>
+            <button type="submit" style={{ ...title.style, width: "100%" }}>
               Submit
             </button>
           </motion.div>
