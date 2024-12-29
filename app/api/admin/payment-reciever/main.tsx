@@ -325,7 +325,11 @@ export async function pay(
 
     try {
       for (let i = 0; i < paidFor.length; i++) {
-        sendEmail(paidFor[i].email, paidFor[i].full_name, paidFor[i].uuid);
+        await sendEmail(
+          paidFor[i].email,
+          paidFor[i].full_name,
+          paidFor[i].uuid
+        );
       }
     } catch (e) {
       return Response.json(
