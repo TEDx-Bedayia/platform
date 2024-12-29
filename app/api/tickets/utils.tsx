@@ -14,19 +14,21 @@ export function verifyEmail(email: string | undefined): boolean {
 }
 
 export function handleMisspelling(email: string): string {
-  if (email.includes("gamil")) {
-    email = email.replace("gamil", "gmail");
-  }
-
-  if (email.includes("gmai")) {
-    email = email.replace("gmai", "gmail");
-  }
-  if (email.includes("gnail")) {
-    email = email.replace("gnail", "gmail");
-  }
-  if (email.includes("gmali")) {
-    email = email.replace("gmali", "gmail");
-  }
+  email = email.replace(".xom", ".com");
+  email = email.replace("@gamil", "@gmail");
+  email = email.replace("@gmai", "@gmail");
+  email = email.replace("@gnail", "@gmail");
+  email = email.replace("@gmali", "@gmail");
+  email = email.replace("@gmal", "@gmail");
+  email = email.replace("@gmalil", "@gmail");
+  email = email.replace("@gmall", "@gmail");
+  email = email.replace("@gmeil", "@gmail");
+  email = email.replace("@gmil", "@gmail");
+  email = email.replace("@gmla", "@gmail");
+  email = email.replace("@bedaya", "@bedayia");
+  email = email.replace("@bedayiaa", "@bedayia");
+  email = email.replace("@bdayia", "@bedayia");
+  email = email.replace("@bdaya", "@bedayia");
   // Regexp to replace gamil, gmaill, gmal, gmalil, gmall, gmall, gmeil, gmil, gmla MUST BE AFTER THE @ symbol
   const gamil = /(?<=@)gma?i?l{1,2}/;
   if (gamil.test(email)) {
