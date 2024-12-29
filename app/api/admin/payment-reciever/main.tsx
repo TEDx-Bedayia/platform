@@ -37,7 +37,8 @@ export async function pay(
     toAdd = ` AND email = '${identification}'`;
   }
   let query = await sql.query(
-    `SELECT * FROM attendees WHERE payment_method = '${from}'` + toAdd
+    `SELECT * FROM attendees WHERE payment_method = '${from}' AND paid = false` +
+      toAdd
   );
 
   if (query.rows.length === 0) {
@@ -63,7 +64,7 @@ export async function pay(
       );
     }
     query = await sql.query(
-      `SELECT * FROM attendees WHERE payment_method = 'CASH' AND email = '${xx.rows[0].email1}' OR email = '${xx.rows[0].email2}' OR email = '${xx.rows[0].email3}' OR email = '${xx.rows[0].email4}'`
+      `SELECT * FROM attendees WHERE payment_method = 'CASH' AND paid = false AND email = '${xx.rows[0].email1}' OR email = '${xx.rows[0].email2}' OR email = '${xx.rows[0].email3}' OR email = '${xx.rows[0].email4}'`
     );
   }
 
@@ -81,13 +82,18 @@ export async function pay(
   }
 
   let total = 0;
+  let containsIndv = false;
   for (let i = 0; i < unpaid.length; i++) {
     total += unpaid[i].price;
+    if (unpaid[i].type == "individual") {
+      containsIndv = true;
+    }
   }
 
   if (
     parseInt(amount) < total &&
     parseInt(amount) >= price.individual &&
+    containsIndv &&
     email_if_needed === ""
   ) {
     return Response.json(
@@ -106,7 +112,7 @@ export async function pay(
     });
     queryio = queryio.slice(0, -4);
     query = await sql.query(
-      `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio}`
+      `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio} AND paid = false`
     );
 
     unpaid = [];
@@ -117,6 +123,46 @@ export async function pay(
         unpaid.push(row);
       }
     }
+
+    unpaid.forEach(async (row) => {
+      // If the row is a group ticket get the other emails as well
+      if (row.type === "group") {
+        const group =
+          await sql`SELECT * FROM groups WHERE email1 = ${row.email} OR email2 = ${row.email} OR email3 = ${row.email} OR email4 = ${row.email}`;
+        if (group.rows.length === 0) {
+          return Response.json(
+            {
+              message:
+                "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
+            },
+            { status: 400 }
+          );
+        }
+        const groupMembers = [
+          group.rows[0].email1,
+          group.rows[0].email2,
+          group.rows[0].email3,
+          group.rows[0].email4,
+        ];
+
+        queryio = "";
+        groupMembers.forEach((email) => {
+          if (email != email_if_needed) queryio += `email = '${email}' OR `;
+        });
+        queryio = queryio.slice(0, -4);
+        query = await sql.query(
+          `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio} AND paid = false`
+        );
+
+        for (let i = 0; i < query.rows.length; i++) {
+          let row = query.rows[i];
+          if (row.paid === false) {
+            row.price = row.type == "group" ? price.group : price.individual;
+            unpaid.push(row);
+          }
+        }
+      }
+    });
 
     if (unpaid.length === 0) {
       return Response.json({ message: "Nobody to pay for." }, { status: 400 });

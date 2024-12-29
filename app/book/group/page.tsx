@@ -345,13 +345,14 @@ export default function SingleTickets() {
                   <motion.div
                     initial={{ opacity: 0.3, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
+                    key={index}
                     transition={{
                       type: "tween",
                       ease: "easeIn",
                       duration: 0.75,
                     }}
                   >
-                    <div className={styles.mainTextbox} key={index}>
+                    <div className={styles.mainTextbox}>
                       <div className={styles.inputWrapper}>
                         <input
                           type={field.type}
