@@ -248,9 +248,9 @@ export default function SingleTickets() {
         </h2>
       </motion.div>
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ ease: "easeInOut", duration: 1.75 }}
+        transition={{ ease: "anticipate", duration: 2 }}
       >
         <form onSubmit={handleSubmit} style={ubuntu.style}>
           {currentPerson == 0 && <h3>Group Leader</h3>}
