@@ -1,0 +1,278 @@
+.container label,
+.container input,
+.container textarea,
+.container select {
+  transition: all ease 300ms;
+  z-index: 10 !important;
+}
+
+.container {
+  background: linear-gradient(
+    45deg,
+    #c33764,
+    #1d2671
+  ); /* Gradient background for visual interest */
+
+  color: #fff; /* White text for readability */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw !important;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-size: 150% 150%;
+  animation: backgroundAnimation 5s ease infinite;
+  /* z-index: -2; */
+}
+
+@keyframes backgroundAnimation {
+  0% {
+    background-position: 0% 0%; /* Start at one position */
+  }
+  50% {
+    background-position: 50% 50%; /* Gradually shift across the gradient */
+  }
+  100% {
+    background-position: 0% 0%; /* Loop back to the start */
+  }
+}
+
+.container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0.3;
+  pointer-events: none;
+  background-image: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0%,
+    rgba(0, 0, 0, 0.07) 1%,
+    transparent 5%
+  );
+  filter: blur(3px);
+  z-index: 1;
+}
+
+.container h1 {
+  font-size: 2em;
+  /* margin-bottom: 1.5rem; */
+  /* margin-top: 0.5rem; */
+  width: auto;
+  text-align: center;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.container h2 {
+  font-size: 1em;
+  margin-bottom: 1.5rem;
+  width: auto;
+  text-align: center;
+  font-weight: 100;
+  z-index: 2;
+}
+
+.container form h3 {
+  text-align: center;
+}
+
+.container form {
+  width: 400px;
+  border-radius: 1rem;
+  background: rgb(255, 255, 255, 0.2);
+  padding: 1.5rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  padding-bottom: 30px;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: #ffffff20 1px solid;
+  z-index: 3 !important;
+}
+
+.container input,
+.container select {
+  background: rgba(255, 255, 255, 0.15);
+
+  color: #fff; /* White text inside inputs */
+  padding: 10px 16px;
+  margin: 10px 0;
+  border-radius: 100rem;
+  border: transparent 2px solid;
+  font-size: 1em;
+  height: 3rem;
+  /* box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.container input {
+  padding-bottom: 0px !important;
+}
+
+.container input:focus {
+  outline: none;
+  border: #b1aae4 2px solid;
+}
+
+.container select:focus {
+  outline: none;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.inputWrapper label {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  padding: 10px 20px;
+  color: #ffffff;
+  opacity: 0.5;
+  font-size: 1em;
+  pointer-events: none;
+  transition: all ease 300ms;
+}
+
+.inputWrapper input:focus + label,
+.inputWrapper input:not(:placeholder-shown) + label {
+  font-size: 0.55em;
+  top: 5px;
+  color: #ffccda;
+  opacity: 1;
+  font-weight: 700;
+}
+
+.paymentMethodContainer {
+  position: relative;
+  width: 100%;
+}
+
+.paymentMethodContainer select {
+  appearance: none; /* Remove default browser styles */
+  -webkit-appearance: none; /* For Safari */
+  -moz-appearance: none; /* For Firefox */
+  padding: 10px 15px;
+  width: 100%;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  border: 2px solid transparent;
+  color: #ffffff80;
+}
+
+.paymentMethodContainer .selectArrow {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  pointer-events: none; /* Make sure the arrow doesn't block clicks */
+  color: white;
+  font-size: 12px;
+}
+
+/* Hover and focus states */
+.paymentMethodContainer select:hover,
+.paymentMethodContainer select:focus {
+  border: #b1aae4 2px solid;
+  color: #ffffffdd;
+}
+
+.container select:valid {
+  color: #fff !important;
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 32px;
+  margin-top: 20px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.buttonsContainer button {
+  background-color: #007bff;
+  /* background: linear-gradient(45deg, #007bff, #0056b3); */
+  color: #fff;
+  padding: 4px 4px;
+  text-align: center;
+  border: none;
+  border-radius: 100rem;
+  aspect-ratio: 1;
+  scale: 1.5;
+  /* add letter spacing */
+  cursor: pointer;
+  transition: background 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container button[type="submit"] {
+  background-color: #007bff;
+  /* background: linear-gradient(45deg, #007bff, #0056b3); */
+  color: #fff;
+  padding: 12px 0px;
+  text-align: center;
+  margin-top: 12px;
+  border: none;
+  border-radius: 100rem;
+  font-weight: 700;
+  /* add letter spacing */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.container button:hover {
+  /* background: linear-gradient(-45deg, #007bff, #0056b3); */
+  background-color: #0056b3;
+}
+
+.container input:-webkit-autofill,
+.container input:-webkit-autofill:hover,
+.container input:-webkit-autofill:focus,
+.container input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #ffffff;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px #23232329;
+}
+
+@media (max-width: 600px) {
+  .container form {
+    padding: 15px;
+    width: 80vw;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+
+  .container::after {
+    opacity: 0.4;
+    background-image: repeating-radial-gradient(
+      circle at 50% 50%,
+      transparent 0%,
+      rgba(0, 0, 0, 0.07) 1%,
+      transparent 5%
+    );
+    filter: blur(4px);
+  }
+}

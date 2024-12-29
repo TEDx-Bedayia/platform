@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   }
   try {
     // Generate QR code as a data URL (base64-encoded image)
-    const qrCodeImage = await QRCode.toDataURL(uuid, { width: 300 });
+    const qrCodeImage = await QRCode.toDataURL(uuid, { width: 400 });
 
     // Convert Base64 string to Buffer for serving as an image
     const base64Data = qrCodeImage.replace(/^data:image\/png;base64,/, "");

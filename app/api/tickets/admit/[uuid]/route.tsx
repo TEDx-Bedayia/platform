@@ -1,3 +1,4 @@
+import { EVENT_DATE } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,13 +18,29 @@ export async function GET(
   headers.set("Access-Control-Allow-Headers", "Content-Type, key"); // Allow specific headers
 
   // Check if the request is coming from official app.
-  if (request.nextUrl.searchParams.get("key") !== process.env.APP_KEY) {
+  if (
+    request.nextUrl.searchParams.get("key") !== process.env.APP_KEY ||
+    process.env.APP_KEY === undefined ||
+    !process.env.APP_KEY
+  ) {
     return Response.json(
       { message: "Unauthorized" },
       { status: 401, headers: headers }
     );
   }
   const uuid = (await params).uuid; // Extract the 'uuid' parameter
+
+  const THRESHOLD = 36 * 60 * 60 * 1000;
+  const currentDate = new Date();
+  const eventDate = EVENT_DATE;
+
+  // Calculate the absolute difference between the current date and the event date
+  if (Math.abs(currentDate.getTime() - eventDate.getTime()) > THRESHOLD) {
+    return NextResponse.json(
+      { error: `Event not started yet. ${currentDate} - ${eventDate}` },
+      { status: 400, headers: headers }
+    );
+  }
 
   try {
     // Update the admitted status for the specified applicant

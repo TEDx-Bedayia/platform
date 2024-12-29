@@ -1,6 +1,10 @@
-import Image from "next/image";
+"use client";
+import { useEffect } from "react";
 
 export default function Home() {
+  useEffect(() => {
+    window.location.href = "/book";
+  });
   return (
     <main
       style={{
@@ -12,7 +16,7 @@ export default function Home() {
       }}
     >
       <center>
-        <h1 className="text-9xl">Await our Website.</h1>
+        <h1 className="text-5xl">Loading...</h1>
       </center>
     </main>
   );

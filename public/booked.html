@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui"
+    />
+    <meta name="color-scheme" content="light" />
+    <title>TEDx'${year} eTicket Confirmation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+        color: #333;
+      }
+
+      .email-container {
+        width: 100%;
+        max-width: 600px;
+        margin: 4em auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        background-color: #e62b1e;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      .content h1 {
+        color: #e62b1e;
+        font-size: 22px;
+        margin-bottom: 15px;
+      }
+
+      .content p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
+
+      .button {
+        display: inline-block;
+        background-color: #e62b1e;
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #777;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        background-color: #f9f9f9;
+      }
+
+      @media (max-width: 600px) {
+        .email-container {
+          width: 100%;
+        }
+
+        .content h1 {
+          font-size: 20px;
+        }
+
+        .content p {
+          font-size: 14px;
+        }
+
+        .button {
+          font-size: 14px;
+          padding: 10px 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <table class="email-container" cellpadding="0" cellspacing="0">
+      <tr>
+        <td class="header">
+          <h1>TEDx'${year} Team</h1>
+        </td>
+      </tr>
+      <tr>
+        <td class="content">
+          <h1>Hello ${name}!</h1>
+          <p>
+            Thank you for booking your eTicket. We are thrilled to welcome you
+            onboard!
+          </p>
+          <p>
+            Your QR-enabled eTicket will be sent to you after you complete the
+            payment. ${vfcash}
+          </p>
+          <p>{pricingDesc}</p>
+          <p>
+            P.S. There is a 1% vodafone imposed fee on E-Wallet payments.<br />If
+            you'd like to change your payment method tell us on WhatsApp or
+            reply to this email.
+          </p>
+          <p>
+            If you have any questions, feel free to contact us on Whatsapp at
+            <strong>{PHONE}</strong>.
+          </p>
+          <p>
+            Best Regards, <br />
+            TEDxYouth@BedayiaSchool'${year} Team
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td class="footer">
+          <p>
+            &copy; 2024 - 20${year} TEDxYouthBedayiaSchool&apos;${year}.
+            Developed by Aly Mohamed Salah.
+          </p>
+          <p>
+            <a href="https://www.tedxbedayia.com" style="color: #e62b1e"
+              >Visit our website</a
+            >
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
