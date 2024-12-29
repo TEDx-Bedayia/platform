@@ -92,6 +92,13 @@ export default function AdminDashboard() {
   const [variable, setVariable] = useState("clear");
   const [filter, setFilter] = useState("");
   const observer = useRef<IntersectionObserver | null>(null);
+  const [devMode, setDevMode] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("admin-token") == "dev") {
+      setDevMode(true);
+    }
+  }, []);
 
   const msg =
     "Hello {name}! Your ticket for the event has been sent to your email. Please check your inbox and spam folder. If you have any questions, feel free to contact us. Enjoy!";
@@ -330,9 +337,7 @@ export default function AdminDashboard() {
 
   return (
     <section id="admin-dashboard" className={styles.dashboard}>
-      {(new Date() > EVENT_DATE ||
-        (localStorage != undefined &&
-          localStorage.getItem("admin-token") == "dev")) && (
+      {(new Date() > EVENT_DATE || devMode) && (
         <button
           className="absolute right-24 top-24 w-9 h-9 bg-red-200 overflow-hidden rounded-lg text-red-700 flex items-center justify-center scale-125 transition-all hover:bg-red-300 active:bg-red-400"
           title="Reset Event Data"
