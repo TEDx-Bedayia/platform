@@ -233,6 +233,16 @@ export default function SingleTickets() {
         transition={{ ease: "easeInOut", duration: 0.75 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Group Ticket</h1>
+        <h3
+          style={{
+            ...title.style,
+            fontWeight: 400,
+            fontSize: ".5em",
+            textAlign: "center",
+          }}
+        >
+          1% vodafone imposed fee on E-Wallet
+        </h3>
         <h2 style={{ ...title.style, fontWeight: 100 }}>1, 400 EGP</h2>
       </motion.div>
       <motion.div

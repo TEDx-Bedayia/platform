@@ -11,7 +11,7 @@ import {
   PaymentMethod,
 } from "../api/tickets/payment-methods/payment-methods";
 import { addLoader, removeLoader } from "../global_components/loader";
-const title = Poppins({ weight: ["100", "700"], subsets: ["latin"] });
+const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 export default function SingleTickets() {
   const [formData, setFormData] = useState({
@@ -169,6 +169,16 @@ export default function SingleTickets() {
         transition={{ ease: "easeInOut", duration: 0.75 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Ticket</h1>
+        <h3
+          style={{
+            ...title.style,
+            fontWeight: 400,
+            fontSize: ".5em",
+            textAlign: "center",
+          }}
+        >
+          1% vodafone imposed fee on E-Wallet
+        </h3>
         <h2 style={{ ...title.style, fontWeight: 100 }}>400 EGP</h2>
       </motion.div>
       <motion.div
