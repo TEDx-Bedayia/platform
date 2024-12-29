@@ -13,6 +13,27 @@ export function verifyEmail(email: string | undefined): boolean {
   return false;
 }
 
+export function handleMisspelling(email: string): string {
+  if (email.includes("gamil")) {
+    email = email.replace("gamil", "gmail");
+  }
+
+  if (email.includes("gmai")) {
+    email = email.replace("gmai", "gmail");
+  }
+  // Regexp to replace gamil, gmaill, gmal, gmalil, gmall, gmall, gmeil, gmil, gmla MUST BE AFTER THE @ symbol
+  const gamil = /(?<=@)gma?i?l{1,2}/;
+  if (gamil.test(email)) {
+    email = email.replace(gamil, "gmail");
+  }
+
+  const gamil2 = /(?<=@)gam?i?l{1,2}/;
+  if (gamil2.test(email)) {
+    email = email.replace(gamil2, "gmail");
+  }
+  return email;
+}
+
 export async function verifyPaymentMethod(
   paymentMethod: string
 ): Promise<string | undefined> {

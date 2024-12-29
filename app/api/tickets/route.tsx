@@ -9,6 +9,7 @@ import {
   checkPhone,
   checkSafety,
   generateRandomString,
+  handleMisspelling,
   verifyEmail,
   verifyPaymentMethod,
 } from "./utils";
@@ -62,6 +63,7 @@ async function submitOneTicket(
   phone: string,
   paymentMethod: string | undefined
 ) {
+  email = handleMisspelling(email);
   if (!verifyEmail(email)) {
     return Response.json(
       {

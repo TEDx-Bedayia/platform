@@ -5,7 +5,12 @@ import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import path from "path";
 import { price } from "../price/prices";
-import { checkSafety, verifyEmail, verifyPaymentMethod } from "../utils";
+import {
+  checkSafety,
+  handleMisspelling,
+  verifyEmail,
+  verifyPaymentMethod,
+} from "../utils";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod
@@ -65,6 +70,9 @@ export async function POST(request: NextRequest) {
 
   try {
     let emails = [email1, email2, email3, email4];
+    emails.forEach((email) => {
+      email = handleMisspelling(email);
+    });
     let names = [name1, name2, name3, name4];
     let resp = await submitTickets(emails, names, phone, paymentMethod);
     if (resp.status != 200) {

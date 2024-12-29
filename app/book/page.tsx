@@ -11,7 +11,7 @@ import {
   PaymentMethod,
 } from "../api/tickets/payment-methods/payment-methods";
 import { addLoader, removeLoader } from "../global_components/loader";
-const title = Poppins({ weight: "700", subsets: ["latin"] });
+const title = Poppins({ weight: ["100", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 export default function SingleTickets() {
   const [formData, setFormData] = useState({
@@ -168,7 +168,8 @@ export default function SingleTickets() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ ease: "easeInOut", duration: 0.75 }}
       >
-        <h1 style={title.style}>Book a Ticket</h1>
+        <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Ticket</h1>
+        <h2 style={{ ...title.style, fontWeight: 100 }}>400 EGP</h2>
       </motion.div>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
@@ -230,7 +231,6 @@ export default function SingleTickets() {
               required={true}
               value={formData.paymentMethod}
               onChange={handleChange}
-              defaultValue=""
             >
               <option value="" disabled>
                 Select Payment Method
