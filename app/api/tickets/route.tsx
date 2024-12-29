@@ -142,7 +142,7 @@ async function submitOneTicket(
 
   try {
     // send payment details and next steps.
-    sendSingleBookingConfirmation(email, name, paymentMethod);
+    await sendSingleBookingConfirmation(email, name, paymentMethod);
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE email = ${email}`;

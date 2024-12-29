@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      sendBookingConfirmation(email1, name1, paymentMethod);
+      await sendBookingConfirmation(email1, name1, paymentMethod);
       // sendBookingConfirmation(email2, name2, paymentMethod);
       // sendBookingConfirmation(email3, name3, paymentMethod);
       // sendBookingConfirmation(email4, name4, paymentMethod);
