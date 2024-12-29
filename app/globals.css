@@ -2,22 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: #333;
-    --background-start-rgb: #fff;
-    --background-end-rgb: #fff;
-  }
-}
-
-html {
-  color: var(--foreground-rgb);
+html,
+body {
+  color: #fff;
   background: linear-gradient(
     45deg,
     #c33764,
@@ -25,10 +12,8 @@ html {
   ); /* Gradient background for visual interest */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox */
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
 }
