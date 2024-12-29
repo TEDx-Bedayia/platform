@@ -124,7 +124,10 @@ export async function pay(
       }
     }
 
-    unpaid.forEach(async (row) => {
+    let originalUnpaidLength = unpaid.length;
+
+    for (let i = 0; i < originalUnpaidLength; i++) {
+      let row = unpaid[i];
       // If the row is a group ticket get the other emails as well
       if (row.type === "group") {
         const group =
@@ -162,7 +165,7 @@ export async function pay(
           }
         }
       }
-    });
+    }
 
     if (unpaid.length === 0) {
       return Response.json({ message: "Nobody to pay for." }, { status: 400 });
@@ -308,12 +311,7 @@ export async function pay(
 
     try {
       for (let i = 0; i < paidFor.length; i++) {
-        let qr = await QRCode.toDataURL(paidFor[i].uuid, { width: 400 });
-        await sendEmail(
-          paidFor[i].email,
-          paidFor[i].full_name,
-          paidFor[i].uuid
-        );
+        sendEmail(paidFor[i].email, paidFor[i].full_name, paidFor[i].uuid);
       }
     } catch (e) {
       return Response.json(

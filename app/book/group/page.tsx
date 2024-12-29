@@ -5,7 +5,6 @@ import styles from "../book.module.css";
 import { motion } from "framer-motion";
 
 import { verifyEmail } from "@/app/api/tickets/utils";
-import { b } from "framer-motion/client";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
 import {
@@ -13,7 +12,7 @@ import {
   PaymentMethod,
 } from "../../api/tickets/payment-methods/payment-methods";
 import { addLoader, removeLoader } from "../../global_components/loader";
-const title = Poppins({ weight: ["100", "700"], subsets: ["latin"] });
+const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function SingleTickets() {
@@ -216,9 +215,10 @@ export default function SingleTickets() {
         additionalFields: {} as { [key: string]: string },
       });
       setSelectedPaymentFields([]);
-      customAlert((await response.json()).message ?? "An error occurred");
+      customAlert((await response.json()).message ?? "Submitted.");
+      setCurrentPerson(0);
     } else {
-      customAlert((await response.json()).message ?? "An error occurred");
+      customAlert((await response.json()).message ?? "An Error Occurred.");
     }
     removeLoader();
   }
@@ -243,7 +243,12 @@ export default function SingleTickets() {
         >
           1% vodafone imposed fee on E-Wallet
         </h3>
-        <h2 style={{ ...title.style, fontWeight: 100 }}>1, 400 EGP</h2>
+        <h2 style={{ ...title.style, fontWeight: 100, marginBottom: ".5rem" }}>
+          1, 400 EGP
+        </h2>
+        <h2 style={{ ...title.style, fontWeight: 400, fontSize: ".75em" }}>
+          350 EGP/Person
+        </h2>
       </motion.div>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}

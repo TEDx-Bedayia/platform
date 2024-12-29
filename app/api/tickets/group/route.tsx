@@ -70,9 +70,7 @@ export async function POST(request: NextRequest) {
 
   try {
     let emails = [email1, email2, email3, email4];
-    emails.forEach((email) => {
-      email = handleMisspelling(email);
-    });
+    emails = emails.map((email) => handleMisspelling(email));
     let names = [name1, name2, name3, name4];
     let resp = await submitTickets(emails, names, phone, paymentMethod);
     if (resp.status != 200) {
@@ -90,10 +88,10 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await sendBookingConfirmation(email1, name1, paymentMethod);
-      await sendBookingConfirmation(email2, name2, paymentMethod);
-      await sendBookingConfirmation(email3, name3, paymentMethod);
-      await sendBookingConfirmation(email4, name4, paymentMethod);
+      sendBookingConfirmation(email1, name1, paymentMethod);
+      sendBookingConfirmation(email2, name2, paymentMethod);
+      sendBookingConfirmation(email3, name3, paymentMethod);
+      sendBookingConfirmation(email4, name4, paymentMethod);
     } catch (e) {
       console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
       return Response.json(

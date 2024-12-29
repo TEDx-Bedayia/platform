@@ -21,6 +21,12 @@ export function handleMisspelling(email: string): string {
   if (email.includes("gmai")) {
     email = email.replace("gmai", "gmail");
   }
+  if (email.includes("gnail")) {
+    email = email.replace("gnail", "gmail");
+  }
+  if (email.includes("gmali")) {
+    email = email.replace("gmali", "gmail");
+  }
   // Regexp to replace gamil, gmaill, gmal, gmalil, gmall, gmall, gmeil, gmil, gmla MUST BE AFTER THE @ symbol
   const gamil = /(?<=@)gma?i?l{1,2}/;
   if (gamil.test(email)) {

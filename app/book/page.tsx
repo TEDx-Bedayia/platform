@@ -154,9 +154,9 @@ export default function SingleTickets() {
         additionalFields: {} as { [key: string]: string },
       });
       setSelectedPaymentFields([]);
-      customAlert((await response.json()).message ?? "An error occurred");
+      customAlert((await response.json()).message ?? "Submitted.");
     } else {
-      customAlert((await response.json()).message ?? "An error occurred");
+      customAlert((await response.json()).message ?? "An Error Occurred.");
     }
     removeLoader();
   }
