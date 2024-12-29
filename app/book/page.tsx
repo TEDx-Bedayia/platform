@@ -166,7 +166,7 @@ export default function SingleTickets() {
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ ease: "easeInOut", duration: 0.75 }}
+        transition={{ ease: "easeOut", duration: 1.5 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Ticket</h1>
         {/* <h3
