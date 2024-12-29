@@ -163,7 +163,7 @@ export default function Payments() {
         formData.method = type == "admin" ? "" : "CASH";
         formData.from = "";
         formData.amount = "";
-        formData.date = "";
+        formData.date = getCurrentDate();
         setFormData({ ...formData });
       } else {
         const { message } = await response.json();
