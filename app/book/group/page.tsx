@@ -160,24 +160,21 @@ export default function SingleTickets() {
     }
 
     try {
-      for (let j = 0; j < 3; j++) {
-        for (let i = 0; i < 3; i++) {
-          if (formData.emails[i] == formData.emails[j] && i != j) {
-            customAlert(
-              "Please enter a unique email. Or set the email to " +
-                formData.emails[j].split("@")[0] +
-                "+" +
-                currentPerson +
-                "@" +
-                formData.emails[j].split("@")[1] +
-                " if you wish to recieve " +
-                formData.names[j] +
-                "'s ticket."
-            );
-            setCurrentPerson(j);
-            removeLoader();
-            return;
-          }
+      for (let i = 0; i < 2; i++) {
+        if (formData.emails[i] == formData.emails[3]) {
+          customAlert(
+            "Please enter a unique email. Or set the email to " +
+              formData.emails[3].split("@")[0] +
+              (!formData.emails[3].includes("+") ? "+p" : "") +
+              4 +
+              "@" +
+              formData.emails[3].split("@")[1] +
+              " if you wish to recieve " +
+              formData.names[3] +
+              "'s ticket on the same email."
+          );
+          removeLoader();
+          return;
         }
       }
     } catch (error) {
@@ -233,7 +230,7 @@ export default function SingleTickets() {
         transition={{ ease: "easeInOut", duration: 0.75 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Group Ticket</h1>
-        <h3
+        {/* <h3
           style={{
             ...title.style,
             fontWeight: 400,
@@ -242,7 +239,7 @@ export default function SingleTickets() {
           }}
         >
           1% vodafone imposed fee on E-Wallet
-        </h3>
+        </h3> */}
         <h2 style={{ ...title.style, fontWeight: 100, marginBottom: ".5rem" }}>
           1, 400 EGP
         </h2>
@@ -256,7 +253,7 @@ export default function SingleTickets() {
         transition={{ ease: "easeInOut", duration: 1.75 }}
       >
         <form onSubmit={handleSubmit} style={ubuntu.style}>
-          {currentPerson == 0 && <h3>Main Submitter</h3>}
+          {currentPerson == 0 && <h3>Group Leader</h3>}
           {currentPerson != 0 && <h3>Person {currentPerson + 1}</h3>}
           <div className={styles.mainTextbox}>
             <div className={styles.inputWrapper}>
@@ -397,14 +394,14 @@ export default function SingleTickets() {
                   onClick={(e) => {
                     e.preventDefault();
                     document.getElementsByTagName("form")[0].style.transition =
-                      "opacity 1s ease";
+                      "opacity 300ms ease";
                     document.getElementsByTagName("form")[0].style.opacity =
                       "0";
                     setTimeout(() => {
                       document.getElementsByTagName("form")[0].style.opacity =
                         "1";
                       setCurrentPerson(currentPerson - 1);
-                    }, 1000);
+                    }, 350);
                   }}
                 >
                   <svg
@@ -482,7 +479,7 @@ export default function SingleTickets() {
 
                         document.getElementsByTagName(
                           "form"
-                        )[0].style.transition = "opacity 1s ease";
+                        )[0].style.transition = "opacity 300ms ease";
                         document.getElementsByTagName("form")[0].style.opacity =
                           "0";
                         setTimeout(() => {
@@ -490,7 +487,7 @@ export default function SingleTickets() {
                             "form"
                           )[0].style.opacity = "1";
                           setCurrentPerson(currentPerson + 1);
-                        }, 1000);
+                        }, 350);
                       } else {
                         if (formData.names[currentPerson] == "")
                           document.getElementById("name-input")!.focus();

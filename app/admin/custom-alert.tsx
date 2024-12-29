@@ -75,7 +75,7 @@ export function customAlert(txt: string, closeable = true) {
   }, 10); // Small timeout to ensure animation starts after element is in the DOM
 }
 
-export function customAlert2(callback: Function) {
+export function customAlert2(displayName: string, callback: Function) {
   // Create a background overlay
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
@@ -118,7 +118,7 @@ export function customAlert2(callback: Function) {
   };
   const label = document.createElement("label");
   label.htmlFor = "from";
-  label.innerText = "Email(s)";
+  label.innerText = displayName;
 
   // Style Input and Label
   label.style.position = "absolute";
@@ -184,13 +184,26 @@ export function customAlert2(callback: Function) {
   closeButton.style.cursor = "pointer";
   closeButton.style.fontSize = "1rem";
 
+  let func = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      closeButton.focus();
+      closeButton.click();
+    }
+
+    if (e.key === "Escape") {
+      alertBox.style.transform = "scale(0.9)";
+      alertBox.style.opacity = "0";
+      overlay.style.opacity = "0";
+      setTimeout(() => document.body.removeChild(overlay), 250);
+      // stop listening for key down
+      window.removeEventListener("keydown", func);
+    }
+  };
+  window.addEventListener("keydown", func);
+
   // Add close button functionality
-  closeButton.onclick = () => {
-    if (
-      !RegExp(
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(,[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$/
-      ).test(email_in.value)
-    ) {
+  closeButton.onclick = async () => {
+    if (!(await callback(email_in.value))) {
       email_in.value = "";
       email_in.style.border = "1px solid red";
       return;
@@ -201,9 +214,8 @@ export function customAlert2(callback: Function) {
     overlay.style.opacity = "0";
 
     // Remove the overlay from the DOM after the animation completes
-    document.body.removeChild(overlay);
 
-    callback(email_in.value);
+    window.removeEventListener("keydown", func);
   };
 
   // Append elements to the alert box

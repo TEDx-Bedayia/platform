@@ -26,7 +26,8 @@ function Entry(
   stream: string,
   incurred: number,
   recieved: number,
-  recieved_at: string
+  recieved_at: string,
+  index: number
 ) {
   return (
     <div
@@ -37,6 +38,7 @@ function Entry(
         width: "60vw",
         gap: "1rem",
       }}
+      key={index}
       className={styles.transaction}
     >
       <span
@@ -193,12 +195,13 @@ export default function History() {
             Recieved At
           </span>
         </div>
-        {data.map((transaction) =>
+        {data.map((transaction, index) =>
           Entry(
             transaction.stream,
             transaction.incurred,
             transaction.recieved,
-            transaction.recieved_at
+            transaction.recieved_at,
+            index
           )
         )}
       </div>

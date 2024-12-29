@@ -169,7 +169,7 @@ export default function SingleTickets() {
         transition={{ ease: "easeInOut", duration: 0.75 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Ticket</h1>
-        <h3
+        {/* <h3
           style={{
             ...title.style,
             fontWeight: 400,
@@ -178,7 +178,7 @@ export default function SingleTickets() {
           }}
         >
           1% vodafone imposed fee on E-Wallet
-        </h3>
+        </h3> */}
         <h2 style={{ ...title.style, fontWeight: 100 }}>400 EGP</h2>
       </motion.div>
       <motion.div

@@ -1,8 +1,17 @@
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
-import QRCode from "qrcode";
 import { price } from "../../tickets/price/prices";
 import { sendEmail } from "./eTicketEmail";
+
+async function safeRandUUID() {
+  let uuid = randomUUID();
+  let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
+  while (query.rows.length !== 0) {
+    uuid = randomUUID();
+    query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
+  }
+  return uuid;
+}
 
 export async function pay(
   from: string,
@@ -188,7 +197,7 @@ export async function pay(
 
       paid += unpaid[i].price;
       if (paid <= parseInt(amount)) {
-        let randUUID = randomUUID();
+        let randUUID = await safeRandUUID();
         try {
           await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
         } catch (e) {
@@ -246,10 +255,15 @@ export async function pay(
             groupMembers.includes(x.email)
           );
 
+          let safeUUIDs: { [key: number]: string } = {};
+          for (let j = 0; j < rowsToUpdate.length; j++) {
+            safeUUIDs[rowsToUpdate[j].id as number] = await safeRandUUID();
+          }
+
           // Generate UUIDs and prepare the data for bulk update
           const updates = rowsToUpdate.map((row) => ({
             id: row.id as number,
-            uuid: randomUUID(),
+            uuid: safeUUIDs[row.id as number],
           }));
 
           // Extract ids and uuids from updates for use in the SQL query

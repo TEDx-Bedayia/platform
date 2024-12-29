@@ -8,11 +8,19 @@ import styles from "./payments.module.css";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
 export default function Payments() {
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
     method: "",
     from: "",
     amount: "",
-    date: "",
+    date: getCurrentDate(),
   });
   const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
   const [type, setType] = useState<"admin" | "school">("school");
@@ -83,12 +91,12 @@ export default function Payments() {
     if (name == "method") {
       formData.from = "";
       formData.amount = "";
-      formData.date = "";
+      formData.date = getCurrentDate();
       setFormData({
         ...formData,
         from: "",
         amount: "",
-        date: "",
+        date: getCurrentDate(),
       });
 
       if (value == "VFCASH") {
@@ -160,7 +168,14 @@ export default function Payments() {
       } else {
         const { message } = await response.json();
         if (response.status == 431) {
-          customAlert2(async (email: string) => {
+          customAlert2("Email(s)", async (email: string) => {
+            if (
+              !RegExp(
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(,[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$/
+              ).test(email)
+            ) {
+              return false;
+            }
             addLoader();
             // setTimeout(() => {
             //   removeLoader();
@@ -206,6 +221,7 @@ export default function Payments() {
               customAlert(message);
             }
             removeLoader();
+            return true;
           });
         } else customAlert(message);
       }
@@ -295,7 +311,7 @@ export default function Payments() {
         >
           For Refunds, enter a negative amount.
           <br />
-          <strong>Developed by Aly Mohamed Salah with ❤️</strong>
+          <strong>Developed by Aly with ❤️</strong>
         </span>
 
         {formData.method == "CASH" && (

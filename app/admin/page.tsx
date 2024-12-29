@@ -2,7 +2,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { Poppins, Ubuntu } from "next/font/google";
-import { customAlert } from "./custom-alert";
+import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
 type Applicant = {
   full_name: string;
@@ -326,6 +326,48 @@ export default function AdminDashboard() {
 
   return (
     <section id="admin-dashboard" className={styles.dashboard}>
+      <button
+        className="absolute right-24 top-24 w-8 h-8 bg-red-200 overflow-hidden rounded-lg text-red-700 flex items-center justify-center scale-150 transition-all hover:bg-red-300 active:bg-red-400"
+        onClick={() => {
+          customAlert2("Destructive Key", async (key: string) => {
+            const response = await fetch(
+              `/api/admin/destructive/delete?verification=${encodeURIComponent(
+                key
+              )}`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  key: `${localStorage.getItem("admin-token")}`,
+                },
+              }
+            );
+
+            if (response.ok) {
+              setApplicants([]);
+              setPageIndex(0);
+              setLoading(false);
+              setHasMore(true);
+              return true;
+            } else {
+              return false;
+            }
+          });
+        }}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.5 7.25C2.5 4.62665 4.62665 2.5 7.25 2.5C9.87335 2.5 12 4.62665 12 7.25C12 7.66421 12.3358 8 12.75 8C13.1642 8 13.5 7.66421 13.5 7.25C13.5 3.79822 10.7018 1 7.25 1C3.79822 1 1 3.79822 1 7.25C1 10.7018 3.79822 13.5 7.25 13.5H12V15.6465C12 15.8692 12.2693 15.9807 12.4268 15.8232L15.3233 12.9268C15.4209 12.8292 15.4209 12.6709 15.3233 12.5732L12.4268 9.6768C12.2693 9.51931 12 9.63085 12 9.85358V12H7.25C4.62665 12 2.5 9.87335 2.5 7.25Z"
+            fill="#b91c1c"
+          />
+        </svg>
+      </button>
       <h1 style={{ ...title.style, fontWeight: 700 }}>All Tickets</h1>
       <div
         style={{
