@@ -25,6 +25,7 @@ export function handleMisspelling(email: string): string {
   email = email.replace("@gmeil", "@gmail");
   email = email.replace("@gmil", "@gmail");
   email = email.replace("@gmla", "@gmail");
+  email = email.replace("@gmaill", "@gmail");
   email = email.replace("@bedaya", "@bedayia");
   email = email.replace("@bedayiaa", "@bedayia");
   email = email.replace("@bdayia", "@bedayia");
