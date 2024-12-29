@@ -147,7 +147,7 @@ export async function pay(
 
         queryio = "";
         groupMembers.forEach((email) => {
-          if (email != email_if_needed) queryio += `email = '${email}' OR `;
+          if (email != row.email) queryio += `email = '${email}' OR `;
         });
         queryio = queryio.slice(0, -4);
         query = await sql.query(
