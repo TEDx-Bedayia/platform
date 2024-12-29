@@ -2,6 +2,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { Poppins, Ubuntu } from "next/font/google";
+import { EVENT_DATE } from "../metadata";
 import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
 type Applicant = {
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
   const observer = useRef<IntersectionObserver | null>(null);
 
   const msg =
-    "Hello {name}! Your ticket for the event has been sent to your email. Please check your inbox and spam folder. If you have any questions, feel free to contact us. Thank you!";
+    "Hello {name}! Your ticket for the event has been sent to your email. Please check your inbox and spam folder. If you have any questions, feel free to contact us. Enjoy!";
 
   function TicketCard(applicant: Applicant, admitApplicant: any) {
     return (
@@ -326,48 +327,57 @@ export default function AdminDashboard() {
 
   return (
     <section id="admin-dashboard" className={styles.dashboard}>
-      <button
-        className="absolute right-24 top-24 w-8 h-8 bg-red-200 overflow-hidden rounded-lg text-red-700 flex items-center justify-center scale-150 transition-all hover:bg-red-300 active:bg-red-400"
-        onClick={() => {
-          customAlert2("Destructive Key", async (key: string) => {
-            const response = await fetch(
-              `/api/admin/destructive/delete?verification=${encodeURIComponent(
-                key
-              )}`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  key: `${localStorage.getItem("admin-token")}`,
-                },
-              }
-            );
+      {new Date() > EVENT_DATE && (
+        <button
+          className="absolute right-24 top-24 w-9 h-9 bg-red-200 overflow-hidden rounded-lg text-red-700 flex items-center justify-center scale-125 transition-all hover:bg-red-300 active:bg-red-400"
+          title="Reset Event Data"
+          onClick={() => {
+            customAlert2("Destructive Key", async (key: string) => {
+              const response = await fetch(
+                `/api/admin/destructive/delete?verification=${encodeURIComponent(
+                  key
+                )}`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    key: `${localStorage.getItem("admin-token")}`,
+                  },
+                }
+              );
 
-            if (response.ok) {
-              setApplicants([]);
-              setPageIndex(0);
-              setLoading(false);
-              setHasMore(true);
-              return true;
-            } else {
-              return false;
-            }
-          });
-        }}
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+              if (response.ok) {
+                setApplicants([]);
+                setPageIndex(0);
+                setLoading(false);
+                setHasMore(true);
+                return true;
+              } else {
+                return false;
+              }
+            });
+          }}
         >
-          <path
-            d="M2.5 7.25C2.5 4.62665 4.62665 2.5 7.25 2.5C9.87335 2.5 12 4.62665 12 7.25C12 7.66421 12.3358 8 12.75 8C13.1642 8 13.5 7.66421 13.5 7.25C13.5 3.79822 10.7018 1 7.25 1C3.79822 1 1 3.79822 1 7.25C1 10.7018 3.79822 13.5 7.25 13.5H12V15.6465C12 15.8692 12.2693 15.9807 12.4268 15.8232L15.3233 12.9268C15.4209 12.8292 15.4209 12.6709 15.3233 12.5732L12.4268 9.6768C12.2693 9.51931 12 9.63085 12 9.85358V12H7.25C4.62665 12 2.5 9.87335 2.5 7.25Z"
-            fill="#b91c1c"
-          />
-        </svg>
-      </button>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9.28033 7.71967C8.98744 7.42678 8.51256 7.42678 8.21967 7.71967C7.92678 8.01256 7.92678 8.48744 8.21967 8.78033L10.9393 11.5L8.21967 14.2197C7.92678 14.5126 7.92678 14.9874 8.21967 15.2803C8.51256 15.5732 8.98744 15.5732 9.28033 15.2803L12 12.5607L14.7197 15.2803C15.0126 15.5732 15.4874 15.5732 15.7803 15.2803C16.0732 14.9874 16.0732 14.5126 15.7803 14.2197L13.0607 11.5L15.7803 8.78033C16.0732 8.48744 16.0732 8.01256 15.7803 7.71967C15.4874 7.42678 15.0126 7.42678 14.7197 7.71967L12 10.4393L9.28033 7.71967Z"
+              fill="#b91c1c"
+            />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M12.5399 0.63663C12.189 0.522816 11.811 0.522816 11.4601 0.63663L3.21012 3.31231C2.48947 3.54603 2 4.21654 2 4.97593V9.99999C2.00001 16.1893 5.7708 20.7049 11.401 22.8293C11.7866 22.9748 12.2134 22.9748 12.599 22.8293C18.2292 20.7049 22 16.1893 22 9.99999V4.97621C22 4.21708 21.5108 3.54611 20.7899 3.31231L12.5399 0.63663ZM11.9229 2.06346C11.973 2.0472 12.027 2.0472 12.0771 2.06346L20.3271 4.73914C20.4308 4.77277 20.5 4.8685 20.5 4.97621V9.99999C20.5 15.4613 17.2193 19.4827 12.0695 21.4259C12.0251 21.4426 11.9749 21.4426 11.9305 21.4259C6.78075 19.4827 3.5 15.4613 3.5 9.99999L3.5 4.97593C3.5 4.86847 3.56895 4.77284 3.67287 4.73914L11.9229 2.06346Z"
+              fill="#b91c1c"
+            />
+          </svg>
+        </button>
+      )}
       <h1 style={{ ...title.style, fontWeight: 700 }}>All Tickets</h1>
       <div
         style={{

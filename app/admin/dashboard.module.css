@@ -113,6 +113,8 @@
   padding: 1.3em;
   border-radius: 20px; /* Softer, rounded corners */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 2px solid #014f86;
+  box-sizing: border-box;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
