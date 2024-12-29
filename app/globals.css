@@ -4,12 +4,6 @@
 
 html,
 body {
-  color: #fff;
-  background: linear-gradient(
-    45deg,
-    #c33764,
-    #1d2671
-  ); /* Gradient background for visual interest */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox */
   width: 100%;

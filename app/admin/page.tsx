@@ -290,7 +290,10 @@ export default function AdminDashboard() {
             window.location.href = "/admin/login";
             return;
           }
-        } else customAlert("Failed to fetch applicants.");
+        } else {
+          setHasMore(false);
+          customAlert("Failed to fetch applicants.");
+        }
       }
 
       setLoading(false);
@@ -327,7 +330,8 @@ export default function AdminDashboard() {
 
   return (
     <section id="admin-dashboard" className={styles.dashboard}>
-      {new Date() > EVENT_DATE && (
+      {(new Date() > EVENT_DATE ||
+        localStorage.getItem("admin-token") == "dev") && (
         <button
           className="absolute right-24 top-24 w-9 h-9 bg-red-200 overflow-hidden rounded-lg text-red-700 flex items-center justify-center scale-125 transition-all hover:bg-red-300 active:bg-red-400"
           title="Reset Event Data"

@@ -36,12 +36,11 @@
   height: 2px; /* Thickness of the underline */
   bottom: 0;
   left: 0;
-  background-color: var(
-    --foreground-rgb
-  ); /* Same color as the text by default */
+  background-color: #000; /* Same color as the text by default */
   transform: scaleX(0); /* Initially hidden */
   transform-origin: bottom right;
   transition: transform 0.3s ease-out; /* Smooth animation */
+  color: #000;
 }
 
 .nav > a:hover {
