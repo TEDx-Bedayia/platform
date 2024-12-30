@@ -244,6 +244,16 @@ export async function pay(
 
       const groupIDs = Object.keys(uniqueGroupsToPayForData);
 
+      if (groupIDs.length * price.group * 4 > parseInt(amount)) {
+        return Response.json(
+          {
+            message:
+              "Not enough money to pay for all tickets. Identify using Emails.",
+          },
+          { status: 431 }
+        );
+      }
+
       for (let i = 0; i < groupIDs.length; i++) {
         const groupID = groupIDs[i];
         const groupMembers = uniqueGroupsToPayForData[groupID];
