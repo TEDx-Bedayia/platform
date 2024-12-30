@@ -50,7 +50,7 @@
     padding: 1rem 2rem;
     flex-direction: column;
     height: fit-content;
-    gap: 1.25rem;
+    gap: 1rem;
   }
 
   .navigation * {
