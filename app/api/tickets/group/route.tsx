@@ -68,9 +68,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  let emails = [email1, email2, email3, email4];
+  emails = emails.map((email) => handleMisspelling(email));
+
   try {
-    let emails = [email1, email2, email3, email4];
-    emails = emails.map((email) => handleMisspelling(email));
     let names = [name1, name2, name3, name4];
     let resp = await submitTickets(emails, names, phone, paymentMethod);
     if (resp.status != 200) {
@@ -78,9 +79,9 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await sql`INSERT INTO groups (email1, email2, email3, email4) VALUES (${email1}, ${email2}, ${email3}, ${email4});`;
+      await sql`INSERT INTO groups (email1, email2, email3, email4) VALUES (${emails[0]}, ${emails[1]}, ${emails[2]}, ${emails[3]});`;
     } catch (error) {
-      await sql`DELETE FROM attendees WHERE email = ${email1} OR email = ${email2} OR email = ${email3} OR email = ${email4};`;
+      await sql`DELETE FROM attendees WHERE email = ${emails[0]} OR email = ${emails[1]} OR email = ${emails[2]} OR email = ${emails[3]};`;
       return Response.json(
         { message: "Error submitting group." },
         { status: 500 }
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await sendBookingConfirmation(email1, name1, paymentMethod);
+      await sendBookingConfirmation(emails[0], name1, paymentMethod);
       // sendBookingConfirmation(email2, name2, paymentMethod);
       // sendBookingConfirmation(email3, name3, paymentMethod);
       // sendBookingConfirmation(email4, name4, paymentMethod);
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.log(error);
-    await sql`DELETE FROM attendees WHERE email = ${email1} OR email = ${email2} OR email = ${email3} OR email = ${email4};`;
+    await sql`DELETE FROM attendees WHERE email = ${emails[0]} OR email = ${emails[1]} OR email = ${emails[2]} OR email = ${emails[3]};`;
     return Response.json(
       { message: "Error submitting group." },
       { status: 500 }

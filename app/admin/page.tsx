@@ -2,6 +2,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { Poppins, Ubuntu } from "next/font/google";
+import { addLoader, removeLoader } from "../global_components/loader";
 import { EVENT_DATE } from "../metadata";
 import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
@@ -343,6 +344,7 @@ export default function AdminDashboard() {
           title="Reset Event Data"
           onClick={() => {
             customAlert2("Destructive Key", async (key: string) => {
+              addLoader();
               const response = await fetch(
                 `/api/admin/destructive/delete?verification=${encodeURIComponent(
                   key
@@ -355,6 +357,7 @@ export default function AdminDashboard() {
                   },
                 }
               );
+              removeLoader();
 
               if (response.ok) {
                 setApplicants([]);
