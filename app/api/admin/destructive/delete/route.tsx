@@ -13,15 +13,22 @@ export async function GET(req: NextRequest) {
   if (
     req.headers.get("key") !== process.env.ADMIN_KEY ||
     !process.env.ADMIN_KEY ||
-    !process.env.DESTRUCTIVE_KEY
+    !process.env.DESTRUCTIVE_KEY ||
+    req.nextUrl.searchParams.get("verification") === null
   ) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   if (
-    req.nextUrl.searchParams.get("verification") !== process.env.DESTRUCTIVE_KEY
+    req.nextUrl.searchParams.get("verification")! !==
+    process.env.DESTRUCTIVE_KEY
   ) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      {
+        message: "Unauthorized",
+      },
+      { status: 401 }
+    );
   }
 
   if (new Date() <= EVENT_DATE && process.env.ADMIN_KEY !== "dev") {

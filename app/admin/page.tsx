@@ -350,9 +350,8 @@ export default function AdminDashboard() {
                   key
                 )}`,
                 {
-                  method: "POST",
+                  method: "GET",
                   headers: {
-                    "Content-Type": "application/json",
                     key: `${localStorage.getItem("admin-token")}`,
                   },
                 }
