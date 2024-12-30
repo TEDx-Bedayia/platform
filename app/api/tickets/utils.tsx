@@ -58,7 +58,7 @@ export async function verifyPaymentMethod(
 
   const vfcash = /^[0-9]{11}$/;
 
-  if (method === "VFCASH") {
+  if (method === "VFCASH" || method === "IPN") {
     // Replace ٠-٩ with 0-9
     metadata = metadata.replace(/[\u0660-\u0669]/g, (c) =>
       (c.charCodeAt(0) - 0x0660).toString()
@@ -74,7 +74,8 @@ export async function verifyPaymentMethod(
 }
 
 export function checkSafety(str: string): boolean {
-  const alphaNumericAndSymbols = /^[a-zA-Z0-9!@()_+\-=,. ]*$/;
+  const alphaNumericAndSymbols =
+    /^[a-zA-Z0-9!@()_+\-=,. \u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]*$/;
   if (alphaNumericAndSymbols.test(str)) return true;
   return false;
 }

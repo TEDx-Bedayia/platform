@@ -214,7 +214,7 @@ export function customAlert2(displayName: string, callback: Function) {
     overlay.style.opacity = "0";
 
     // Remove the overlay from the DOM after the animation completes
-
+    setTimeout(() => document.body.removeChild(overlay), 250);
     window.removeEventListener("keydown", func);
   };
 

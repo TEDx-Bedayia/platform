@@ -64,7 +64,13 @@ export default function SingleTickets() {
     if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
       return;
     }
+
+    if (name == "vfcash" || name == "ipn")
+      value = value.replace(/[\u0660-\u0669]/g, (c) => {
+        return (c.charCodeAt(0) - 0x0660).toString();
+      });
     if (name == "vfcash" || name == "ipn") value = value.replace(/[^+\d]/g, "");
+
     if (name == "tlda" && value.includes("+")) return;
     if (
       (name == "vfcash" || name == "ipn") &&
@@ -92,6 +98,10 @@ export default function SingleTickets() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     let { name, value } = e.target;
+    if (name == "phone")
+      value = value.replaceAll(/[\u0660-\u0669]/g, (c) => {
+        return (c.charCodeAt(0) - 0x0660).toString();
+      });
     if (name == "phone") value = value.replace(/[^+\d]/g, "");
 
     if (name == "phone" && (isNaN(Number(value)) || value.includes(" "))) {
