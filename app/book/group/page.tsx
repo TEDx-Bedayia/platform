@@ -89,7 +89,7 @@ export default function SingleTickets() {
       ...formData,
       additionalFields: {
         ...formData.additionalFields,
-        [name]: value,
+        [name]: value.toLowerCase(),
       },
     });
   };
