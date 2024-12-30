@@ -62,10 +62,11 @@ export default function SingleTickets() {
   const handleAdditionalFieldChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
     if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
       return;
     }
+    if (name == "vfcash" || name == "ipn") value = value.replace(/[^+\d]/g, "");
     if (name == "tlda" && value.includes("+")) return;
     if (
       (name == "vfcash" || name == "ipn") &&
@@ -92,7 +93,8 @@ export default function SingleTickets() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name == "phone") value = value.replace(/[^+\d]/g, "");
 
     if (name == "phone" && (isNaN(Number(value)) || value.includes(" "))) {
       if (value != "+") return;
@@ -147,9 +149,13 @@ export default function SingleTickets() {
     addLoader();
     if (
       (formData.additionalFields.vfcash &&
-        formData.additionalFields.vfcash.length < 11) ||
+        (formData.additionalFields.vfcash.length < 11 ||
+          (formData.additionalFields.vfcash.includes("+") &&
+            formData.additionalFields.vfcash.length != 13))) ||
       (formData.additionalFields.ipn &&
-        formData.additionalFields.ipn.length < 11)
+        (formData.additionalFields.ipn.length < 11 ||
+          (formData.additionalFields.ipn.includes("+") &&
+            formData.additionalFields.ipn.length != 13)))
     ) {
       customAlert(
         "Please enter a valid phone number for E-Wallet or InstaPay."
@@ -159,6 +165,15 @@ export default function SingleTickets() {
       return;
     }
 
+    if (
+      formData.phone.length < 11 ||
+      (formData.phone.includes("+") && formData.phone.length != 13)
+    ) {
+      customAlert("Please enter a valid phone number.");
+      setCurrentPerson(0);
+      removeLoader();
+      return;
+    }
     try {
       for (let i = 0; i < 2; i++) {
         if (formData.emails[i] == formData.emails[3]) {
@@ -293,7 +308,6 @@ export default function SingleTickets() {
                   name="phone"
                   id="phone-input"
                   placeholder=""
-                  maxLength={13}
                   minLength={11}
                   required={true}
                   value={formData.phone}
@@ -375,11 +389,12 @@ export default function SingleTickets() {
             </div>
           )}
 
-          {currentPerson != 3 && (
-            <h3 style={{ margin: "0.5rem 0", color: "white", opacity: 0.6 }}>
-              Please fill out the fields above to continue
-            </h3>
-          )}
+          {currentPerson != 3 &&
+            (formData.emails.includes("") || formData.names.includes("")) && (
+              <h3 style={{ margin: "0.5rem 0", color: "white", opacity: 0.6 }}>
+                Please fill out the fields above to continue
+              </h3>
+            )}
 
           <div className={styles.buttonsContainer}>
             {currentPerson != 0 && (
@@ -524,7 +539,9 @@ export default function SingleTickets() {
             animate={{ opacity: 1 }}
             transition={{ type: "tween", ease: "anticipate", duration: 2 }}
           >
-            {currentPerson == 3 && (
+            {(currentPerson == 3 ||
+              (!formData.emails.includes("") &&
+                !formData.names.includes(""))) && (
               <button
                 type="submit"
                 style={{ ...title.style, width: "100%", marginTop: "2rem" }}

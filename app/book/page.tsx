@@ -60,10 +60,11 @@ export default function SingleTickets() {
   const handleAdditionalFieldChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
     if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
       return;
     }
+    if (name == "vfcash" || name == "ipn") value = value.replace(/[^+\d]/g, "");
     if (name == "tlda" && value.includes("+")) return;
     if (
       (name == "vfcash" || name == "ipn") &&
@@ -90,7 +91,8 @@ export default function SingleTickets() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name == "phone") value = value.replace(/[^+\d]/g, "");
 
     if (name == "phone" && (isNaN(Number(value)) || value.includes(" "))) {
       if (value != "+") return;
@@ -129,8 +131,16 @@ export default function SingleTickets() {
     document.body.focus();
     addLoader();
     if (
-      formData.additionalFields.vfcash &&
-      formData.additionalFields.vfcash.length < 11
+      (formData.additionalFields.vfcash &&
+        (formData.additionalFields.vfcash.length < 11 ||
+          (formData.additionalFields.vfcash.includes("+") &&
+            formData.additionalFields.vfcash.length != 13))) ||
+      (formData.additionalFields.ipn &&
+        (formData.additionalFields.ipn.length < 11 ||
+          (formData.additionalFields.ipn.includes("+") &&
+            formData.additionalFields.ipn.length != 13))) ||
+      formData.phone.length < 11 ||
+      (formData.phone.includes("+") && formData.phone.length != 13)
     ) {
       customAlert("Please enter a valid phone number");
       removeLoader();
@@ -224,7 +234,6 @@ export default function SingleTickets() {
                 name="phone"
                 id="phone-input"
                 placeholder=""
-                maxLength={13}
                 minLength={11}
                 required={true}
                 value={formData.phone}
