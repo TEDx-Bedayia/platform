@@ -157,7 +157,7 @@ async function submitOneTicket(
   }
   return Response.json(
     {
-      message: `Ticket Booked! Please check your email for confirmation.`,
+      message: `Ticket Booked! Check your email to continue.`,
       success: true,
     },
     { status: 200 }

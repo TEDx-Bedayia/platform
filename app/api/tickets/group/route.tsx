@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
   return Response.json({
     success: true,
     message:
-      "Tickets Submitted Successfully! Please check your emails for confirmations and payment details.",
+      "Tickets Submitted Successfully! Check your email for payment details to continue.",
   });
 }
 
