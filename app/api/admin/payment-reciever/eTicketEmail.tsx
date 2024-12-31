@@ -1,4 +1,4 @@
-import { HOST, YEAR } from "@/app/metadata";
+import { EVENT_DESC, HOST, YEAR } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import nodemailer from "nodemailer";
@@ -13,6 +13,7 @@ export async function sendEmail(email: string, name: string, uuid: string) {
     .replace("${name}", name)
     .replace("${qrCodeURL}", `${HOST}/api/qr?uuid=${uuid}`)
     .replace("${uuid}", uuid)
+    .replace("{EVENT_DESC}", EVENT_DESC)
     .replaceAll("${year}", YEAR.toString());
 
   try {

@@ -37,7 +37,7 @@ export async function GET(
   // Calculate the absolute difference between the current date and the event date
   if (Math.abs(currentDate.getTime() - eventDate.getTime()) > THRESHOLD) {
     return NextResponse.json(
-      { error: `Event not started yet. ${currentDate} - ${eventDate}` },
+      { error: `Event not started yet. ${eventDate.toLocaleDateString()}` },
       { status: 400, headers: headers }
     );
   }
@@ -53,22 +53,22 @@ export async function GET(
       let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
       if (query.rowCount === 0) {
         return NextResponse.json(
-          { error: "Applicant not found. Send to Aly." },
+          { error: "Applicant not found." },
           { status: 404, headers: headers }
         );
       } else if (query.rows[0].admitted) {
         return NextResponse.json(
-          { error: "Applicant already admitted" },
+          { error: "Applicant already admitted." },
           { status: 400, headers: headers }
         );
       } else if (!query.rows[0].paid) {
         return NextResponse.json(
-          { error: "Applicant has not paid" },
+          { error: "Applicant has not paid." },
           { status: 400, headers: headers }
         );
       } else {
         return NextResponse.json(
-          { error: "Applicant already admitted" },
+          { error: "Applicant already admitted." },
           { status: 400, headers: headers }
         );
       }
@@ -81,7 +81,7 @@ export async function GET(
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json(
-      { error: "An Error Occurred" },
+      { error: "An Error Occurred." },
       { status: 502, headers: headers }
     );
   }
