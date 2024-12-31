@@ -1,7 +1,8 @@
 .container label,
 .container input,
 .container textarea,
-.container select {
+.container select,
+.paymentMethodSelector {
   transition: all ease 300ms;
   z-index: 10 !important;
 }
@@ -103,7 +104,8 @@
 }
 
 .container input,
-.container select {
+.container select,
+.paymentMethodSelector {
   background: rgba(255, 255, 255, 0.15);
 
   color: #fff; /* White text inside inputs */
@@ -116,6 +118,10 @@
   /* box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); */
   width: 100%;
   box-sizing: border-box;
+}
+
+.paymentMethodSelector {
+  margin: 0 !important;
 }
 
 .container input {
@@ -160,13 +166,14 @@
 .paymentMethodContainer {
   position: relative;
   width: 100%;
+  margin: 10px 0;
 }
 
-.paymentMethodContainer select {
+.paymentMethodContainer select,
+.paymentMethodSelector {
   appearance: none; /* Remove default browser styles */
   -webkit-appearance: none; /* For Safari */
   -moz-appearance: none; /* For Firefox */
-  padding: 10px 15px;
   width: 100%;
   border: none;
   font-size: 16px;
@@ -174,6 +181,14 @@
   outline: none;
   border: 2px solid transparent;
   color: #ffffff80;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 101 !important;
+}
+
+.paymentMethodSelector > * {
+  margin: 10px 16px;
 }
 
 .paymentMethodContainer .selectArrow {
@@ -191,6 +206,50 @@
 .paymentMethodContainer select:focus {
   border: #b1aae4 2px solid;
   color: #ffffffdd;
+}
+
+.paymentMethodOptions {
+  position: absolute;
+  background-color: #a07299;
+  top: 0;
+  z-index: 100;
+  border-radius: 1.5rem;
+  padding: 10px 16px;
+  width: 100%;
+  padding-top: 3.5rem;
+  /* display: none; */
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paymentMethodOptions > div:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.paymentMethodOptions > div {
+  border-bottom: #ffffff40 1px solid;
+}
+
+.selectArrow {
+  transition: all 0.5s ease;
+  transform: rotate(0deg);
+}
+
+.selectArrow.activeSVG {
+  transform: rotate(180deg);
+  top: 40%;
+}
+
+.activeOption {
+  opacity: 1;
+  transform: translateY(0px);
+  pointer-events: all;
 }
 
 .container select:valid {

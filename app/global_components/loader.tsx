@@ -22,7 +22,13 @@ export function Loader() {
         pointerEvents: "none",
       }}
     >
-      <Image src="/loading.gif" alt="Loading..." width={50} height={50} />
+      <Image
+        src="/loading.gif"
+        unoptimized
+        alt="Loading..."
+        width={50}
+        height={50}
+      />
     </div>
   );
 }

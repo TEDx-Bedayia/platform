@@ -213,7 +213,7 @@ export default function SingleTickets() {
                 type="text"
                 name="name"
                 id="name-input"
-                placeholder=""
+                placeholder=" "
                 value={formData.name}
                 required={true}
                 onChange={handleChange}
@@ -227,7 +227,7 @@ export default function SingleTickets() {
               <input
                 type="email"
                 name="email"
-                placeholder=""
+                placeholder=" "
                 id="email-input"
                 required={true}
                 value={formData.email}
@@ -243,7 +243,7 @@ export default function SingleTickets() {
                 type="text"
                 name="phone"
                 id="phone-input"
-                placeholder=""
+                placeholder=" "
                 minLength={11}
                 required={true}
                 value={formData.phone}
@@ -253,23 +253,67 @@ export default function SingleTickets() {
             </div>
           </div>
 
-          <div className={styles.paymentMethodContainer}>
-            <select
-              name="paymentMethod"
-              id="payment-method"
-              required={true}
-              value={formData.paymentMethod}
-              onChange={handleChange}
+          <div
+            id="paymentMethodContainer"
+            className={styles.paymentMethodContainer}
+          >
+            <div
+              className={styles.paymentMethodSelector}
+              onClick={() => {
+                document
+                  .getElementById("paymentMethodOptions")
+                  ?.classList.toggle(styles.activeOption);
+
+                document
+                  .getElementsByClassName(styles.selectArrow)[0]
+                  .classList.toggle(styles.activeSVG);
+              }}
             >
-              <option value="" disabled>
-                Select Payment Method
-              </option>
+              {paymentOptions.find(
+                (value) => value.identifier == formData.paymentMethod
+              )?.displayName == null ? (
+                <span style={{ padding: "0", margin: "0" }}>
+                  Select Payment Method
+                </span>
+              ) : (
+                <span style={{ color: "white", padding: "0", margin: "0" }}>
+                  {
+                    paymentOptions.find(
+                      (value) => value.identifier == formData.paymentMethod
+                    )?.displayName
+                  }
+                </span>
+              )}
+            </div>
+            <div
+              id="paymentMethodOptions"
+              className={styles.paymentMethodOptions}
+            >
               {paymentOptions.map((option) => (
-                <option key={option.identifier} value={option.identifier}>
+                <div
+                  className={styles.paymentMethod}
+                  key={option.identifier}
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      paymentMethod: option.identifier,
+                      additionalFields: {},
+                    });
+
+                    setSelectedPaymentFields(option.fields || []);
+
+                    document
+                      .getElementById("paymentMethodOptions")
+                      ?.classList.toggle(styles.activeOption);
+                    document
+                      .getElementsByClassName(styles.selectArrow)[0]
+                      .classList.toggle(styles.activeSVG);
+                  }}
+                >
                   {option.displayName}
-                </option>
+                </div>
               ))}
-            </select>
+            </div>
 
             <svg
               className={styles.selectArrow}
@@ -278,6 +322,7 @@ export default function SingleTickets() {
               viewBox="0 0 12 12"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              style={{ zIndex: 101 }}
             >
               <path
                 d="M6 8.825C5.8 8.825 5.6 8.725 5.5 8.625L2.2 5.325C1.9 5.025 1.9 4.525 2.2 4.225C2.5 3.925 3 3.925 3.3 4.225L6 6.925L8.7 4.225C9 3.925 9.5 3.925 9.8 4.225C10.1 4.525 10.1 5.025 9.8 5.325L6.6 8.525C6.4 8.725 6.2 8.825 6 8.825Z"
@@ -291,22 +336,33 @@ export default function SingleTickets() {
             <div className="additional-field-container">
               {selectedPaymentFields.length > 0 &&
                 selectedPaymentFields.map((field, index) => (
-                  <div className={styles.mainTextbox} key={index}>
-                    <div className={styles.inputWrapper}>
-                      <input
-                        type={field.type}
-                        name={field.id}
-                        id={`additional-field-${index}`}
-                        placeholder=""
-                        required={field.required}
-                        value={formData.additionalFields[field.id] || ""}
-                        onChange={handleAdditionalFieldChange}
-                      />
-                      <label htmlFor={`additional-field-${index}`}>
-                        {field.placeholder}
-                      </label>
+                  <motion.div
+                    initial={{ opacity: 0.3, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    key={index}
+                    transition={{
+                      type: "tween",
+                      ease: "easeIn",
+                      duration: 0.75,
+                    }}
+                  >
+                    <div className={styles.mainTextbox}>
+                      <div className={styles.inputWrapper}>
+                        <input
+                          type={field.type}
+                          name={field.id}
+                          id={`additional-field-${index}`}
+                          placeholder=" "
+                          required={field.required}
+                          value={formData.additionalFields[field.id] || ""}
+                          onChange={handleAdditionalFieldChange}
+                        />
+                        <label htmlFor={`additional-field-${index}`}>
+                          {field.placeholder}
+                        </label>
+                      </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
             </div>
           )}
