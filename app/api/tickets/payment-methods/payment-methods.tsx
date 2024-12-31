@@ -39,7 +39,7 @@ const INSTAPAY: PaymentMethod = {
       type: "string",
       id: "ipn",
       label: "InstaPay Address (IPA)",
-      placeholder: "InstaPay Address",
+      placeholder: "InstaPay Address (without @instapay)",
       required: true,
     },
   ],
