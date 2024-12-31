@@ -186,7 +186,6 @@ export function customAlert2(displayName: string, callback: Function) {
 
   let func = (e: KeyboardEvent) => {
     if (e.key === "Enter") {
-      closeButton.focus();
       closeButton.click();
     }
 
