@@ -284,7 +284,7 @@ export default function SingleTickets() {
                 type="text"
                 name="name"
                 id="name-input"
-                placeholder=""
+                placeholder=" "
                 value={formData.names[currentPerson]}
                 required={true}
                 onChange={handleChange}
@@ -298,7 +298,7 @@ export default function SingleTickets() {
               <input
                 type="email"
                 name="email"
-                placeholder=""
+                placeholder=" "
                 id="email-input"
                 required={true}
                 value={formData.emails[currentPerson]}
@@ -315,7 +315,7 @@ export default function SingleTickets() {
                   type="text"
                   name="phone"
                   id="phone-input"
-                  placeholder=""
+                  placeholder=" "
                   minLength={11}
                   required={true}
                   value={formData.phone}
@@ -382,7 +382,7 @@ export default function SingleTickets() {
                           type={field.type}
                           name={field.id}
                           id={`additional-field-${index}`}
-                          placeholder=""
+                          placeholder=" "
                           required={field.required}
                           value={formData.additionalFields[field.id] || ""}
                           onChange={handleAdditionalFieldChange}
