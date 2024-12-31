@@ -146,9 +146,9 @@ async function sendBookingConfirmation(
       paymentMethod.split("@")[1]
     }. If that's incorrect please reply to this message or contact us on WhatsApp as soon as possible.`;
   } else if (paymentMethod.split("@")[0] === "IPN") {
-    paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Please send us a screenshot of your payment along with your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp. You're sending from @${
-      paymentMethod.split("@")[1]
-    }. If that's incorrect please reply to this message or contact us on WhatsApp as soon as possible.`;
+    paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. The Mobile Wallet icon is the last one on the right in the InstaPay send money options, and it looks like a wallet. Please send us a screenshot of your payment from ${
+      paymentMethod.split("@")[0]
+    } along with your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp. If your InstaPay phone number is incorrect please reply to this message or contact us on WhatsApp as soon as possible.`;
   }
 
   let pricingDesc = `The price for your entire group ticket (4 people) is: <strong>${price.markup(
