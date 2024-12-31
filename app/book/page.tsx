@@ -142,10 +142,6 @@ export default function SingleTickets() {
         (formData.additionalFields.vfcash.length < 11 ||
           (formData.additionalFields.vfcash.includes("+") &&
             formData.additionalFields.vfcash.length != 13))) ||
-      (formData.additionalFields.ipn &&
-        (formData.additionalFields.ipn.length < 11 ||
-          (formData.additionalFields.ipn.includes("+") &&
-            formData.additionalFields.ipn.length != 13))) ||
       formData.phone.length < 11 ||
       (formData.phone.includes("+") && formData.phone.length != 13)
     ) {
