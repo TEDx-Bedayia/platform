@@ -58,7 +58,7 @@ export async function verifyPaymentMethod(
 
   const vfcash = /^[0-9]{11}$/;
 
-  if (method === "VFCASH" || method === "IPN") {
+  if (method === "VFCASH") {
     // Replace ٠-٩ with 0-9
     metadata = metadata.replace(/[\u0660-\u0669]/g, (c) =>
       (c.charCodeAt(0) - 0x0660).toString()
