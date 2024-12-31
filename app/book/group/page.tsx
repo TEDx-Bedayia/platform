@@ -153,18 +153,12 @@ export default function SingleTickets() {
     document.body.focus();
     addLoader();
     if (
-      (formData.additionalFields.vfcash &&
-        (formData.additionalFields.vfcash.length < 11 ||
-          (formData.additionalFields.vfcash.includes("+") &&
-            formData.additionalFields.vfcash.length != 13))) ||
-      (formData.additionalFields.ipn &&
-        (formData.additionalFields.ipn.length < 11 ||
-          (formData.additionalFields.ipn.includes("+") &&
-            formData.additionalFields.ipn.length != 13)))
+      formData.additionalFields.vfcash &&
+      (formData.additionalFields.vfcash.length < 11 ||
+        (formData.additionalFields.vfcash.includes("+") &&
+          formData.additionalFields.vfcash.length != 13))
     ) {
-      customAlert(
-        "Please enter a valid phone number for E-Wallet or InstaPay."
-      );
+      customAlert("Please enter a valid phone number for E-Wallet.");
       setCurrentPerson(0);
       removeLoader();
       return;
