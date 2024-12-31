@@ -14,6 +14,9 @@ export const TICKET_WINDOW = [
 export const EVENT_DATE = new Date("2025-01-31T23:59:59Z"); // Change to event date
 export const HOST = "https://tedxbedayia.com"; // Change to your domain
 
+export const EVENT_DESC =
+  "The event will be held on Friday, 31st of January, 2025.";
+
 export const YEAR = EVENT_DATE.getUTCFullYear().toString().slice(2);
 
 export const support: Author = {
