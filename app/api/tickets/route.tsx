@@ -1,4 +1,11 @@
-import { IPN, PHONE, TELDA, TICKET_WINDOW, YEAR } from "@/app/metadata";
+import {
+  EVENT_DATE,
+  IPN,
+  PHONE,
+  TELDA,
+  TICKET_WINDOW,
+  YEAR,
+} from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import { type NextRequest } from "next/server";
@@ -196,6 +203,10 @@ async function sendSingleBookingConfirmation(
     .replace("${vfcash}", paymentDetails)
     .replace("{pricingDesc}", pricingDesc)
     .replace("{PHONE}", PHONE)
+    .replaceAll(
+      "{DATE}",
+      `${EVENT_DATE.getDate()}/${EVENT_DATE.getMonth()}/${EVENT_DATE.getFullYear()}`
+    )
     .replaceAll("${year}", YEAR.toString());
 
   const transporter = nodemailer.createTransport({
