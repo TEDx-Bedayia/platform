@@ -66,19 +66,16 @@ export default function SingleTickets() {
     if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
       return;
     }
-    if (name == "vfcash" || name == "ipn")
+    if (name == "vfcash")
       value = value.replace(/[\u0660-\u0669]/g, (c) => {
         return (c.charCodeAt(0) - 0x0660).toString();
       });
-    if (name == "vfcash" || name == "ipn") value = value.replace(/[^+\d]/g, "");
-    if (name == "tlda" && value.includes("+")) return;
-    if (
-      (name == "vfcash" || name == "ipn") &&
-      (isNaN(Number(value)) || value.includes(" "))
-    ) {
+    if (name == "vfcash") value = value.replace(/[^+\d]/g, "");
+    if ((name == "tlda" || name == "ipn") && value.includes("+")) return;
+    if (name == "vfcash" && (isNaN(Number(value)) || value.includes(" "))) {
       if (value != "+") return;
     }
-    if (name == "vfcash" || name == "ipn") {
+    if (name == "vfcash") {
       if (value.includes("+")) {
         if (value.length > 13) return;
       } else if (value.length > 11) {
