@@ -37,7 +37,7 @@ export async function GET(
   // Calculate the absolute difference between the current date and the event date
   if (Math.abs(currentDate.getTime() - eventDate.getTime()) > THRESHOLD) {
     return NextResponse.json(
-      { error: `Event not started yet. ${currentDate} - ${eventDate}` },
+      { error: `Event not started yet. ${eventDate.toLocaleDateString()}` },
       { status: 400, headers: headers }
     );
   }
