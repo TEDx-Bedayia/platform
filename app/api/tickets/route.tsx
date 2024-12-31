@@ -205,7 +205,9 @@ async function sendSingleBookingConfirmation(
     .replace("{PHONE}", PHONE)
     .replaceAll(
       "{DATE}",
-      `${EVENT_DATE.getDate()}/${EVENT_DATE.getMonth()}/${EVENT_DATE.getFullYear()}`
+      `${EVENT_DATE.getUTCDate()}/${
+        EVENT_DATE.getUTCMonth() + 1
+      }/${EVENT_DATE.getUTCFullYear()}`
     )
     .replaceAll("${year}", YEAR.toString());
 
