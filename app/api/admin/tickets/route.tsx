@@ -1,9 +1,26 @@
-import { NextResponse } from "next/server";
+import { sql } from "@vercel/postgres";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST() {
   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 }
 
-export async function GET() {
-  return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+export async function GET(request: NextRequest) {
+  // Check Admin Perms
+  if (
+    request.headers.get("key") !== process.env.ADMIN_KEY ||
+    !process.env.ADMIN_KEY
+  ) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  // SELECT email FROM attendees WHERE paid = false; and return all rows formatted as a string with commas and space in between.
+
+  const { rows } = await sql`SELECT email FROM attendees WHERE paid = false;`;
+  let emails = "";
+  rows.forEach((row) => {
+    emails += row.email + ", ";
+  });
+
+  return NextResponse.json({ emails }, { status: 200 });
 }
