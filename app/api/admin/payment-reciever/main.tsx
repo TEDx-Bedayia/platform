@@ -323,9 +323,11 @@ export async function pay(
     if (from == "CASH") {
       from = "CASH@" + identification.replaceAll("@", " ");
     }
-    if (paid != 0 && paid <= total && paid <= parseInt(amount))
-      await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
-    else if (paid == 0) {
+    if (paid != 0 && paid <= total && paid <= parseInt(amount)) {
+      if (parseInt(amount) != 0) {
+        await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
+      }
+    } else if (paid == 0) {
       return Response.json(
         {
           message:
