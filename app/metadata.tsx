@@ -11,13 +11,13 @@ export const TICKET_WINDOW = [
   new Date("2025-01-01T22:00:00Z"),
   new Date("2025-01-31T23:59:59Z"),
 ]; // Change to actual ticket window
-export const EVENT_DATE = new Date("2024-12-31T23:59:59Z"); // Change to event date
+export const EVENT_DATE = new Date("2025-01-31T23:59:59Z"); // Change to event date
 export const HOST = "https://tedxbedayia.com"; // Change to your domain
 
 export const EVENT_DESC =
   "The event will be held on Friday, 31st of January, 2025.";
 
-export const YEAR = EVENT_DATE.getUTCFullYear().toString().slice(2);
+export const YEAR = 25;
 
 export const support: Author = {
   name: "Aly Mobarak", // Change with your name (head)
