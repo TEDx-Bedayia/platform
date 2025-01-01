@@ -99,14 +99,16 @@ export default function Payments() {
         date: getCurrentDate(),
       });
 
-      if (value == "VFCASH") {
-        setChangingFieldTitle("Phone Number");
-      } else if (value == "TLDA") {
-        setChangingFieldTitle("Telda");
-      } else if (value == "IPN") {
-        setChangingFieldTitle("InstaPay Number");
-      } else {
+      if (
+        paymentOptions.find((option) => option.identifier == value)?.fields
+          .length == 0
+      ) {
         setChangingFieldTitle("Email Address");
+      } else {
+        setChangingFieldTitle(
+          paymentOptions.find((option) => option.identifier == value)?.fields[0]
+            .placeholder ?? "Email Address"
+        );
       }
     }
 
@@ -160,7 +162,7 @@ export default function Payments() {
               " EGP."
           );
         else customAlert("Refund Inserted.");
-        formData.method = type == "admin" ? "" : "CASH";
+        formData.method = type == "admin" ? formData.method : "CASH";
         formData.from = "";
         formData.amount = "";
         formData.date = getCurrentDate();
