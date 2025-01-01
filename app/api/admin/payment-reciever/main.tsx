@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
 import { sendEmail } from "./eTicketEmail";
 
-async function safeRandUUID() {
+export async function safeRandUUID() {
   let uuid = randomUUID();
   let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
   while (query.rows.length !== 0) {
@@ -323,9 +323,11 @@ export async function pay(
     if (from == "CASH") {
       from = "CASH@" + identification.replaceAll("@", " ");
     }
-    if (paid != 0 && paid <= total && paid <= parseInt(amount))
-      await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
-    else if (paid == 0) {
+    if (paid != 0 && paid <= total && paid <= parseInt(amount)) {
+      if (parseInt(amount) != 0) {
+        await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
+      }
+    } else if (paid == 0) {
       return Response.json(
         {
           message:

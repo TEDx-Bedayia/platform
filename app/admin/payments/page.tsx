@@ -154,13 +154,15 @@ export default function Payments() {
 
       if (response.ok) {
         let { refund, paid } = await response.json();
-        if (!refund)
+        if (!refund && paid != -1)
           customAlert(
             paid +
               " EGP were accepted successfully. Refund " +
               (parseInt(amount) - paid) +
               " EGP."
           );
+        else if (paid == -1 && parseInt(amount) == 0)
+          customAlert("Speaker Ticket Accepted.");
         else customAlert("Refund Inserted.");
         formData.method = type == "admin" ? formData.method : "CASH";
         formData.from = "";

@@ -2,6 +2,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { Poppins, Ubuntu } from "next/font/google";
+import { redirect } from "next/navigation";
 import { addLoader, removeLoader } from "../global_components/loader";
 import { EVENT_DATE } from "../metadata";
 import { customAlert, customAlert2 } from "./custom-alert";
@@ -53,6 +54,23 @@ const group = (
     <path
       d="M23.0534 10.6667C22.8565 10.6667 22.6634 10.6807 22.475 10.7076C21.9283 10.7858 21.4217 10.406 21.3435 9.85928C21.2653 9.31256 21.6452 8.80597 22.1919 8.72777C22.4738 8.68746 22.7614 8.66667 23.0534 8.66667C26.3892 8.66667 29.0933 11.3709 29.0933 14.7067C29.0933 16.6744 28.1522 18.4212 26.6982 19.5232C29.8068 20.9167 31.9733 24.0376 31.9733 27.6667C31.9733 28.219 31.5256 28.6667 30.9733 28.6667C30.421 28.6667 29.9733 28.219 29.9733 27.6667C29.9733 24.5388 27.8974 21.8932 25.0459 21.0375L24.3333 20.8237V18.5891L24.8803 18.3112C26.1956 17.6428 27.0933 16.2787 27.0933 14.7067C27.0933 12.4754 25.2845 10.6667 23.0534 10.6667Z"
       fill="#1F2328"
+    />
+  </svg>
+);
+
+const speakerTicketIcon = (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M22 1.75002C22 1.47444 21.8489 1.22106 21.6064 1.09011C21.3642 0.959306 21.0691 0.972213 20.8387 1.12283C20.792 1.15211 20.7446 1.18046 20.6969 1.20808C20.5913 1.26909 20.4278 1.35946 20.2071 1.46954C19.7659 1.68971 19.0964 1.98866 18.2054 2.28941C16.4244 2.8906 13.7554 3.50002 10.25 3.50002H9.7548L9.75 3.5H6.5C3.46243 3.5 1 5.96243 1 9C1 11.5176 2.6915 13.64 5 14.293V14.75C5 17.8113 5.68398 20.2548 6.06118 21.3712C6.30061 22.0798 6.96462 22.5 7.66124 22.5H9.67422C10.968 22.5 11.7734 21.1784 11.4059 20.0465C10.9945 18.7795 10.5 16.7792 10.5 14.5C10.5 14.4701 10.4983 14.4407 10.4949 14.4118C13.8766 14.4403 16.4602 15.0559 18.1978 15.6634C19.0879 15.9745 19.7568 16.2839 20.1977 16.5117C20.2815 16.5551 20.3691 16.6077 20.4594 16.6619C20.8164 16.8764 21.2163 17.1166 21.601 16.9128C21.8465 16.7828 22 16.5278 22 16.25V1.75002ZM10.5 12.9118C14.0638 12.9409 16.8127 13.5901 18.6928 14.2474C19.4304 14.5053 20.0339 14.7642 20.5 14.9872V2.99271C20.033 3.20875 19.427 3.46022 18.6852 3.71062C16.8068 4.34467 14.0605 4.97086 10.5 4.99903V12.9118ZM6.5 14.75V14.5H9C9 16.9857 9.53723 19.1484 9.97923 20.5098C10.0146 20.6187 9.99563 20.7471 9.92328 20.8533C9.85291 20.9566 9.76098 21 9.67422 21H7.66124C7.55594 21 7.49953 20.9421 7.48225 20.891C7.13816 19.8726 6.5 17.5974 6.5 14.75ZM6.5 5H9V13H6.5C4.29086 13 2.5 11.2091 2.5 9C2.5 6.79086 4.29086 5 6.5 5Z"
+      fill="#15803D"
     />
   </svg>
 );
@@ -130,14 +148,13 @@ export default function AdminDashboard() {
             <div
               style={{ position: "relative", width: "32px", height: "32px" }}
             >
-              {applicant.ticket_type === "individual" ? onePerson : group}
+              {applicant.ticket_type === "group" ? group : onePerson}
               <span
                 style={{
                   fontSize: ".5rem",
                   fontWeight: 700,
                   position: "absolute",
-                  width:
-                    applicant.ticket_type == "individual" ? "100%" : "71.5%",
+                  width: applicant.ticket_type === "group" ? "71.5%" : "100%",
                   textAlign: "center",
                   top: "20px",
                 }}
@@ -190,7 +207,9 @@ export default function AdminDashboard() {
             </span>
             <span style={{ fontSize: ".7rem" }}>
               <span style={{ fontWeight: "700" }}>
-                {applicant.payment_method.split("@")[0]}
+                {applicant.ticket_type !== "speaker"
+                  ? applicant.payment_method.split("@")[0]
+                  : "SPEAKER"}
               </span>
               {applicant.payment_method.split("@")[1] != undefined &&
                 ": " + applicant.payment_method.split("@")[1]}
@@ -390,6 +409,17 @@ export default function AdminDashboard() {
           </svg>
         </button>
       )}
+
+      <button
+        className="absolute left-24 top-24 w-9 h-9 bg-green-200 overflow-hidden rounded-lg text-green-700 flex items-center justify-center scale-125 transition-all hover:bg-green-300 active:bg-green-400"
+        title="Add Speaker Tickets"
+        onClick={() => {
+          window.location.href = "/admin/speaker-tickets";
+        }}
+      >
+        {speakerTicketIcon}
+      </button>
+
       <h1 style={{ ...title.style, fontWeight: 700 }}>All Tickets</h1>
       <div
         style={{

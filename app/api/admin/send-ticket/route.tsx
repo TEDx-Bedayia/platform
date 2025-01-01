@@ -1,6 +1,5 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
-import QRCode from "qrcode";
 import { sendEmail } from "../payment-reciever/eTicketEmail";
 
 export async function GET(request: NextRequest) {
