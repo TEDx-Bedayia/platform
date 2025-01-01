@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
 import { sendEmail } from "./eTicketEmail";
 
-async function safeRandUUID() {
+export async function safeRandUUID() {
   let uuid = randomUUID();
   let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
   while (query.rows.length !== 0) {
