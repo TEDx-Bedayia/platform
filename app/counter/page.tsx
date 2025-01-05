@@ -1,0 +1,58 @@
+"use client";
+import { Poppins, Ubuntu } from "next/font/google";
+import { useEffect, useState } from "react";
+
+const title = Poppins({ weight: ["400"], subsets: ["latin"] });
+const ubuntu = Ubuntu({ weight: ["700"], subsets: ["latin"] });
+export default function TicketCounter() {
+  const [ticketCount, setTicketCount] = useState(0);
+  const [paidCount, setPaidCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/tickets")
+      .then((res) => res.json())
+      .then((data) => {
+        setTicketCount(data.total);
+        setPaidCount(data.paid);
+      });
+  }, []);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100vw",
+        height: "100vh",
+      }}
+    >
+      <span
+        style={{
+          ...ubuntu.style,
+          fontSize: "20rem",
+          fontWeight: "700",
+          margin: "0 !important",
+          padding: "0 !important",
+        }}
+      >
+        {ticketCount > 0 ? ticketCount : "..."}
+      </span>
+
+      <span
+        style={{
+          ...title.style,
+          fontSize: "1rem",
+          fontWeight: "400",
+          margin: "0 !important",
+          padding: "0 !important",
+          position: "absolute",
+          bottom: "20%",
+        }}
+      >
+        Sold: {paidCount}
+      </span>
+    </div>
+  );
+}

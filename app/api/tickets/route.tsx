@@ -230,3 +230,16 @@ async function sendSingleBookingConfirmation(
     html: personalizedHtml,
   });
 }
+
+export async function GET(request: NextRequest) {
+  // Return number of tickets and number ofo paid tickets
+  let query = await sql`SELECT COUNT(*) FROM attendees;`;
+  let query2 = await sql`SELECT COUNT(*) FROM attendees WHERE paid = true;`;
+  return Response.json(
+    {
+      total: query.rows[0].count,
+      paid: query2.rows[0].count,
+    },
+    { status: 200 }
+  );
+}
