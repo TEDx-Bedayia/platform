@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   let from = params.get("from");
   if (from === null) {
     return Response.json(
-      { message: "Email of Sender is required." },
+      { message: "Email/ID of Sender is required." },
       { status: 400 }
     );
   }

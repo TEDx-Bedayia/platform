@@ -85,6 +85,8 @@ export async function POST(request: NextRequest) {
       return resp;
     }
 
+    let id = (await resp.json()).id;
+
     try {
       await sql`INSERT INTO groups (email1, email2, email3, email4) VALUES (${emails[0]}, ${emails[1]}, ${emails[2]}, ${emails[3]});`;
     } catch (error) {
@@ -96,7 +98,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await sendBookingConfirmation(emails[0], name1, paymentMethod);
+      await sendBookingConfirmation(emails[0], name1, paymentMethod, id);
       // sendBookingConfirmation(email2, name2, paymentMethod);
       // sendBookingConfirmation(email3, name3, paymentMethod);
       // sendBookingConfirmation(email4, name4, paymentMethod);
@@ -129,7 +131,8 @@ export async function POST(request: NextRequest) {
 async function sendBookingConfirmation(
   email: string,
   name: string,
-  paymentMethod: string
+  paymentMethod: string,
+  id: string
 ) {
   const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
   const htmlContent = await promises.readFile(filePath, "utf8");
@@ -140,7 +143,7 @@ async function sendBookingConfirmation(
       paymentMethod.split("@")[1]
     }</strong>, stating your email address: <strong>${email}</strong> to confirm your payment.`;
   } else if (paymentMethod.split("@")[0] === "CASH") {
-    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion: <strong>${email}</strong>.`;
+    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell your attendee ID: <strong>${id}</strong>.`;
   } else if (paymentMethod.split("@")[0] === "TLDA") {
     paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>. You're sending from @${
       paymentMethod.split("@")[1]
@@ -281,11 +284,12 @@ async function submitTickets(
   }
 
   try {
-    await sql.query(
-      `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ${q};`
+    let res = await sql.query(
+      `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ${q} RETURNING *;`
     );
+    let id = res.rows[0].id;
 
-    return Response.json({ success: true });
+    return Response.json({ success: true, id });
   } catch (err: any) {
     // console.log(err);
     return Response.json({ success: false }, { status: 500 });
