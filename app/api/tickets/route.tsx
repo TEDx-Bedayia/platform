@@ -133,11 +133,13 @@ async function submitOneTicket(
     );
   }
 
+  let id;
   try {
-    await sql.query(
-      `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ($1::text, $2::text, $3::text, $4::text, $5::text);`,
+    let res = await sql.query(
+      `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ($1::text, $2::text, $3::text, $4::text, $5::text) RETURNING *;`,
       [email, name, paymentMethod, phone, "individual"]
     );
+    id = res.rows[0].id;
   } catch (error) {
     return Response.json(
       {
@@ -149,7 +151,7 @@ async function submitOneTicket(
 
   try {
     // send payment details and next steps.
-    await sendSingleBookingConfirmation(email, name, paymentMethod);
+    await sendSingleBookingConfirmation(email, name, paymentMethod, id);
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE email = ${email}`;
@@ -174,7 +176,8 @@ async function submitOneTicket(
 async function sendSingleBookingConfirmation(
   email: string,
   name: string,
-  paymentMethod: string
+  paymentMethod: string,
+  ID: string
 ) {
   const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
   const htmlContent = await promises.readFile(filePath, "utf8");
@@ -185,7 +188,7 @@ async function sendSingleBookingConfirmation(
       paymentMethod.split("@")[1]
     }</strong>, stating your email address: <strong>${email}</strong> to confirm your payment.`;
   } else if (paymentMethod.split("@")[0] === "CASH") {
-    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them the email address that has received this message to avoid confusion: <strong>${email}</strong>.`;
+    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them your attendee ID: <strong>${ID}</strong>.`;
   } else if (paymentMethod.split("@")[0] === "TLDA") {
     paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>. You're sending from @${
       paymentMethod.split("@")[1]

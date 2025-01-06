@@ -24,7 +24,9 @@ export default function Payments() {
   });
   const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
   const [type, setType] = useState<"admin" | "school">("school");
-  const [changingFieldTitle, setChangingFieldTitle] = useState("Email Address");
+  const [changingFieldTitle, setChangingFieldTitle] = useState(
+    "Email Address Or ID"
+  );
 
   useEffect(() => {
     if (localStorage.getItem("admin-token")) {
@@ -103,11 +105,11 @@ export default function Payments() {
         paymentOptions.find((option) => option.identifier == value)?.fields
           .length == 0
       ) {
-        setChangingFieldTitle("Email Address");
+        setChangingFieldTitle("Email Address Or ID");
       } else {
         setChangingFieldTitle(
           paymentOptions.find((option) => option.identifier == value)?.fields[0]
-            .placeholder ?? "Email Address"
+            .placeholder ?? "Email Address Or ID"
         );
       }
     }
@@ -332,9 +334,6 @@ export default function Payments() {
             }}
           >
             To check how much money is needed, enter 0 in the amount field.
-            <br />
-            Then, only accept the amount of money needed (or refund difference f
-            sa3etha).
           </span>
         )}
       </div>
