@@ -102,7 +102,7 @@ const sendTicket = async (
   }
 };
 
-export const formatDate = (date: Date) => {
+const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "2-digit",
