@@ -2,7 +2,6 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { Poppins, Ubuntu } from "next/font/google";
-import { redirect } from "next/navigation";
 import { addLoader, removeLoader } from "../global_components/loader";
 import { EVENT_DATE } from "../metadata";
 import { customAlert, customAlert2 } from "./custom-alert";
@@ -12,6 +11,7 @@ type Applicant = {
   email: string;
   ticket_type: string;
   payment_method: string;
+  created_at: string;
   paid: boolean;
   admitted: boolean;
   id: number;
@@ -100,6 +100,27 @@ const sendTicket = async (
       )
     );
   }
+};
+
+const formatDate = (date: Date) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  };
+
+  const formatter = new Intl.DateTimeFormat("en-EG", options);
+  const parts = formatter.formatToParts(date);
+  const ampm = date.getHours() >= 12 ? "PM" : "AM";
+  const formattedDate = `${parts.find((p) => p.type === "day")?.value}/${
+    parts.find((p) => p.type === "month")?.value
+  }/${parts.find((p) => p.type === "year")?.value}, ${
+    parts.find((p) => p.type === "hour")?.value
+  }:${parts.find((p) => p.type === "minute")?.value} ${ampm}`;
+  return formattedDate;
 };
 
 export default function AdminDashboard() {
@@ -213,6 +234,9 @@ export default function AdminDashboard() {
               </span>
               {applicant.payment_method.split("@")[1] != undefined &&
                 ": " + applicant.payment_method.split("@")[1]}
+              <span style={{ fontSize: ".5rem", marginLeft: ".5rem" }}>
+                {formatDate(new Date(applicant.created_at))}
+              </span>
             </span>
           </div>
 
@@ -306,6 +330,7 @@ export default function AdminDashboard() {
         if (data.length < 10) {
           setHasMore(false); // No more data if less than 10 rows are returned
         }
+        console.log(data);
         setApplicants((prevApplicants) => [...prevApplicants, ...data]);
       } else {
         if (response.status === 401) {

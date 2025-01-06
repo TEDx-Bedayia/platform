@@ -57,7 +57,7 @@ export async function GET(
     // SQL query to fetch paginated applicants using LIMIT and OFFSET
     const result = await sql.query(
       `SELECT id, full_name, email, type AS "ticket_type", 
-              payment_method, paid, admitted, sent, phone
+              payment_method, paid, admitted, sent, phone, created_at
        FROM attendees
        ` +
         filterQuery +
