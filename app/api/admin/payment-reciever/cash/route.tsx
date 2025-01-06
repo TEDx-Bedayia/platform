@@ -1,3 +1,5 @@
+import { price } from "@/app/api/tickets/price/prices";
+import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { pay } from "../main";
 
@@ -28,6 +30,30 @@ export async function GET(request: NextRequest) {
     return Response.json(
       { message: "Email/ID of Sender is required." },
       { status: 400 }
+    );
+  }
+
+  if (!isNaN(Number(from))) {
+    let res = await sql`SELECT * FROM attendees WHERE id = ${Number(from)}`;
+
+    if (res.rowCount === 0) {
+      return Response.json({ message: "User not found." }, { status: 404 });
+    }
+
+    let email = res.rows[0].email;
+    let name = res.rows[0].full_name;
+    let amount =
+      res.rows[0].type == "group" ? price.group * 4 : price.individual;
+
+    return Response.json(
+      {
+        email,
+        message:
+          "Please Check Name: " +
+          name +
+          `. Also, they should pay ${amount} EGP.`,
+      },
+      { status: 555 }
     );
   }
 
