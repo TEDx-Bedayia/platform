@@ -156,23 +156,25 @@ export default function Payments() {
 
       if (response.ok) {
         let { refund, paid } = await response.json();
-        if (!refund && paid != -1)
+        if (!refund && paid != -1) {
+          let refundText = " Refund " + (parseInt(amount) - paid) + " EGP.";
+          let ifRefund = parseInt(amount) - paid > 0 ? refundText : "";
           customAlert(
-            paid +
-              " EGP were accepted successfully. Refund " +
-              (parseInt(amount) - paid) +
-              " EGP."
+            paid + " EGP were accepted successfully." + ifRefund,
+            true,
+            true
           );
-        else if (paid == -1 && parseInt(amount) == 0)
-          customAlert("Speaker Ticket Accepted.");
-        else customAlert("Refund Inserted.");
+        } else if (paid == -1 && parseInt(amount) == 0)
+          customAlert("Speaker Ticket Accepted.", true, true);
+        else customAlert("Refund Inserted.", true, true);
         formData.method = type == "admin" ? formData.method : "CASH";
         formData.from = "";
         formData.amount = "";
         formData.date = getCurrentDate();
         setFormData({ ...formData });
       } else {
-        const { message } = await response.json();
+        const json = await response.json();
+        let message = json.message;
         if (response.status == 431) {
           customAlert2("Email(s)", async (email: string) => {
             if (
@@ -228,6 +230,12 @@ export default function Payments() {
             }
             removeLoader();
             return true;
+          });
+        } else if (response.status == 555) {
+          customAlert(message);
+          setFormData({
+            ...formData,
+            from: json.email,
           });
         } else customAlert(message);
       }

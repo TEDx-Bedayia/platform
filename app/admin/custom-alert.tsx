@@ -1,4 +1,6 @@
-export function customAlert(txt: string, closeable = true) {
+import { a } from "framer-motion/client";
+
+export function customAlert(txt: string, closeable = true, verified = false) {
   // Create a background overlay
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
@@ -19,13 +21,16 @@ export function customAlert(txt: string, closeable = true) {
   const alertBox = document.createElement("div");
   alertBox.style.backgroundColor = "white";
   alertBox.style.padding = "2rem";
-  alertBox.style.borderRadius = "10px";
+  alertBox.style.borderRadius = "1rem";
   alertBox.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.1)";
   alertBox.style.textAlign = "center";
   alertBox.style.maxWidth = "400px";
   alertBox.style.width = "85%";
   alertBox.style.transform = "scale(0.9)"; // Start with a slightly smaller scale
   alertBox.style.transition = "transform 0.3s ease, opacity 0.3s ease"; // Animation on transform and opacity
+  if (verified) alertBox.style.border = "#2BCB77 10px solid";
+  alertBox.style.boxSizing = "border-box";
+  // if (verified) alertBox.style.color = "white";
 
   // Create the message text
   const message = document.createElement("p");
@@ -43,6 +48,7 @@ export function customAlert(txt: string, closeable = true) {
   closeButton.style.borderRadius = "5px";
   closeButton.style.cursor = "pointer";
   closeButton.style.fontSize = "1rem";
+  // if (verified) closeButton.style.backgroundColor = "#2BCB77";
 
   // Add close button functionality
   closeButton.onclick = () => {
