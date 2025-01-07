@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { YEAR, support } from "./metadata";
-import NavBar from "./navbar";
 
 /* DO NOT EDIT */
 export const metadata: Metadata = {
@@ -9,6 +8,18 @@ export const metadata: Metadata = {
   description:
     "This is the official website for the TEDxYouth event hosted at Bedayia International School. Stop by to book your tickets, know more about us, and have some fun! Waiting for you!",
   authors: [support],
+  icons: [
+    {
+      url: "/favicon-32x32.png",
+      sizes: "32x32",
+      type: "image/png",
+    },
+    {
+      url: "/favicon-16x16.png",
+      sizes: "16x16",
+      type: "image/png",
+    },
+  ],
 };
 
 export default function RootLayout({
