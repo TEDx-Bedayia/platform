@@ -43,11 +43,8 @@ export async function pay(
   if (from.split("@")[0] === "CASH") {
     identification = from.split("@").splice(1).join("@");
     from = "CASH";
-    if (!isNaN(parseInt(identification))) {
-      toAdd = ` AND id = ${parseInt(identification)}`;
-    } else {
-      toAdd = ` AND email = '${identification}'`;
-    }
+
+    toAdd = ` AND email = '${identification}'`;
   }
   let query = await sql.query(
     `SELECT * FROM attendees WHERE payment_method = '${from}' AND paid = false` +
