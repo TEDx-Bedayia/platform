@@ -330,7 +330,6 @@ export default function AdminDashboard() {
         if (data.length < 10) {
           setHasMore(false); // No more data if less than 10 rows are returned
         }
-        console.log(data);
         setApplicants((prevApplicants) => [...prevApplicants, ...data]);
       } else {
         if (response.status === 401) {
