@@ -14,8 +14,6 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // SELECT email FROM attendees WHERE paid = false; and return all rows formatted as a string with commas and space in between.
-
   const { rows } = await sql`SELECT email FROM attendees WHERE paid = false;`;
   let emails = "";
   rows.forEach((row) => {

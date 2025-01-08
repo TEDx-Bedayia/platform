@@ -1,6 +1,5 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
-import { getPaymentMethods } from "../../tickets/payment-methods/payment-methods";
 import { price } from "../../tickets/price/prices";
 
 export async function GET(request: NextRequest) {

@@ -235,7 +235,7 @@ async function sendSingleBookingConfirmation(
 }
 
 export async function GET(request: NextRequest) {
-  // Return number of tickets and number ofo paid tickets
+  // Return number of tickets and number of paid tickets
   let query = await sql`SELECT COUNT(*) FROM attendees;`;
   let query2 = await sql`SELECT COUNT(*) FROM attendees WHERE paid = true;`;
   return Response.json(

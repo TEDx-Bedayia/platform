@@ -1,6 +1,5 @@
 "use client";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
-import { s } from "framer-motion/client";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";

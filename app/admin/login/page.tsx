@@ -1,6 +1,6 @@
 "use client";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
-import { Poppins, Space_Grotesk } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
 import styles from "./login.module.css"; // Importing the CSS module

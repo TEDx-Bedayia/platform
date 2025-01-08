@@ -11,7 +11,7 @@ export async function GET(
     params: Promise<{ uuid: string }>;
   }
 ) {
-  // Set CORS headers
+  // Set CORS headers to allow access from Usher App
   const headers = new Headers();
   headers.set("Access-Control-Allow-Origin", "*"); // Allow all origins
   headers.set("Access-Control-Allow-Methods", "GET"); // Allow specific methods
@@ -88,7 +88,7 @@ export async function GET(
 }
 
 export async function OPTIONS() {
-  // Handle preflight OPTIONS request
+  // Handle preflight OPTIONS request to Allow CORS for Usher App
   const headers = new Headers();
   headers.set("Access-Control-Allow-Origin", "*"); // Allow all origins
   headers.set("Access-Control-Allow-Methods", "GET"); // Allow specific methods

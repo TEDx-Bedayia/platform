@@ -7,5 +7,5 @@ export default function Logout() {
     window.location.href = "/admin/login";
   });
 
-  return <div></div>;
+  return <></>;
 }

@@ -30,12 +30,10 @@ export function handleMisspelling(email: string): string {
   email = email.replace("@bedayiaa", "@bedayia");
   email = email.replace("@bdayia", "@bedayia");
   email = email.replace("@bdaya", "@bedayia");
-  // Regexp to replace gamil, gmaill, gmal, gmalil, gmall, gmall, gmeil, gmil, gmla MUST BE AFTER THE @ symbol
   const gamil = /(?<=@)gma?i?l{1,2}/;
   if (gamil.test(email)) {
     email = email.replace(gamil, "gmail");
   }
-
   const gamil2 = /(?<=@)gam?i?l{1,2}/;
   if (gamil2.test(email)) {
     email = email.replace(gamil2, "gmail");
