@@ -3,8 +3,6 @@ import { type NextRequest } from "next/server";
 import { getPaymentMethods } from "../../tickets/payment-methods/payment-methods";
 
 export async function GET(request: NextRequest) {
-  let params = request.nextUrl.searchParams;
-
   if (
     request.headers.get("key") !== process.env.ADMIN_KEY ||
     !process.env.ADMIN_KEY
