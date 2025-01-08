@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("QR Code generation error:", error);
+    console.error("QR Code generation error: ", error);
     return NextResponse.json({ error: "An Error Occurred" }, { status: 502 });
   }
 }

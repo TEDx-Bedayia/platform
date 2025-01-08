@@ -1,8 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Poppins, Space_Grotesk, Ubuntu } from "next/font/google";
-import { totalmem } from "os";
+import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../custom-alert";
 import styles from "./history.module.css"; // Import CSS styles
 
@@ -147,16 +146,37 @@ export default function History() {
           fontWeight: 300,
           color: "grey",
           marginBottom: "1rem",
+          textAlign: "center",
         }}
       >
-        Expected Ticket Inflows: {total} EGP. <br /> Total Recieved:{" "}
-        {data.reduce((acc, curr) => acc + curr.recieved, 0)} EGP.
+        Expected Ticket Inflows: <br />{" "}
+        <strong style={{ color: "#107E7D" }}>{total} EGP</strong> <br /> Total
+        Recieved: <br />
+        <strong style={{ color: "#107E7D" }}>
+          {data.reduce((acc, curr) => acc + curr.recieved, 0)} EGP
+        </strong>
         <br />
         Errors:{" "}
         {data.reduce(
           (acc, curr) => acc + curr.recieved - curr.incurred,
           0
         )}{" "}
+        EGP. <br /> Telda:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("Telda"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
+        EGP. Instapay:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("Instapay"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
+        EGP. E-Wallet:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("E-Wallet"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
+        EGP. Office:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("Office"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
         EGP.
       </p>
       <div className={styles.transactionList}>
