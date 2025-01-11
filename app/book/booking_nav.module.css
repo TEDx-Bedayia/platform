@@ -72,11 +72,11 @@
   }
 
   .socials {
-    bottom: -4rem;
+    bottom: -10%; /* 4 rem */
   }
 
   .contact {
-    bottom: -1.5rem;
+    bottom: -5%;
   }
 
   .navigation * {

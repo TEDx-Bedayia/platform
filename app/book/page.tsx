@@ -10,6 +10,8 @@ import {
   Field,
   PaymentMethod,
 } from "../api/tickets/payment-methods/payment-methods";
+import "./htmlcolor.css";
+
 import { addLoader, removeLoader } from "../global_components/loader";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
