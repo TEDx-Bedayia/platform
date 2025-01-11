@@ -1,0 +1,72 @@
+@keyframes slideVertically {
+  0% {
+    transform: translateX(0px);
+  }
+  98%,
+  100% {
+    transform: translateX(calc(calc(calc(-6 * 100%) - 6rem) + 100vw));
+  }
+}
+
+@keyframes slideVerticallyPhone {
+  0% {
+    transform: translateX(0px);
+  }
+  98%,
+  100% {
+    transform: translateX(calc(calc(calc(-6 * 100%) - 4.5rem) + 100vw));
+  }
+}
+
+#testimonials > div {
+  animation: slideVertically 55s ease-in 2s infinite alternate;
+}
+
+@media only screen and (max-width: 1100px) {
+  #testimonials > div {
+    animation: slideVerticallyPhone 55s linear 2s infinite alternate;
+  }
+
+  #hero {
+    background-size: auto 80% !important;
+  }
+}
+
+#hero button {
+  transition:
+    transform ease-in 300ms,
+    box-shadow ease-in 300ms,
+    border ease-in 300ms;
+}
+
+#hero .primary:hover {
+  box-shadow:
+    0 19px 38px rgba(141, 37, 71, 0.25),
+    0 15px 12px rgba(141, 37, 71, 0.22);
+}
+
+#hero .secondary-wrapper {
+  transition:
+    transform ease-in 300ms,
+    box-shadow ease-in 300ms,
+    background-color ease-in 300ms,
+    border ease-in 300ms;
+
+  width: 17.25rem;
+  height: 5.5rem;
+}
+
+@media only screen and (max-width: 1100px) {
+  #hero .secondary-wrapper {
+    width: 16rem;
+    height: 3.625rem;
+  }
+}
+
+#hero .secondary-wrapper > div {
+  transition:
+    transform ease-in 300ms,
+    box-shadow ease-in 300ms,
+    background-color ease-in 300ms,
+    border ease-in 300ms;
+}

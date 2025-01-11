@@ -435,7 +435,10 @@ export default function SingleTickets() {
 
           {currentPerson != 3 &&
             (formData.emails.includes("") || formData.names.includes("")) && (
-              <h3 style={{ margin: "0.5rem 0", color: "white", opacity: 0.6 }}>
+              <h3
+                style={{ margin: "0.5rem 0", color: "white", opacity: 0.6 }}
+                className="max-phone:text-sm"
+              >
                 Please fill out the fields above to continue
               </h3>
             )}
