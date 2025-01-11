@@ -50,12 +50,13 @@ export default function RootLayout({
         passHref
         style={{
           position: "absolute",
-          bottom: "-1.5rem",
+          // bottom: "-1.5rem",
           textAlign: "center",
           width: "100vw",
           color: "lightgray",
           fontSize: ".75rem",
         }}
+        className={styles.contact}
       >
         Contact Us On <span className="text-secondary-200">+201055782533</span>
       </Link>
@@ -63,7 +64,7 @@ export default function RootLayout({
         className={styles.socials}
         style={{
           position: "absolute",
-          bottom: "-4rem",
+          // bottom: "-4rem",
           left: "50%",
           transform: "translateX(-50%)",
         }}

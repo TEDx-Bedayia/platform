@@ -51,6 +51,11 @@
   display: flex;
   gap: 20px;
   justify-content: center;
+  bottom: 1rem;
+}
+
+.contact {
+  bottom: 4rem;
 }
 
 .navigation > a:hover::after {
@@ -64,6 +69,14 @@
     flex-direction: column;
     height: fit-content;
     gap: 1rem;
+  }
+
+  .socials {
+    bottom: -4rem;
+  }
+
+  .contact {
+    bottom: -1.5rem;
   }
 
   .navigation * {
