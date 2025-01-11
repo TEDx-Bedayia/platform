@@ -31,11 +31,11 @@ export default function TicketCounter() {
       <span
         style={{
           ...ubuntu.style,
-          fontSize: "20rem",
           fontWeight: "700",
           margin: "0 !important",
           padding: "0 !important",
         }}
+        className="text-[20rem] max-phone:text-[15rem]"
       >
         {ticketCount > 0 ? ticketCount : "..."}
       </span>

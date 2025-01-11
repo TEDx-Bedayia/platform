@@ -324,6 +324,11 @@
     -webkit-backdrop-filter: blur(20px) !important;
   }
 
+  .container {
+    padding-top: 2rem;
+    height: calc(100vh + 5rem);
+  }
+
   .container::after {
     opacity: 0.4;
     background-image: repeating-radial-gradient(

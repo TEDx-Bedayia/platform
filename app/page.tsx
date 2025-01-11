@@ -1,22 +1,558 @@
 "use client";
-import { useEffect } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import "./styles/globals.css";
+import "./styles/hero.css";
+import "./styles/info.css";
+import "./styles/navigation.css";
+import "./styles/theme.css";
 
-export default function Home() {
-  useEffect(() => {
-    window.location.href = "/book";
-  });
+import { Bungee, Ubuntu } from "next/font/google";
+
+const button = Bungee({ weight: "400", subsets: ["latin"] });
+const ubuntu = Ubuntu({ weight: "400", subsets: ["latin"] });
+
+function infoItem(text: string, svg: any) {
   return (
-    <main
+    <div className="flex flex-row items-center justify-center gap-2">
+      {svg}
+      <span
+        className="font-[Sansation] text-[2em]/[2rem] max-phone:text-[1.25em]/[1.25rem]"
+        style={{ fontWeight: 400 }}
+      >
+        {text}
+      </span>
+    </div>
+  );
+}
+
+function infoLink(text: string, svg: any, link: string) {
+  return (
+    <div className="flex flex-row items-center justify-center gap-2">
+      {svg}
+      <Link
+        href={link}
+        className="font-[Sansation] text-[2em]/[2rem] text-secondary-200 underline max-phone:text-[1.25em]/[1.25rem]"
+        style={{ fontWeight: 400 }}
+      >
+        {text}
+      </Link>
+    </div>
+  );
+}
+
+function testimonial(
+  avatar_url: string,
+  role: string,
+  name: string,
+  quote: string,
+  alt: boolean
+) {
+  if (alt)
+    return (
+      <div
+        className="flex h-[6.75rem] w-[38.5rem] flex-row items-center justify-start gap-4 rounded-[1rem] bg-secondary-400 px-10 py-4 max-phone:h-[5.0625rem] max-phone:min-w-[28.875rem] max-phone:gap-3 max-phone:rounded-[0.75rem] max-phone:px-[1.875rem] max-phone:py-3"
+        style={{
+          backgroundImage: 'url("/Hero Section/Vector Art Testimonial.png")',
+          backgroundSize: "100% 100%",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="flex h-full w-[37.75rem] flex-col items-start justify-start gap-0 py-1 text-start max-phone:w-[20rem]">
+          <span className="mb-1 font-small max-phone:text-[0.75em]/[1.125rem]">
+            {name}
+          </span>
+          <p
+            className="font-body max-phone:text-[2em]/[3rem]"
+            style={ubuntu.style}
+          >
+            {quote}
+          </p>
+        </div>
+      </div>
+    );
+
+  return (
+    <div
+      className="flex h-[6.75rem] w-[38.5rem] flex-row items-center justify-start gap-4 rounded-[1rem] bg-primary-400 px-10 py-4 max-phone:h-[5.0625rem] max-phone:min-w-[28.875rem] max-phone:gap-3 max-phone:rounded-[0.75rem] max-phone:px-[1.875rem] max-phone:py-3"
       style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "100vw",
+        backgroundImage: 'url("/Hero Section/Vector Art Testimonial alt.png")',
+        backgroundSize: "100% 100%",
+        backgroundRepeat: "no-repeat",
       }}
     >
+      <div className="flex h-full w-[37.75rem] flex-col items-start justify-start gap-0 py-1 text-start max-phone:w-[20rem]">
+        <span className="mb-1 font-small max-phone:text-[0.75em]/[1.125rem]">
+          {name}
+        </span>
+        <p
+          className="font-body max-phone:text-[2em]/[3rem]"
+          style={ubuntu.style}
+        >
+          {quote}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <main className="wrapper" style={{ scrollBehavior: "smooth" }}>
+      <center
+        className="fixed top-0 z-[9999999] w-[100%] backdrop-blur-[5px]"
+        style={{ background: "rgba(16, 13, 38, 0.10)" }}
+      >
+        <section
+          id="nav"
+          className={`flex flex-row justify-between items-center max-phone:flex-col h-[5.5rem] px-[11rem] max-tablet:px-[6rem] max-phone:h-[6.625rem] max-phone:w-[80vw] max-phone:min-w-[80vw] max-phone:max-w-[80vw] max-phone:justify-center max-phone:px-0 max-phone:py-3`}
+        >
+          <a
+            href="#"
+            className="cursor-pointer hover:opacity-75 transition-opacity opacity-100 duration-200"
+          >
+            <Image
+              width="448"
+              height="36"
+              className="h-9 w-[28rem] max-phone:h-[1.6875rem] max-phone:w-[21rem]"
+              src="/main-logo.png"
+              alt="Event's Logo"
+            />
+          </a>
+
+          {/* Book a Ticket */}
+          <button
+            className={`flex flex-row items-center gap-2 bg-primary px-6 py-2 transition-all max-phone:mt-4`}
+            style={{ ...button.style, borderRadius: "0.5rem" }}
+            onClick={() => (window.location.href = "/book")}
+          >
+            <div className="h-6 w-6">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                style={{ width: "100%", height: "100%" }}
+              >
+                <path
+                  d="M10 14H7"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M13 17H7"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <rect
+                  x="13"
+                  y="7"
+                  width="4"
+                  height="4"
+                  rx="1"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+            <span
+              className="font-body"
+              style={{
+                ...button.style,
+                fontWeight: 500,
+                fontStyle: "normal",
+                letterSpacing: "0.3px",
+              }}
+            >
+              BOOK A TICKET
+            </span>
+          </button>
+        </section>
+      </center>
+
+      <center style={{ overflow: "hidden", maxWidth: "100vw" }}>
+        <section
+          id="hero"
+          className="relative mx-0 mb-[4.5rem] w-[100%] max-w-[100vw] pt-[6.75rem] max-tablet:pt-[5rem] max-phone:bg-[length:80vh_100px] max-phone:pt-[10rem]"
+        >
+          <div>
+            <motion.div
+              initial={{ y: 40 }}
+              animate={{ y: 0 }}
+              transition={{ ease: "easeInOut", duration: 0.75 }}
+            >
+              <Image
+                width="1440"
+                height="358"
+                className="w-[45rem] max-phone:w-[95vw]"
+                src="/main-heading.png"
+                alt="Main Header"
+              />
+            </motion.div>
+            <p
+              className="w-[33.5rem] pt-4 text-center font-body text-text-gray-light max-tablet:mt-2 max-phone:mt-3 max-phone:w-[85vw]"
+              style={ubuntu.style}
+            >
+              Buckle up for a journey of inspiration and innovation at TEDx!
+              Immerse yourself in a day filled with thought-provoking
+              conversations, extraordinary performances, and enlightening
+              experiences. Join us as we explore ideas worth spreading. Prepare
+              to connect to a kaleidoscope of minds like your own &ndash;
+              curious & hungry for change.{" "}
+            </p>
+
+            <div className="ml-2 mt-6 flex flex-row items-end justify-center gap-4 max-tablet:ml-0 max-phone:mt-[1.125rem] max-phone:flex-col max-phone:items-center max-phone:justify-center max-phone:gap-2">
+              <motion.div
+                initial={{ rotate: 30 }}
+                animate={{ rotate: 0 }}
+                transition={{ ease: "easeInOut", duration: 0.75 }}
+              >
+                <button
+                  className="primary hover:-translate-y-2 w-[16.25rem] shrink-0 items-center justify-center rounded-2xl bg-primary py-6 text-center font-button max-phone:w-[16rem] max-phone:py-[1.125rem]"
+                  style={{ ...button.style }}
+                  onClick={() => (window.location.href = "/book")}
+                >
+                  Book a Ticket
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ rotate: -30 }}
+                animate={{ rotate: 0 }}
+                transition={{ ease: "easeInOut", duration: 0.75 }}
+              >
+                <div className="secondary-wrapper relative mt-4 hover:-translate-y-2">
+                  <div className="absolute right-0 top-0 z-10 flex items-center justify-center rounded-full bg-[#6096E1] px-4 py-[0.375rem] max-phone:right-[-1rem] max-phone:top-[-1rem]">
+                    <span className="font-special">15% OFF!</span>
+                  </div>
+                  <button
+                    className="max-phone:border-3 absolute bottom-0 left-0 w-[16.25rem] shrink-0 items-center justify-center rounded-2xl border-4 border-solid border-[#6096E1] bg-transparent py-5 text-center font-button max-phone:w-[16rem] max-phone:py-[0.9375rem]"
+                    style={{ ...button.style }}
+                    onClick={() => (window.location.href = "/book/group")}
+                  >
+                    Book a Group Ticket
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="testimonials"
+          className="flex max-w-[100vw] flex-row justify-start gap-4 overflow-hidden scroll-smooth max-phone:gap-3"
+        >
+          {testimonial(
+            "/Avatars/kareem.png",
+            "Graduate",
+            "Kareem",
+            "TEDx hosts a beautiful culmination of knowledge and entertainment, curated to ensure you have the best of times.",
+            true
+          )}
+          {testimonial(
+            "/Avatars/ahmed.png",
+            "Student",
+            "Abdelrahman El-Kalla",
+            "I liked how TEDx had a diverse genre of topics that the speakers spoke about.",
+            false
+          )}
+          {testimonial(
+            "/Avatars/girl.png",
+            "Student",
+            "Ibrahim Dawood",
+            "The food tasted well and the speakers were fun!",
+            true
+          )}
+          {testimonial(
+            "/Avatars/girl.png",
+            "Team Member",
+            "Omar Emara",
+            "The speaker lounge was perfect.",
+            false
+          )}
+          {testimonial(
+            "/Avatars/mom.png",
+            "Student",
+            "Jude Ahmed",
+            "Very interactive audience, making the talks relatable.",
+            true
+          )}
+          {testimonial(
+            "/Avatars/mom.png",
+            "Student",
+            "Moaz Moatasem",
+            "All team members worked well to produce such an event.",
+            false
+          )}
+          {testimonial(
+            "/Avatars/mom.png",
+            "Student",
+            "Omar Farghaly",
+            "The speakers were fun to listen to.",
+            true
+          )}
+          {testimonial(
+            "/Avatars/dad.png",
+            "Parent",
+            "Omar Mohamed El-Mandooh",
+            "Best event you'll ever go to!",
+            false
+          )}
+        </section>
+      </center>
+
+      <section
+        id="theme"
+        className="relative mx-0 mb-[4.5rem] mt-16 w-[100%] max-w-[100vw]"
+      >
+        <Image
+          src="/theme-star.png"
+          alt=""
+          width="120"
+          height="120"
+          className="absolute left-[16rem] top-4 max-phone:hidden"
+        ></Image>
+        <Image
+          src="/theme-moon.png"
+          alt=""
+          width="129"
+          height="120"
+          className="absolute right-[18rem] top-[20rem] rotate-12 max-phone:hidden"
+        ></Image>
+        <div>
+          <center>
+            <Image
+              width="1440"
+              height="540"
+              src="/theme-title.png"
+              alt=""
+              className="w-[30rem] max-phone:w-[95vw]"
+            ></Image>
+            <p
+              className="mt-4 w-[40rem] text-center font-body text-gray-200 max-tablet:mt-2 max-phone:mt-3 max-phone:w-[85vw]"
+              style={{ lineHeight: "2rem", ...ubuntu.style }}
+            >
+              Time, like a vast and endless chamber, carries the echoes of
+              voices, dreams, and actions that ripple throughout generations.
+              The{" "}
+              <span
+                className="align-start m-0 inline-flex w-max justify-start rounded-[0.75rem] bg-accent py-1 pl-4 pr-2 font-bold"
+                style={{ lineHeight: "1rem" }}
+              >
+                <span>Echoes of Time</span>
+                <Image
+                  className="h-4 w-4"
+                  src="/mini-stars-dreamscape.png"
+                  height={28}
+                  width={25}
+                  alt=""
+                ></Image>
+              </span>{" "}
+              remind us that each idea shared and every story told reverberates
+              through history, shaping the present and inspiring the future.
+              These echoes are not merely remnants of the past; they are calls
+              to action, urging us to embrace their lessons and create a legacy
+              that resonates for years to come.
+            </p>
+          </center>
+        </div>
+      </section>
+
+      <section
+        id="info"
+        className="max-phone:pt-[2'rem] mx-0 mb-[4.5rem] mt-4 w-[100%] max-w-[100vw]"
+      >
+        <div
+          id="info-title"
+          className="mb-6 font-title font-bold max-phone:text-[2.5em]"
+        >
+          Event Information
+        </div>
+        <center className="flex w-screen shrink-0 flex-row justify-center gap-5 text-start max-phone:flex-col">
+          <div className="flex w-full flex-col gap-4 text-center">
+            {infoItem(
+              "Friday, 31st of January, 2025",
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 48 48"
+                fill="none"
+              >
+                <rect
+                  x="6"
+                  y="12"
+                  width="36"
+                  height="30"
+                  rx="4"
+                  stroke="white"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M8 22H40"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M18 32H30"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M16 6L16 14"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M32 6L32 14"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
+            {infoItem(
+              "03:00 PM",
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 48 48"
+                fill="none"
+              >
+                <circle cx="24" cy="26" r="14" stroke="white" strokeWidth="2" />
+                <path
+                  d="M10 10L6 14"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M38 10L42 14"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M18 22L23.8093 25.8729C23.9172 25.9448 24.0622 25.9223 24.1432 25.821L28 21"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
+            {infoLink(
+              "Bedayia International School",
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 48 48"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M24.3981 39.8097C26.6803 38.6808 38 32.5493 38 22C38 14.268 31.732 8 24 8C16.268 8 10 14.268 10 22C10 32.5493 21.3197 38.6808 23.6019 39.8097C23.8572 39.936 24.1428 39.936 24.3981 39.8097ZM24 28C27.3137 28 30 25.3137 30 22C30 18.6863 27.3137 16 24 16C20.6863 16 18 18.6863 18 22C18 25.3137 20.6863 28 24 28Z"
+                  fill="#C5CEEB"
+                  fillOpacity="0.25"
+                />
+                <path
+                  d="M24.3981 39.8097L23.9547 38.9134H23.9547L24.3981 39.8097ZM23.6019 39.8097L24.0453 38.9134H24.0453L23.6019 39.8097ZM37 22C37 26.8936 34.3766 30.8205 31.3621 33.7164C28.3515 36.6085 25.0528 38.3702 23.9547 38.9134L24.8415 40.7061C26.0256 40.1203 29.5279 38.2518 32.7477 35.1587C35.9636 32.0692 39 27.6557 39 22H37ZM24 9C31.1797 9 37 14.8203 37 22H39C39 13.7157 32.2843 7 24 7V9ZM11 22C11 14.8203 16.8203 9 24 9V7C15.7157 7 9 13.7157 9 22H11ZM24.0453 38.9134C22.9472 38.3702 19.6485 36.6085 16.6379 33.7164C13.6234 30.8205 11 26.8936 11 22H9C9 27.6557 12.0364 32.0692 15.2523 35.1587C18.4721 38.2518 21.9744 40.1203 23.1585 40.7061L24.0453 38.9134ZM23.9547 38.9134C23.9614 38.9101 23.9776 38.9045 24 38.9045C24.0224 38.9045 24.0386 38.9101 24.0453 38.9134L23.1585 40.7061C23.6932 40.9706 24.3068 40.9706 24.8415 40.7061L23.9547 38.9134ZM29 22C29 24.7614 26.7614 27 24 27V29C27.866 29 31 25.866 31 22H29ZM24 17C26.7614 17 29 19.2386 29 22H31C31 18.134 27.866 15 24 15V17ZM19 22C19 19.2386 21.2386 17 24 17V15C20.134 15 17 18.134 17 22H19ZM24 27C21.2386 27 19 24.7614 19 22H17C17 25.866 20.134 29 24 29V27Z"
+                  fill="white"
+                />
+              </svg>,
+              "https://maps.app.goo.gl/KjaRfqvMDMvuWBLu9"
+            )}
+            {infoItem(
+              "Gate #2",
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 48 48"
+                fill="none"
+              >
+                <path
+                  d="M12 10.5V26H21.382C21.6827 26 21.833 26 21.9538 26.0747C22.0747 26.1493 22.1419 26.2838 22.2764 26.5528L23.7236 29.4472C23.8581 29.7162 23.9253 29.8507 24.0462 29.9253C24.167 30 24.3173 30 24.618 30H35.5C35.7357 30 35.8536 30 35.9268 29.9268C36 29.8536 36 29.7357 36 29.5V14.5C36 14.2643 36 14.1464 35.9268 14.0732C35.8536 14 35.7357 14 35.5 14H24.618C24.3173 14 24.167 14 24.0462 13.9253C23.9253 13.8507 23.8581 13.7162 23.7236 13.4472L22.2764 10.5528C22.1419 10.2838 22.0747 10.1493 21.9538 10.0747C21.833 10 21.6827 10 21.382 10H12.5C12.2643 10 12.1464 10 12.0732 10.0732C12 10.1464 12 10.2643 12 10.5Z"
+                  fill="#C2CDEA"
+                  fillOpacity="0.25"
+                />
+                <path
+                  d="M12 26V10.5C12 10.2643 12 10.1464 12.0732 10.0732C12.1464 10 12.2643 10 12.5 10H21.382C21.6827 10 21.833 10 21.9538 10.0747C22.0747 10.1493 22.1419 10.2838 22.2764 10.5528L23.7236 13.4472C23.8581 13.7162 23.9253 13.8507 24.0462 13.9253C24.167 14 24.3173 14 24.618 14H35.5C35.7357 14 35.8536 14 35.9268 14.0732C36 14.1464 36 14.2643 36 14.5V29.5C36 29.7357 36 29.8536 35.9268 29.9268C35.8536 30 35.7357 30 35.5 30H24.618C24.3173 30 24.167 30 24.0462 29.9253C23.9253 29.8507 23.8581 29.7162 23.7236 29.4472L22.2764 26.5528C22.1419 26.2838 22.0747 26.1493 21.9538 26.0747C21.833 26 21.6827 26 21.382 26H12ZM12 26V38"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
+          </div>
+        </center>
+      </section>
+
       <center>
-        <h1 className="text-5xl">Loading...</h1>
+        <div className="temp-note mt-20 w-[33.5rem] font-small text-text-gray-dark max-phone:w-[95vw]">
+          Send us a WhatsApp message at{" "}
+          <a
+            className="font-body text-secondary-200"
+            href="https://wa.me/201055782533"
+          >
+            +201055782533
+          </a>{" "}
+          if you find any bugs.
+        </div>
+
+        <div className="socials mt-12">
+          <a
+            href="https://www.instagram.com/TEDxYouthBedayiaSchool"
+            target="_blank"
+            className="icon"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="#fff"
+                d="M 8 3 C 5.243 3 3 5.243 3 8 L 3 16 C 3 18.757 5.243 21 8 21 L 16 21 C 18.757 21 21 18.757 21 16 L 21 8 C 21 5.243 18.757 3 16 3 L 8 3 z M 8 5 L 16 5 C 17.654 5 19 6.346 19 8 L 19 16 C 19 17.654 17.654 19 16 19 L 8 19 C 6.346 19 5 17.654 5 16 L 5 8 C 5 6.346 6.346 5 8 5 z M 17 6 A 1 1 0 0 0 16 7 A 1 1 0 0 0 17 8 A 1 1 0 0 0 18 7 A 1 1 0 0 0 17 6 z M 12 7 C 9.243 7 7 9.243 7 12 C 7 14.757 9.243 17 12 17 C 14.757 17 17 14.757 17 12 C 17 9.243 14.757 7 12 7 z M 12 9 C 13.654 9 15 10.346 15 12 C 15 13.654 13.654 15 12 15 C 10.346 15 9 13.654 9 12 C 9 10.346 10.346 9 12 9 z"
+              ></path>
+            </svg>
+          </a>
+          <a
+            href="https://www.facebook.com/TEDxYouthBedayiaSchool"
+            target="_blank"
+            className="icon"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="#fff"
+                d="M 12 2 C 6.4889971 2 2 6.4889971 2 12 C 2 17.511003 6.4889971 22 12 22 C 17.511003 22 22 17.511003 22 12 C 22 6.4889971 17.511003 2 12 2 z M 12 4 C 16.430123 4 20 7.5698774 20 12 C 20 16.014467 17.065322 19.313017 13.21875 19.898438 L 13.21875 14.384766 L 15.546875 14.384766 L 15.912109 12.019531 L 13.21875 12.019531 L 13.21875 10.726562 C 13.21875 9.7435625 13.538984 8.8710938 14.458984 8.8710938 L 15.935547 8.8710938 L 15.935547 6.8066406 C 15.675547 6.7716406 15.126844 6.6953125 14.089844 6.6953125 C 11.923844 6.6953125 10.654297 7.8393125 10.654297 10.445312 L 10.654297 12.019531 L 8.4277344 12.019531 L 8.4277344 14.384766 L 10.654297 14.384766 L 10.654297 19.878906 C 6.8702905 19.240845 4 15.970237 4 12 C 4 7.5698774 7.5698774 4 12 4 z"
+              ></path>
+            </svg>
+          </a>
+        </div>
       </center>
     </main>
   );

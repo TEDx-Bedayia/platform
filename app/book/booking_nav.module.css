@@ -40,6 +40,19 @@
   transition: transform 0.25s ease-out;
 }
 
+.icon {
+  transition: all 0.2s;
+}
+.icon:hover {
+  transform: scale(1.5) translate(0px, -10px) !important;
+}
+
+.socials {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
 .navigation > a:hover::after {
   transform: scaleX(1);
   transform-origin: bottom left;
