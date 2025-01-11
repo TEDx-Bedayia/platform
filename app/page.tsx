@@ -328,7 +328,7 @@ export default function Home() {
           alt=""
           width="129"
           height="120"
-          className="absolute right-[18rem] top-[20rem] rotate-12 max-phone:hidden"
+          className="absolute right-[18rem] top-[20rem] rotate-12 max-phone:hidden max-tablet:right-[12rem] max-tablet:top-[18rem]"
         ></Image>
         <div>
           <center>
