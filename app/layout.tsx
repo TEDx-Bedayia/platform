@@ -6,8 +6,20 @@ import { YEAR, support } from "./metadata";
 export const metadata: Metadata = {
   title: `TEDxYouth@BedayiaSchool'${YEAR}`,
   description:
-    "This is the official website for the TEDxYouth event hosted at Bedayia International School. Stop by to book your tickets, know more about us, and have some fun! Waiting for you!",
+    "Stop by the official TEDxBedayia to book your tickets, know more about us, and have some fun! Waiting for you!",
   authors: [support],
+  keywords: [
+    "TEDx",
+    "TEDxYouth",
+    "Bedayia",
+    "School",
+    "Cairo",
+    "Egypt",
+    "School Event",
+    "Event Near Me",
+    "Echoes of Time",
+    "School Event " + YEAR,
+  ],
   icons: [
     {
       url: "/favicon-32x32.png",

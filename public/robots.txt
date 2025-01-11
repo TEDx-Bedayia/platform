@@ -1,0 +1,8 @@
+User-agent: Googlebot
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.tedxbedayia.com/sitemap.xml
