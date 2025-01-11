@@ -321,14 +321,14 @@ export default function Home() {
       >
         <Image
           src="/theme-star.png"
-          alt=""
+          alt="TEDx Bedayia School Empowerment Inspiring Next Generation"
           width="120"
           height="120"
           className="absolute left-[16rem] top-4 max-phone:hidden"
         ></Image>
         <Image
           src="/theme-moon.png"
-          alt=""
+          alt="Echoes in Time TEDx Bedayia Cool Event"
           width="129"
           height="120"
           className="absolute right-[18rem] top-[20rem] rotate-12 max-phone:hidden max-tablet:right-[12rem] max-tablet:top-[18rem]"
@@ -339,7 +339,7 @@ export default function Home() {
               width="1440"
               height="540"
               src="/theme-title.png"
-              alt=""
+              alt="Inspiration Innovation Ideas Worth Spreading"
               className="w-[30rem] max-phone:w-[95vw]"
             ></Image>
             <p
@@ -359,7 +359,7 @@ export default function Home() {
                   src="/mini-stars-dreamscape.png"
                   height={28}
                   width={25}
-                  alt=""
+                  alt="Impactful Unique TEDx Event and Ideas"
                 ></Image>
               </span>{" "}
               remind us that each idea shared and every story told reverberates
