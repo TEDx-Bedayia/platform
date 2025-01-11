@@ -94,7 +94,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .icon:hover {
     transform: scale(1) translate(0px, 0px) !important;
   }
