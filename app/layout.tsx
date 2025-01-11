@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     "Egypt",
     "School Event",
     "Event Near Me",
+    "Echoes of Time",
     "School Event " + YEAR,
   ],
   icons: [
