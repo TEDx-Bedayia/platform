@@ -59,7 +59,7 @@ export default function RootLayout({
           sizes="16x16"
           href="/favicon-16x16.png"
         />
-        <title>TEDxYouth@BedayiaSchool&apos;25</title>
+        {/* <title>TEDxYouth@BedayiaSchool&apos;25</title> */}
         <meta name="theme-color" content="#100d26"></meta>
         <link rel="manifest" href="/site.webmanifest" />
       </head>
