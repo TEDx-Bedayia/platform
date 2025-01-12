@@ -204,6 +204,7 @@ export default function AdminDashboard() {
                     );
 
                     if (selectedEmailEditor !== applicant.id) {
+                      setEditorEmail("");
                       document
                         .getElementById("email_editor" + applicant.id)
                         ?.focus();

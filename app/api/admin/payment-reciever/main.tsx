@@ -83,6 +83,9 @@ export async function pay(
     let row = query.rows[i];
     if (row.paid === false) {
       row.price = row.type == "group" ? price.group : price.individual;
+      if (row.type == "discounted") {
+        row.price = price.discounted;
+      }
       unpaid.push(row);
     }
   }
@@ -130,6 +133,10 @@ export async function pay(
       let row = query.rows[i];
       if (row.paid === false) {
         row.price = row.type == "group" ? price.group : price.individual;
+
+        if (row.type == "discounted") {
+          row.price = price.discounted;
+        }
         unpaid.push(row);
       }
     }
@@ -171,6 +178,10 @@ export async function pay(
           let row = query.rows[i];
           if (row.paid === false) {
             row.price = row.type == "group" ? price.group : price.individual;
+
+            if (row.type == "discounted") {
+              row.price = price.discounted;
+            }
             unpaid.push(row);
           }
         }
