@@ -141,7 +141,10 @@ export default function AdminDashboard() {
   }, []);
 
   const msg =
-    "Hello {name}! Your ticket for the event has been sent to your email. Please check your inbox and spam folder. If you have any questions, feel free to contact us. Enjoy!";
+    "Hello {name}! Your ticket for the event has been sent to your email. Please check your inbox and spam folder. If you have any questions or concerns, feel free to contact us. Enjoy!";
+
+  const grpMsg =
+    "Hello {name}! The tickets for the event have been sent to each member individually on their email. Please check your inbox and spam folder. If you have any questions or concerns, feel free to contact us. Enjoy!";
 
   function TicketCard(applicant: Applicant, admitApplicant: any) {
     return (
@@ -273,9 +276,21 @@ export default function AdminDashboard() {
                   window.open(
                     `https://web.whatsapp.com/send/?phone=${
                       applicant.phone
-                    }&text=${encodeURIComponent(
-                      msg.replace("{name}", applicant.full_name.split(" ")[0])
-                    )}&type=phone_number&app_absent=0`
+                    }&text=${
+                      applicant.ticket_type == "group"
+                        ? encodeURIComponent(
+                            grpMsg.replace(
+                              "{name}",
+                              applicant.full_name.split(" ")[0]
+                            )
+                          )
+                        : encodeURIComponent(
+                            msg.replace(
+                              "{name}",
+                              applicant.full_name.split(" ")[0]
+                            )
+                          )
+                    }&type=phone_number&app_absent=0`
                   )
                 }
               >
