@@ -121,6 +121,7 @@ export function customAlert2(
   email_in.id = "from";
   email_in.name = "from";
   email_in.value = defaultVal;
+  email_in.required = true;
   email_in.placeholder = " ";
   email_in.onchange = () => {
     email_in.style.borderColor = "#0070f3";
