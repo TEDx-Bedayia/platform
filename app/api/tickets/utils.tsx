@@ -14,7 +14,6 @@ export function verifyEmail(email: string | undefined): boolean {
 }
 
 export function handleMisspelling(email: string): string {
-  email = email.replace(".xom", ".com");
   email = email.replace("@gamil", "@gmail");
   email = email.replace("@gmai", "@gmail");
   email = email.replace("@gnail", "@gmail");
@@ -38,6 +37,21 @@ export function handleMisspelling(email: string): string {
   if (gamil2.test(email)) {
     email = email.replace(gamil2, "gmail");
   }
+
+  // RegEXP to check for .xom, .con, .cmo AT THE END of the email
+  const xom = /(?<=\.)xom$/;
+  if (xom.test(email)) {
+    email = email.replace(xom, "com");
+  }
+  const con = /(?<=\.)con$/;
+  if (con.test(email)) {
+    email = email.replace(con, "com");
+  }
+  const cmo = /(?<=\.)cmo$/;
+  if (cmo.test(email)) {
+    email = email.replace(cmo, "com");
+  }
+
   return email;
 }
 
