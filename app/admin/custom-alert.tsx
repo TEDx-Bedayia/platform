@@ -81,7 +81,11 @@ export function customAlert(txt: string, closeable = true, verified = false) {
   }, 10); // Small timeout to ensure animation starts after element is in the DOM
 }
 
-export function customAlert2(displayName: string, callback: Function) {
+export function customAlert2(
+  displayName: string,
+  callback: Function,
+  defaultVal = ""
+) {
   // Create a background overlay
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
@@ -116,9 +120,9 @@ export function customAlert2(displayName: string, callback: Function) {
   email_in.type = "text";
   email_in.id = "from";
   email_in.name = "from";
-  email_in.value = "";
-  email_in.placeholder = " ";
+  email_in.value = defaultVal;
   email_in.required = true;
+  email_in.placeholder = " ";
   email_in.onchange = () => {
     email_in.style.borderColor = "#0070f3";
   };
@@ -159,7 +163,7 @@ export function customAlert2(displayName: string, callback: Function) {
 
   email_in.onblur = () => {
     email_in.style.borderColor = "#ddd";
-    if (email_in.value === "") {
+    if (email_in.value === defaultVal) {
       email_in.style.backgroundColor = "#f9f9f9";
 
       label.style.top = "50%";
@@ -209,7 +213,7 @@ export function customAlert2(displayName: string, callback: Function) {
   // Add close button functionality
   closeButton.onclick = async () => {
     if (!(await callback(email_in.value))) {
-      email_in.value = "";
+      email_in.value = defaultVal;
       email_in.style.border = "1px solid red";
       return;
     }

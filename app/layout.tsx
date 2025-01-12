@@ -59,10 +59,6 @@ export default function RootLayout({
           sizes="16x16"
           href="/favicon-16x16.png"
         />
-        {/* <title>TEDxYouth@BedayiaSchool&apos;25</title> */}
-        {/* <meta charSet="utf-8" /> */}
-        {/* <meta name="viewport" content="width=device-width, initial-scale=1" /> */}
-        {/* <meta name="description" content={metadata.description!} /> */}
         <meta name="robots" content="index, follow"></meta>
         <meta name="googlebot" content="index, follow"></meta>
         {/* OG */}
