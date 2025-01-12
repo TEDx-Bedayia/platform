@@ -45,6 +45,18 @@
   order: 1;
   align-self: stretch;
   flex-grow: 0;
+
+  width: min-content !important;
+  white-space: nowrap;
+  outline: none;
+  cursor: text;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: all 300ms ease-in-out;
+}
+
+.applicantEmail.active {
+  border-color: #000;
 }
 
 /* Applicant List Container */

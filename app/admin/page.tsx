@@ -1,8 +1,10 @@
 "use client";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
+import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
 import { addLoader, removeLoader } from "../global_components/loader";
+import { check, cross, pencil } from "../icons";
 import { EVENT_DATE } from "../metadata";
 import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
@@ -134,6 +136,9 @@ export default function AdminDashboard() {
   const observer = useRef<IntersectionObserver | null>(null);
   const [devMode, setDevMode] = useState(false);
 
+  const [selectedEmailEditor, setSelectedEmailEditor] = useState(0);
+  const [editorEmail, setEditorEmail] = useState("");
+
   useEffect(() => {
     if (localStorage.getItem("admin-token") == "dev") {
       setDevMode(true);
@@ -187,12 +192,137 @@ export default function AdminDashboard() {
               </span>
             </div>
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "0px" }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "start",
+                gap: "0px",
+              }}
             >
               <span className={styles.applicantName}>
                 {applicant.full_name}
               </span>
-              <span className={styles.applicantEmail}>{applicant.email}</span>
+              <div className="flex flex-row-reverse justify-center items-center gap-2">
+                <span
+                  contentEditable={selectedEmailEditor === applicant.id}
+                  className={styles.applicantEmail + " " + styles.disabled}
+                  id={"email_editor" + applicant.id}
+                  onInput={(e) => {
+                    setEditorEmail(e.currentTarget.innerText);
+                    return;
+                  }}
+                >
+                  {applicant.email}
+                </span>
+
+                {selectedEmailEditor == applicant.id && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{
+                      opacity: 1,
+                      transition: { duration: 0.2, ease: "easeInOut" },
+                    }}
+                    exit={{ opacity: 0 }}
+                    style={{ cursor: "pointer" }}
+                    className="hover:scale-[2] origin-bottom-left transition-all duration-200"
+                    onClick={() => {
+                      setSelectedEmailEditor(0);
+                      document
+                        .getElementById("email_editor" + applicant.id)
+                        ?.classList.remove(styles.active);
+
+                      document.getElementById(
+                        "email_editor" + applicant.id
+                      )!.innerText = applicant.email;
+
+                      setEditorEmail("");
+                    }}
+                  >
+                    {cross}
+                  </motion.div>
+                )}
+
+                <div
+                  style={{ cursor: "pointer" }}
+                  className="hover:scale-[2] origin-bottom-left transition-all duration-200"
+                  onClick={async () => {
+                    setSelectedEmailEditor(
+                      selectedEmailEditor == applicant.id ? 0 : applicant.id
+                    );
+
+                    if (selectedEmailEditor !== applicant.id) {
+                      document
+                        .getElementById("email_editor" + applicant.id)
+                        ?.focus();
+
+                      // Select the text
+                      const range = document.createRange();
+                      range.selectNodeContents(
+                        document.getElementById("email_editor" + applicant.id)!
+                      );
+                      const sel = window.getSelection();
+                      sel?.removeAllRanges();
+                      sel?.addRange(range);
+                    } else {
+                      // Unselect text
+                      const range = document.createRange();
+                      range.selectNodeContents(
+                        document.getElementById("email_editor" + applicant.id)!
+                      );
+                      const sel = window.getSelection();
+                      sel?.removeAllRanges();
+
+                      // Try to Update the Email
+                      const emailRegExp = new RegExp(
+                        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                      );
+                      if (
+                        emailRegExp.test(editorEmail) &&
+                        editorEmail !== applicant.email
+                      ) {
+                        addLoader();
+                        let resp = await fetch(`/api/admin/update-email`, {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            key: `${localStorage.getItem("admin-token")}`,
+                          },
+                          body: JSON.stringify({
+                            email: editorEmail,
+                            id: applicant.id,
+                          }),
+                        });
+                        removeLoader();
+
+                        if (resp.ok) {
+                          setApplicants((prevApplicants) =>
+                            prevApplicants.map((prevApplicant) =>
+                              prevApplicant.id === applicant.id
+                                ? { ...prevApplicant, email: editorEmail }
+                                : prevApplicant
+                            )
+                          );
+                        } else {
+                          customAlert("Error updating email.");
+                        }
+                      } else {
+                        if (editorEmail != applicant.email && editorEmail != "")
+                          customAlert("Invalid Email.");
+                      }
+                      setEditorEmail("");
+                      document.getElementById(
+                        "email_editor" + applicant.id
+                      )!.innerText = applicant.email;
+                    }
+
+                    document
+                      .getElementById("email_editor" + applicant.id)
+                      ?.classList.toggle(styles.active);
+                  }}
+                >
+                  {selectedEmailEditor == applicant.id ? check : pencil}
+                </div>
+              </div>
             </div>
           </div>
           <span
