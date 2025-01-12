@@ -60,6 +60,21 @@ export default function RootLayout({
           href="/favicon-16x16.png"
         />
         {/* <title>TEDxYouth@BedayiaSchool&apos;25</title> */}
+        {/* <meta charSet="utf-8" /> */}
+        {/* <meta name="viewport" content="width=device-width, initial-scale=1" /> */}
+        {/* <meta name="description" content={metadata.description!} /> */}
+        <meta name="robots" content="index, follow"></meta>
+        <meta name="googlebot" content="index, follow"></meta>
+        {/* OG */}
+        <meta property="og:type" content="website"></meta>
+        <meta property="og:title" content={metadata.title!.toString()}></meta>
+        <meta property="og:description" content={metadata.description!}></meta>
+        <meta property="og:image" content="/og-image.png"></meta>
+        <meta property="og:url" content="TEDxBedayia.com"></meta>
+        <meta
+          property="og:site_name"
+          content={metadata.title!.toString()}
+        ></meta>
         <meta name="theme-color" content="#100d26"></meta>
         <link rel="manifest" href="/site.webmanifest" />
       </head>
