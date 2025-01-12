@@ -4,9 +4,9 @@ import { YEAR, support } from "./metadata";
 
 /* DO NOT EDIT */
 export const metadata: Metadata = {
-  title: `TEDxYouth@BedayiaSchool'${YEAR}`,
+  title: `TEDxBedayia | ${YEAR}`,
   description:
-    "Stop by the official TEDxBedayia to book your tickets, know more about us, and have some fun! Waiting for you!",
+    "Stop by the official TEDxBedayia Website to book your tickets, know more about us, and have some fun! Waiting for you!",
   authors: [support],
   keywords: [
     "TEDx",
