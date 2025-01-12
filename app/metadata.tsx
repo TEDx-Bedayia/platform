@@ -7,6 +7,8 @@ export const IPN = "omarelmandooh@instapay"; // Change to Instapay details
 export const INDIVIDUAL_TICKET_PRICE = 400; // Change to individual ticket price
 export const GROUP_TICKET_PRICE = 350; // Change to group ticket price per person
 
+export const DISCOUNTED_TICKET_PRICE = 300; // Change to discounted ticket price
+
 export const TICKET_WINDOW = [
   new Date("2025-01-01T22:00:00Z"),
   new Date("2025-01-31T23:59:59Z"),

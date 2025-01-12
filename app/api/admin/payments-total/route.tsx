@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     CASE 
         WHEN type = 'individual' THEN ${price.individual}
         WHEN type = 'group' THEN ${price.group} 
+        WHEN type = 'discounted' THEN ${price.discounted}
         ELSE 0
     END
     ) AS total_price
