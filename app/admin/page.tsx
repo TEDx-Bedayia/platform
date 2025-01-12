@@ -315,9 +315,10 @@ export default function AdminDashboard() {
             </span>
             <span style={{ fontSize: ".7rem" }}>
               <span style={{ fontWeight: "700" }}>
-                {applicant.ticket_type !== "speaker"
+                {applicant.ticket_type == "group" ||
+                applicant.ticket_type == "individual"
                   ? applicant.payment_method.split("@")[0]
-                  : "SPEAKER"}
+                  : applicant.ticket_type.toUpperCase()}
               </span>
               {applicant.payment_method.split("@")[1] != undefined &&
                 ": " + applicant.payment_method.split("@")[1]}

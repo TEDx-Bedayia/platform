@@ -200,7 +200,7 @@ export default function Home() {
                 height="358"
                 className="w-[45rem] max-phone:w-[95vw]"
                 src="/main-heading.png"
-                alt="TEDx Bedayia 2025 Cairo Egypt Event Echoes in Time"
+                alt="TEDxYouth Bedayia 2025"
               />
             </motion.div>
             <p
@@ -321,7 +321,7 @@ export default function Home() {
       >
         <Image
           src="/theme-star.png"
-          alt="TEDx Bedayia School Empowerment Inspiring Next Generation"
+          alt="TEDx Bedayia School Empowerment Inspiring Next Generation 2025 Cairo Egypt Event"
           width="120"
           height="120"
           className="absolute left-[16rem] top-4 max-phone:hidden"
