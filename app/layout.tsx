@@ -4,7 +4,7 @@ import { YEAR, support } from "./metadata";
 
 /* DO NOT EDIT */
 export const metadata: Metadata = {
-  title: `TEDxBedayia | ${YEAR}`,
+  title: `TEDxBedayia | 20${YEAR}`,
   description:
     "Stop by the official TEDxBedayia Website to book your tickets, know more about us, and have some fun! Waiting for you!",
   authors: [support],
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "School Event",
     "Event Near Me",
     "Echoes of Time",
-    "School Event " + YEAR,
+    "School Event 20" + YEAR,
   ],
   icons: [
     {
