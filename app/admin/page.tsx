@@ -475,6 +475,7 @@ export default function AdminDashboard() {
             <option value="paid">Paid</option>
             <option value="admitted">Admitted</option>
             <option value="name">Name</option>
+            <option value="uuid">UUID</option>
           </select>
           <input
             type="text"

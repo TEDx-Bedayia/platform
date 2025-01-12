@@ -40,6 +40,7 @@ export async function GET(
     name: `full_name ILIKE '%${request.nextUrl.searchParams.get("name")}%'`,
     paid: `paid = ${request.nextUrl.searchParams.get("paid")}`,
     admitted: `admitted = ${request.nextUrl.searchParams.get("admitted")}`,
+    uuid: `uuid = ${request.nextUrl.searchParams.get("uuid")}`,
   };
 
   let filterQuery = "WHERE ";
