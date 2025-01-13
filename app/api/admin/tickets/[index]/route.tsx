@@ -37,13 +37,13 @@ export async function GET(
   // Checks
   if (
     !["true", "false"].includes(
-      request.nextUrl.searchParams.get("sent") ?? ""
+      request.nextUrl.searchParams.get("sent") ?? "true"
     ) ||
     !["true", "false"].includes(
-      request.nextUrl.searchParams.get("paid") ?? ""
+      request.nextUrl.searchParams.get("paid") ?? "true"
     ) ||
     !["true", "false"].includes(
-      request.nextUrl.searchParams.get("admitted") ?? ""
+      request.nextUrl.searchParams.get("admitted") ?? "true"
     )
   ) {
     return NextResponse.json({ error: "Invalid Parameter" }, { status: 400 });
