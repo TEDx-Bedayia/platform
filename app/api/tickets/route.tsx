@@ -2,7 +2,6 @@ import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { sendBookingConfirmation } from "../utils/email-helper";
-import { TicketType } from "../utils/ticket-types";
 import {
   checkPhone,
   checkSafety,
@@ -10,7 +9,8 @@ import {
   handleMisspelling,
   verifyEmail,
   verifyPaymentMethod,
-} from "./utils";
+} from "../utils/input-sanitization";
+import { TicketType } from "../utils/ticket-types";
 
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {

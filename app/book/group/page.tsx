@@ -4,7 +4,7 @@ import styles from "../book.module.css";
 
 import { motion } from "framer-motion";
 
-import { verifyEmail } from "@/app/api/tickets/utils";
+import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";

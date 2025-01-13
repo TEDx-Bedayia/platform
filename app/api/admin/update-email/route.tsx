@@ -45,9 +45,7 @@ export async function POST(request: NextRequest) {
         result.rows[0].full_name,
         email,
         result.rows[0].id,
-        result.rows[0].type === "group"
-          ? TicketType.GROUP
-          : TicketType.INDIVIDUAL
+        result.rows[0].type
       );
     }
 

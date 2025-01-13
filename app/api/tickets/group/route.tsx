@@ -2,13 +2,13 @@ import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { sendBookingConfirmation } from "../../utils/email-helper";
-import { TicketType } from "../../utils/ticket-types";
 import {
   checkSafety,
   handleMisspelling,
   verifyEmail,
   verifyPaymentMethod,
-} from "../utils";
+} from "../../utils/input-sanitization";
+import { TicketType } from "../../utils/ticket-types";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod
