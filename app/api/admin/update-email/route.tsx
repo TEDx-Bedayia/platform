@@ -1,5 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
+import { sendBookingConfirmation } from "../../utils/email-helper";
+import { TicketType } from "../../utils/ticket-types";
 
 // Handler for POST requests
 export async function POST(request: NextRequest) {
@@ -35,6 +37,18 @@ export async function POST(request: NextRequest) {
 
     if (result.rows[0].type === "group") {
       await sql`UPDATE groups SET email = ${email} WHERE email1 = ${oldEmail} OR email2 = ${oldEmail} OR email3 = ${oldEmail} OR email4 = ${oldEmail}`;
+    }
+
+    if (result.rows[0].paid === false) {
+      await sendBookingConfirmation(
+        result.rows[0].payment_method,
+        result.rows[0].name,
+        email,
+        result.rows[0].id,
+        result.rows[0].type === "group"
+          ? TicketType.GROUP
+          : TicketType.INDIVIDUAL
+      );
     }
 
     return NextResponse.json(
