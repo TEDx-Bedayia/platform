@@ -34,12 +34,14 @@ export async function sendBookingConfirmation(
 
   let pricingDesc =
     ticketType === TicketType.GROUP
-      ? `The price for your entire group ticket (4 people) is: <strong>${price.markup(
-          price.group * 4,
-          paymentMethod.split("@")[0].toLowerCase()
-        )} EGP</strong>. Make sure you as the group leader pay the exact due amount at once to avoid delays. You can't pay for each ticket separately.`
-      : `The price for your ticket is: <strong>${price.markup(
-          price.individual,
+      ? `The price for your entire group ticket (4 people) is: <strong>${
+          price.getPrice(
+            ticketType,
+            paymentMethod.split("@")[0].toLowerCase()
+          ) * 4
+        } EGP</strong>. Make sure you as the group leader pay the exact due amount at once to avoid delays. You can't pay for each ticket separately.`
+      : `The price for your ticket is: <strong>${price.getPrice(
+          ticketType,
           paymentMethod.split("@")[0].toLowerCase()
         )} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
 
