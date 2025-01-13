@@ -4,6 +4,8 @@ import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { pay } from "../main";
 
+export const maxDuration = 15;
+
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
