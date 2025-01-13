@@ -42,8 +42,7 @@ export async function GET(request: NextRequest) {
 
     let email = res.rows[0].email;
     let name = res.rows[0].full_name;
-    let amount =
-      res.rows[0].type == "group" ? price.group * 4 : price.individual;
+    let amount = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
 
     return Response.json(
       {
