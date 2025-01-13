@@ -3,10 +3,13 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
+import { TicketType } from "../api/utils/ticket-types";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
   check,
   cross,
+  destructiveIcon,
+  devSearch,
   group,
   onePerson,
   pencil,
@@ -130,13 +133,16 @@ export default function AdminDashboard() {
             <div
               style={{ position: "relative", width: "32px", height: "32px" }}
             >
-              {applicant.ticket_type === "group" ? group : onePerson}
+              {applicant.ticket_type === TicketType.GROUP ? group : onePerson}
               <span
                 style={{
                   fontSize: ".5rem",
                   fontWeight: 700,
                   position: "absolute",
-                  width: applicant.ticket_type === "group" ? "71.5%" : "100%",
+                  width:
+                    applicant.ticket_type === TicketType.GROUP
+                      ? "71.5%"
+                      : "100%",
                   textAlign: "center",
                   top: "20px",
                 }}
@@ -315,8 +321,8 @@ export default function AdminDashboard() {
             </span>
             <span style={{ fontSize: ".7rem" }}>
               <span style={{ fontWeight: "700" }}>
-                {applicant.ticket_type == "group" ||
-                applicant.ticket_type == "individual"
+                {applicant.ticket_type == TicketType.GROUP ||
+                applicant.ticket_type == TicketType.INDIVIDUAL
                   ? applicant.payment_method.split("@")[0]
                   : applicant.ticket_type.toUpperCase()}
               </span>
@@ -364,7 +370,7 @@ export default function AdminDashboard() {
                     `https://web.whatsapp.com/send/?phone=${
                       applicant.phone
                     }&text=${
-                      applicant.ticket_type == "group"
+                      applicant.ticket_type == TicketType.GROUP
                         ? encodeURIComponent(
                             grpMsg.replace(
                               "{name}",
@@ -515,24 +521,7 @@ export default function AdminDashboard() {
             });
           }}
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M9.28033 7.71967C8.98744 7.42678 8.51256 7.42678 8.21967 7.71967C7.92678 8.01256 7.92678 8.48744 8.21967 8.78033L10.9393 11.5L8.21967 14.2197C7.92678 14.5126 7.92678 14.9874 8.21967 15.2803C8.51256 15.5732 8.98744 15.5732 9.28033 15.2803L12 12.5607L14.7197 15.2803C15.0126 15.5732 15.4874 15.5732 15.7803 15.2803C16.0732 14.9874 16.0732 14.5126 15.7803 14.2197L13.0607 11.5L15.7803 8.78033C16.0732 8.48744 16.0732 8.01256 15.7803 7.71967C15.4874 7.42678 15.0126 7.42678 14.7197 7.71967L12 10.4393L9.28033 7.71967Z"
-              fill="#b91c1c"
-            />
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M12.5399 0.63663C12.189 0.522816 11.811 0.522816 11.4601 0.63663L3.21012 3.31231C2.48947 3.54603 2 4.21654 2 4.97593V9.99999C2.00001 16.1893 5.7708 20.7049 11.401 22.8293C11.7866 22.9748 12.2134 22.9748 12.599 22.8293C18.2292 20.7049 22 16.1893 22 9.99999V4.97621C22 4.21708 21.5108 3.54611 20.7899 3.31231L12.5399 0.63663ZM11.9229 2.06346C11.973 2.0472 12.027 2.0472 12.0771 2.06346L20.3271 4.73914C20.4308 4.77277 20.5 4.8685 20.5 4.97621V9.99999C20.5 15.4613 17.2193 19.4827 12.0695 21.4259C12.0251 21.4426 11.9749 21.4426 11.9305 21.4259C6.78075 19.4827 3.5 15.4613 3.5 9.99999L3.5 4.97593C3.5 4.86847 3.56895 4.77284 3.67287 4.73914L11.9229 2.06346Z"
-              fill="#b91c1c"
-            />
-          </svg>
+          {destructiveIcon}
         </button>
       )}
 
@@ -618,22 +607,7 @@ export default function AdminDashboard() {
               setHasMore(true);
             }}
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M3.04505 18.8942L9.93934 11.9999L3.04505 5.10565C2.75216 4.81275 2.75216 4.33788 3.04505 4.04499C3.33794 3.75209 3.81282 3.75209 4.10571 4.04499L11.5303 11.4696C11.8232 11.7625 11.8232 12.2374 11.5303 12.5303L4.10571 19.9549C3.81282 20.2478 3.33794 20.2478 3.04505 19.9549C2.75216 19.662 2.75215 19.1871 3.04505 18.8942Z"
-                fill="#fff"
-              />
-              <path
-                d="M11.25 19.4999C10.8358 19.4999 10.5 19.8357 10.5 20.2499C10.5 20.6642 10.8358 20.9999 11.25 20.9999H20.75C21.1642 20.9999 21.5 20.6642 21.5 20.2499C21.5 19.8357 21.1642 19.4999 20.75 19.4999L11.25 19.4999Z"
-                fill="#fff"
-              />
-            </svg>
+            {devSearch}
           </button>
         </div>
       </div>
