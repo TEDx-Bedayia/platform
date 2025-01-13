@@ -74,7 +74,24 @@ export default function RootLayout({
         <meta name="theme-color" content="#100d26"></meta>
         <link rel="manifest" href="/site.webmanifest" />
       </head>
-      <body>{children}</body>
+      <body>
+        <h1
+          style={{
+            position: "absolute",
+            overflow: "hidden",
+            fontSize: "0px",
+            color: "transparent",
+            width: "0px",
+            height: "0px",
+            margin: "0px",
+            padding: "0px",
+            display: "none",
+          }}
+        >
+          {metadata.title!.toString()}
+        </h1>
+        {children}
+      </body>
     </html>
   );
 }
