@@ -158,7 +158,7 @@ export default function AdminDashboard() {
               <div className="flex flex-row-reverse justify-center items-center gap-2">
                 <span
                   contentEditable={selectedEmailEditor === applicant.id}
-                  className={styles.applicantEmail + " " + styles.disabled}
+                  className={styles.applicantEmail}
                   id={"email_editor" + applicant.id}
                   onInput={(e) => {
                     setEditorEmail(e.currentTarget.innerText);
@@ -320,9 +320,11 @@ export default function AdminDashboard() {
                   ? applicant.payment_method.split("@")[0]
                   : applicant.ticket_type.toUpperCase()}
               </span>
-              {applicant.payment_method.split("@")[1] != undefined &&
-                ": " + applicant.payment_method.split("@")[1]}
-              <span style={{ fontSize: ".5rem", marginLeft: ".5rem" }}>
+              <span>
+                {applicant.payment_method.split("@")[1] != undefined &&
+                  ": " + applicant.payment_method.split("@")[1]}{" "}
+              </span>
+              <span style={{ fontSize: ".5rem", marginLeft: ".25rem" }}>
                 {formatDate(new Date(applicant.created_at))}
               </span>
             </span>

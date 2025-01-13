@@ -32,7 +32,10 @@ export async function pay(
   }
 
   if (parseInt(amount) < 0) {
-    await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, 0, ${amount}, ${date})`;
+    await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from.replaceAll(
+      "@",
+      " "
+    )}, 0, ${amount}, ${date})`;
     return Response.json(
       { refund: true, message: "Refund Inserted." },
       { status: 200 }

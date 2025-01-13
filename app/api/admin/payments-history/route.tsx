@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   }
 
   let query =
-    await sql`SELECT stream, incurred, recieved, recieved_at FROM pay_backup ORDER BY created_at DESC`;
+    await sql`SELECT stream, incurred, recieved, created_at FROM pay_backup ORDER BY created_at DESC`;
 
   let pM = await getPaymentMethods();
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
             row.stream.toString().split("@")[1].replaceAll(" ", "@"),
       incurred: row.incurred,
       recieved: row.recieved,
-      recieved_at: row.recieved_at,
+      created_at: row.created_at,
     }))
   );
 }
