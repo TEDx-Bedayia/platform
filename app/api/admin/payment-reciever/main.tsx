@@ -86,10 +86,7 @@ export async function pay(
   for (let i = 0; i < query.rows.length; i++) {
     let row = query.rows[i];
     if (row.paid === false) {
-      row.price = row.type == TicketType.GROUP ? price.group : price.individual;
-      if (row.type == TicketType.DISCOUNTED) {
-        row.price = price.discounted;
-      }
+      row.price = price.getPrice(row.type, row.payment_method);
       unpaid.push(row);
     }
   }
@@ -136,12 +133,7 @@ export async function pay(
     for (let i = 0; i < query.rows.length; i++) {
       let row = query.rows[i];
       if (row.paid === false) {
-        row.price =
-          row.type == TicketType.GROUP ? price.group : price.individual;
-
-        if (row.type == TicketType.DISCOUNTED) {
-          row.price = price.discounted;
-        }
+        row.price = price.getPrice(row.type, row.payment_method);
         unpaid.push(row);
       }
     }
@@ -182,12 +174,7 @@ export async function pay(
         for (let i = 0; i < query.rows.length; i++) {
           let row = query.rows[i];
           if (row.paid === false) {
-            row.price =
-              row.type == TicketType.GROUP ? price.group : price.individual;
-
-            if (row.type == TicketType.DISCOUNTED) {
-              row.price = price.discounted;
-            }
+            row.price = price.getPrice(row.type, row.payment_method);
             unpaid.push(row);
           }
         }
@@ -325,7 +312,7 @@ export async function pay(
               }
             });
           } catch (e) {
-            paid -= price.group;
+            paid -= price.group * 4;
             console.error(e);
             return Response.json(
               { message: "Err #7109. Contact Support or Try Again." },

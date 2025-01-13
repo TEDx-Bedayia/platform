@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { TicketType } from "../../utils/ticket-types";
 import { price } from "./prices";
 
 export async function GET(request: NextRequest) {
@@ -13,9 +14,9 @@ export async function GET(request: NextRequest) {
   }
 
   let total = 0;
-  if (type === "individual") {
+  if (type === TicketType.INDIVIDUAL) {
     total = price.individual;
-  } else if (type === "group") {
+  } else if (type === TicketType.GROUP) {
     total = price.group * 4;
   } else {
     return Response.json({ message: "Invalid ticket type." }, { status: 400 });
