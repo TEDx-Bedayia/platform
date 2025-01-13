@@ -1,5 +1,6 @@
 "use client";
 import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods";
+import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";

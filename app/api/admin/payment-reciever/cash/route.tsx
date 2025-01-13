@@ -1,4 +1,5 @@
 import { price } from "@/app/api/tickets/price/prices";
+import { ResponseCode } from "@/app/api/utils/response-codes";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { pay } from "../main";
