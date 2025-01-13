@@ -115,7 +115,7 @@ export async function pay(
         message:
           "Not enough money to pay for all tickets. Identify using Emails.",
       },
-      { status: 431 }
+      { status: ResponseCode.EMAIL_REQUIRED }
     );
   }
 
@@ -259,7 +259,7 @@ export async function pay(
             message:
               "Not enough money to pay for all tickets. Identify using Emails.",
           },
-          { status: 431 }
+          { status: ResponseCode.EMAIL_REQUIRED }
         );
       }
 

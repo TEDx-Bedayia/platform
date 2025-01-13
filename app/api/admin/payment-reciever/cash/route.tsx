@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
           name +
           `. Also, they should pay ${amount} EGP.`,
       },
-      { status: 555 }
+      { status: ResponseCode.UPDATE_ID }
     );
   }
 
