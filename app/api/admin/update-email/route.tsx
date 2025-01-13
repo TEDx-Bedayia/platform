@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     if (result.rows[0].paid === false) {
       await sendBookingConfirmation(
         result.rows[0].payment_method,
-        result.rows[0].name,
+        result.rows[0].full_name,
         email,
         result.rows[0].id,
         result.rows[0].type === "group"
