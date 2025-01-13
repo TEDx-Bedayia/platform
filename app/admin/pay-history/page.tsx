@@ -21,6 +21,27 @@ const title = Poppins({ weight: "700", subsets: ["latin"] });
 
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
+const formatDate = (date: Date) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  };
+
+  const formatter = new Intl.DateTimeFormat("en-EG", options);
+  const parts = formatter.formatToParts(date);
+  const ampm = date.getHours() >= 12 ? "PM" : "AM";
+  const formattedDate = `${parts.find((p) => p.type === "day")?.value}/${
+    parts.find((p) => p.type === "month")?.value
+  }/${parts.find((p) => p.type === "year")?.value}, ${
+    parts.find((p) => p.type === "hour")?.value
+  }:${parts.find((p) => p.type === "minute")?.value} ${ampm}`;
+  return formattedDate;
+};
+
 function Entry(
   stream: string,
   incurred: number,
@@ -69,8 +90,8 @@ function Entry(
       >
         {recieved - incurred} EGP
       </span>
-      <span style={{ width: "132px" }}>
-        {new Date(recieved_at).toDateString()}
+      <span style={{ width: "180px" }}>
+        {formatDate(new Date(recieved_at))}
       </span>
     </div>
   );
@@ -80,7 +101,7 @@ interface Transaction {
   stream: string;
   incurred: number;
   recieved: number;
-  recieved_at: string;
+  created_at: string;
 }
 
 export default function History() {
@@ -211,7 +232,7 @@ export default function History() {
           >
             To Refund
           </span>
-          <span style={{ width: "132px", textAlign: "left", fontWeight: 700 }}>
+          <span style={{ width: "180px", textAlign: "left", fontWeight: 700 }}>
             Recieved At
           </span>
         </div>
@@ -220,7 +241,7 @@ export default function History() {
             transaction.stream,
             transaction.incurred,
             transaction.recieved,
-            transaction.recieved_at,
+            transaction.created_at,
             index
           )
         )}
