@@ -158,7 +158,7 @@ export default function AdminDashboard() {
               <div className="flex flex-row-reverse justify-center items-center gap-2">
                 <span
                   contentEditable={selectedEmailEditor === applicant.id}
-                  className={styles.applicantEmail + " " + styles.disabled}
+                  className={styles.applicantEmail}
                   id={"email_editor" + applicant.id}
                   onInput={(e) => {
                     setEditorEmail(e.currentTarget.innerText);
