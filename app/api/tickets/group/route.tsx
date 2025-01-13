@@ -214,7 +214,7 @@ async function submitTickets(
 
   let q = "";
   for (let i = 0; i < emails.length; i++) {
-    q += `('${emails[i]}', '${names[i]}', '${paymentMethod}', '${phone}', 'group')`;
+    q += `('${emails[i]}', '${names[i]}', '${paymentMethod}', '${phone}', '${TicketType.GROUP}')`;
     if (i != emails.length - 1) {
       q += ", ";
     }
