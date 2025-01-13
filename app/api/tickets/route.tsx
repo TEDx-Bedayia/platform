@@ -143,9 +143,9 @@ async function submitOneTicket(
   try {
     // send payment details and next steps.
     await sendBookingConfirmation(
-      email,
-      name,
       paymentMethod,
+      name,
+      email,
       id,
       TicketType.INDIVIDUAL
     );

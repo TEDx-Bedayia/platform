@@ -91,9 +91,9 @@ export async function POST(request: NextRequest) {
     try {
       // Send email to group leader
       await sendBookingConfirmation(
-        emails[0],
-        name1,
         paymentMethod,
+        name1,
+        emails[0],
         id,
         TicketType.GROUP
       );
