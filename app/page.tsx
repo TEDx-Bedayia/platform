@@ -186,9 +186,6 @@ export default function Home() {
           id="hero"
           className="relative mx-0 mb-[4.5rem] w-[100%] max-w-[100vw] pt-[6.75rem] max-tablet:pt-[5rem] max-phone:bg-[length:80vh_100px] max-phone:pt-[10rem]"
         >
-          <h1 className="hidden absolute text-[0rem]">
-            TEDx Bedayia Fun Event
-          </h1>
           <div>
             <motion.div
               initial={{ y: 40 }}
