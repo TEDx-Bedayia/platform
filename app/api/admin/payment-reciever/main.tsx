@@ -1,6 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
+import { ResponseCode } from "../../utils/response-codes";
 import { TicketType } from "../../utils/ticket-types";
 import { sendEmail } from "./eTicketEmail";
 
@@ -115,7 +116,7 @@ export async function pay(
         message:
           "Not enough money to pay for all tickets. Identify using Emails.",
       },
-      { status: 431 }
+      { status: ResponseCode.EMAIL_REQUIRED }
     );
   }
 
@@ -259,7 +260,7 @@ export async function pay(
             message:
               "Not enough money to pay for all tickets. Identify using Emails.",
           },
-          { status: 431 }
+          { status: ResponseCode.EMAIL_REQUIRED }
         );
       }
 

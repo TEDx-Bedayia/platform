@@ -1,4 +1,5 @@
 import { price } from "@/app/api/tickets/price/prices";
+import { ResponseCode } from "@/app/api/utils/response-codes";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { pay } from "../main";
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
           name +
           `. Also, they should pay ${amount} EGP.`,
       },
-      { status: 555 }
+      { status: ResponseCode.UPDATE_ID }
     );
   }
 
