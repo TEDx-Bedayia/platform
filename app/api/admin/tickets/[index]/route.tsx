@@ -34,13 +34,28 @@ export async function GET(
 
   const searchParams = request.nextUrl.searchParams.keys();
 
+  // Checks
+  if (
+    !["true", "false"].includes(
+      request.nextUrl.searchParams.get("sent") ?? "true"
+    ) ||
+    !["true", "false"].includes(
+      request.nextUrl.searchParams.get("paid") ?? "true"
+    ) ||
+    !["true", "false"].includes(
+      request.nextUrl.searchParams.get("admitted") ?? "true"
+    )
+  ) {
+    return NextResponse.json({ error: "Invalid Parameter" }, { status: 400 });
+  }
+
   const filters: { [key: string]: string } = {
     sent: `sent = ${request.nextUrl.searchParams.get("sent")}`,
     email: `email = '${request.nextUrl.searchParams.get("email")}'`,
     name: `full_name ILIKE '%${request.nextUrl.searchParams.get("name")}%'`,
     paid: `paid = ${request.nextUrl.searchParams.get("paid")}`,
     admitted: `admitted = ${request.nextUrl.searchParams.get("admitted")}`,
-    uuid: `uuid = ${request.nextUrl.searchParams.get("uuid")}`,
+    uuid: `uuid ILIKE '%${request.nextUrl.searchParams.get("uuid")}%'`,
   };
 
   let filterQuery = "WHERE ";

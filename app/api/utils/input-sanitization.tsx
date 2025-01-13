@@ -1,4 +1,4 @@
-import { getIdentifiersForPaymentMethods } from "./payment-methods/payment-methods";
+import { getIdentifiersForPaymentMethods } from "../tickets/payment-methods/payment-methods";
 
 export function verifyEmail(email: string | undefined): boolean {
   if (email === undefined) {

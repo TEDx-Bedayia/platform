@@ -11,6 +11,7 @@ import { promises } from "fs";
 import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import path from "path";
+import { TicketType } from "../../utils/ticket-types";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function GET(request: NextRequest) {
@@ -54,7 +55,9 @@ export async function GET(request: NextRequest) {
       values.push(
         `('${rotatingEmail}', '${speakerName.split(" ")[0]}''s Invitation ${
           i + 1
-        }', 'CASH', '200000000000', 'speaker', true, true, '${uuid}')`
+        }', 'CASH', '200000000000', '${
+          TicketType.SPEAKER
+        }', true, true, '${uuid}')`
       );
     }
 

@@ -1,6 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
+import { TicketType } from "../../utils/ticket-types";
 import { sendEmail } from "./eTicketEmail";
 
 export async function safeRandUUID() {
@@ -64,7 +65,7 @@ export async function pay(
     );
   }
 
-  if (from === "CASH" && query.rows[0].type == "group") {
+  if (from === "CASH" && query.rows[0].type == TicketType.GROUP) {
     let xx =
       await sql`SELECT * FROM groups WHERE email1 = ${query.rows[0].email} OR email2 = ${query.rows[0].email} OR email3 = ${query.rows[0].email} OR email4 = ${query.rows[0].email}`;
     if (xx.rows.length === 0) {
@@ -85,8 +86,8 @@ export async function pay(
   for (let i = 0; i < query.rows.length; i++) {
     let row = query.rows[i];
     if (row.paid === false) {
-      row.price = row.type == "group" ? price.group : price.individual;
-      if (row.type == "discounted") {
+      row.price = row.type == TicketType.GROUP ? price.group : price.individual;
+      if (row.type == TicketType.DISCOUNTED) {
         row.price = price.discounted;
       }
       unpaid.push(row);
@@ -101,7 +102,7 @@ export async function pay(
   let containsIndv = false;
   for (let i = 0; i < unpaid.length; i++) {
     total += unpaid[i].price;
-    if (unpaid[i].type == "individual") {
+    if (unpaid[i].type == TicketType.INDIVIDUAL) {
       containsIndv = true;
     }
   }
@@ -135,9 +136,10 @@ export async function pay(
     for (let i = 0; i < query.rows.length; i++) {
       let row = query.rows[i];
       if (row.paid === false) {
-        row.price = row.type == "group" ? price.group : price.individual;
+        row.price =
+          row.type == TicketType.GROUP ? price.group : price.individual;
 
-        if (row.type == "discounted") {
+        if (row.type == TicketType.DISCOUNTED) {
           row.price = price.discounted;
         }
         unpaid.push(row);
@@ -149,7 +151,7 @@ export async function pay(
     for (let i = 0; i < originalUnpaidLength; i++) {
       let row = unpaid[i];
       // If the row is a group ticket get the other emails as well
-      if (row.type === "group") {
+      if (row.type === TicketType.GROUP) {
         const group =
           await sql`SELECT * FROM groups WHERE email1 = ${row.email} OR email2 = ${row.email} OR email3 = ${row.email} OR email4 = ${row.email}`;
         if (group.rows.length === 0) {
@@ -180,9 +182,10 @@ export async function pay(
         for (let i = 0; i < query.rows.length; i++) {
           let row = query.rows[i];
           if (row.paid === false) {
-            row.price = row.type == "group" ? price.group : price.individual;
+            row.price =
+              row.type == TicketType.GROUP ? price.group : price.individual;
 
-            if (row.type == "discounted") {
+            if (row.type == TicketType.DISCOUNTED) {
               row.price = price.discounted;
             }
             unpaid.push(row);
@@ -208,7 +211,7 @@ export async function pay(
 
   try {
     for (let i = 0; i < unpaid.length; i++) {
-      if (unpaid[i].type == "group") continue;
+      if (unpaid[i].type == TicketType.GROUP) continue;
 
       paid += unpaid[i].price;
       if (paid <= parseInt(amount)) {
@@ -233,7 +236,7 @@ export async function pay(
     // If there are group tickets to pay for
     if (paidFor.length !== unpaid.length) {
       for (let i = 0; i < unpaid.length; i++) {
-        if (unpaid[i].type == "group") {
+        if (unpaid[i].type == TicketType.GROUP) {
           let group =
             await sql`SELECT * FROM groups WHERE email1 = ${unpaid[i].email} OR email2 = ${unpaid[i].email} OR email3 = ${unpaid[i].email} OR email4 = ${unpaid[i].email}`;
           if (group.rows.length === 0) {

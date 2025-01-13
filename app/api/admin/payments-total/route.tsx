@@ -1,6 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { price } from "../../tickets/price/prices";
+import { TicketType } from "../../utils/ticket-types";
 
 export async function GET(request: NextRequest) {
   if (
@@ -13,9 +14,9 @@ export async function GET(request: NextRequest) {
   try {
     let query = await sql.query(`SELECT SUM(
     CASE 
-        WHEN type = 'individual' THEN ${price.individual}
-        WHEN type = 'group' THEN ${price.group} 
-        WHEN type = 'discounted' THEN ${price.discounted}
+        WHEN type = '${TicketType.INDIVIDUAL}' THEN ${price.individual}
+        WHEN type = '${TicketType.GROUP}' THEN ${price.group} 
+        WHEN type = '${TicketType.DISCOUNTED}' THEN ${price.discounted}
         ELSE 0
     END
     ) AS total_price

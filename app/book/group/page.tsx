@@ -4,7 +4,8 @@ import styles from "../book.module.css";
 
 import { motion } from "framer-motion";
 
-import { verifyEmail } from "@/app/api/tickets/utils";
+import { verifyEmail } from "@/app/api/utils/input-sanitization";
+import { backArrow, forwardArrow } from "@/app/icons";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
 import {
@@ -15,7 +16,7 @@ import { addLoader, removeLoader } from "../../global_components/loader";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
-export default function SingleTickets() {
+export default function GroupTickets() {
   const [formData, setFormData] = useState({
     emails: ["", "", "", ""],
     names: ["", "", "", ""],
@@ -466,20 +467,7 @@ export default function SingleTickets() {
                     }, 350);
                   }}
                 >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M7.78033 12.5303C7.48744 12.8232 7.01256 12.8232 6.71967 12.5303L2.46967 8.28033C2.17678 7.98744 2.17678 7.51256 2.46967 7.21967L6.71967 2.96967C7.01256 2.67678 7.48744 2.67678 7.78033 2.96967C8.07322 3.26256 8.07322 3.73744 7.78033 4.03033L4.81066 7H12.25C12.6642 7 13 7.33579 13 7.75C13 8.16421 12.6642 8.5 12.25 8.5H4.81066L7.78033 11.4697C8.07322 11.7626 8.07322 12.2374 7.78033 12.5303Z"
-                      fill="#FFFFFF"
-                    />
-                  </svg>
+                  {backArrow}
                 </button>
               </motion.div>
             )}
@@ -562,20 +550,7 @@ export default function SingleTickets() {
                       }
                     }}
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M8.21967 2.96967C8.51256 2.67678 8.98744 2.67678 9.28033 2.96967L13.5303 7.21967C13.8232 7.51256 13.8232 7.98744 13.5303 8.28033L9.28033 12.5303C8.98744 12.8232 8.51256 12.8232 8.21967 12.5303C7.92678 12.2374 7.92678 11.7626 8.21967 11.4697L11.1893 8.5H3.75C3.33579 8.5 3 8.16421 3 7.75C3 7.33579 3.33579 7 3.75 7H11.1893L8.21967 4.03033C7.92678 3.73744 7.92678 3.26256 8.21967 2.96967Z"
-                        fill="#FFFFFF"
-                      />
-                    </svg>
+                    {forwardArrow}
                   </button>
                 </motion.div>
               )}
