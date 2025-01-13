@@ -1,17 +1,8 @@
-import {
-  EVENT_DATE,
-  IPN,
-  PHONE,
-  TELDA,
-  TICKET_WINDOW,
-  YEAR,
-} from "@/app/metadata";
+import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
-import { promises } from "fs";
 import { type NextRequest } from "next/server";
-import nodemailer from "nodemailer";
-import path from "path";
-import { price } from "../price/prices";
+import { sendBookingConfirmation } from "../../utils/email-helper";
+import { TicketType } from "../../utils/ticket-types";
 import {
   checkSafety,
   handleMisspelling,
@@ -98,16 +89,22 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await sendBookingConfirmation(emails[0], name1, paymentMethod, id);
-      // sendBookingConfirmation(email2, name2, paymentMethod);
-      // sendBookingConfirmation(email3, name3, paymentMethod);
-      // sendBookingConfirmation(email4, name4, paymentMethod);
+      // Send email to group leader
+      await sendBookingConfirmation(
+        emails[0],
+        name1,
+        paymentMethod,
+        id,
+        TicketType.GROUP
+      );
     } catch (e) {
-      console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
+      console.error(
+        "[CRITICAL ERROR] LESS SECURE APPS NOT TURNED ON FOR GMAIL"
+      );
       return Response.json(
         {
           message:
-            "Error Occurred. Please try again or contact us for help: SMTP_ERR_001.",
+            "Error Occurred. Please try again or contact us for help: SMTP_LSA_502.",
         },
         { status: 400 }
       );
@@ -125,66 +122,6 @@ export async function POST(request: NextRequest) {
     success: true,
     message:
       "Tickets Submitted Successfully! Check your email for payment details to continue.",
-  });
-}
-
-async function sendBookingConfirmation(
-  email: string,
-  name: string,
-  paymentMethod: string,
-  id: string
-) {
-  const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
-  const htmlContent = await promises.readFile(filePath, "utf8");
-
-  let paymentDetails = "";
-  if (paymentMethod.split("@")[0] === "VFCASH") {
-    paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. After your payment, send us a WhatsApp or SMS message from the phone you will pay with, <strong>${
-      paymentMethod.split("@")[1]
-    }</strong>, stating your email address: <strong>${email}</strong> to confirm your payment.`;
-  } else if (paymentMethod.split("@")[0] === "CASH") {
-    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell your attendee ID: <strong>${id}</strong>.`;
-  } else if (paymentMethod.split("@")[0] === "TLDA") {
-    paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>. You're sending from @${
-      paymentMethod.split("@")[1]
-    }. If that's incorrect please reply to this message or contact us on WhatsApp as soon as possible.`;
-  } else if (paymentMethod.split("@")[0] === "IPN") {
-    paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Then, please send us a screenshot of your payment with your username <strong>${
-      paymentMethod.split("@")[1]
-    }@instapay</strong> visible and send your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp.`;
-  }
-
-  let pricingDesc = `The price for your entire group ticket (4 people) is: <strong>${price.markup(
-    price.group * 4,
-    paymentMethod.split("@")[0].toLowerCase()
-  )} EGP</strong>. Make sure you as the group leader pay the exact due amount at once to avoid delays. You can't pay for each ticket separately. P.S. Only you have to go through the steps outlined above for payment.`;
-
-  // Replace placeholders in the HTML
-  const personalizedHtml = htmlContent
-    .replace("${name}", name)
-    .replace("${vfcash}", paymentDetails)
-    .replace("{pricingDesc}", pricingDesc)
-    .replace("{PHONE}", PHONE)
-    .replaceAll(
-      "{DATE}",
-      `${EVENT_DATE.getUTCDate()}/${
-        EVENT_DATE.getUTCMonth() + 1
-      }/${EVENT_DATE.getUTCFullYear()}`
-    )
-    .replaceAll("${year}", YEAR.toString());
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-  await transporter.sendMail({
-    from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
-    to: email,
-    subject: "Regarding your eTicket.",
-    html: personalizedHtml,
   });
 }
 
@@ -291,7 +228,6 @@ async function submitTickets(
 
     return Response.json({ success: true, id });
   } catch (err: any) {
-    // console.log(err);
     return Response.json({ success: false }, { status: 500 });
   }
 }

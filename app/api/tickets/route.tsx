@@ -1,17 +1,8 @@
-import {
-  EVENT_DATE,
-  IPN,
-  PHONE,
-  TELDA,
-  TICKET_WINDOW,
-  YEAR,
-} from "@/app/metadata";
+import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
-import { promises } from "fs";
 import { type NextRequest } from "next/server";
-import nodemailer from "nodemailer";
-import path from "path";
-import { price } from "./price/prices";
+import { sendBookingConfirmation } from "../utils/email-helper";
+import { TicketType } from "../utils/ticket-types";
 import {
   checkPhone,
   checkSafety,
@@ -137,7 +128,7 @@ async function submitOneTicket(
   try {
     let res = await sql.query(
       `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ($1::text, $2::text, $3::text, $4::text, $5::text) RETURNING *;`,
-      [email, name, paymentMethod, phone, "individual"]
+      [email, name, paymentMethod, phone, TicketType.INDIVIDUAL]
     );
     id = res.rows[0].id;
   } catch (error) {
@@ -151,7 +142,13 @@ async function submitOneTicket(
 
   try {
     // send payment details and next steps.
-    await sendSingleBookingConfirmation(email, name, paymentMethod, id);
+    await sendBookingConfirmation(
+      email,
+      name,
+      paymentMethod,
+      id,
+      TicketType.INDIVIDUAL
+    );
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE email = ${email}`;
@@ -173,68 +170,7 @@ async function submitOneTicket(
   );
 }
 
-async function sendSingleBookingConfirmation(
-  email: string,
-  name: string,
-  paymentMethod: string,
-  ID: string
-) {
-  const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
-  const htmlContent = await promises.readFile(filePath, "utf8");
-
-  let paymentDetails = "";
-  if (paymentMethod.split("@")[0] === "VFCASH") {
-    paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. After your payment, send us a WhatsApp or SMS message from the phone you will pay with, <strong>${
-      paymentMethod.split("@")[1]
-    }</strong>, stating your email address: <strong>${email}</strong> to confirm your payment.`;
-  } else if (paymentMethod.split("@")[0] === "CASH") {
-    paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them your attendee ID: <strong>${ID}</strong>.`;
-  } else if (paymentMethod.split("@")[0] === "TLDA") {
-    paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your email address: <strong>${email}</strong>. You're sending from @${
-      paymentMethod.split("@")[1]
-    }. If that's incorrect please reply to this message or contact us on WhatsApp as soon as possible.`;
-  } else if (paymentMethod.split("@")[0] === "IPN") {
-    paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Then, please send us a screenshot of your payment with your username <strong>${
-      paymentMethod.split("@")[1]
-    }@instapay</strong> visible and send your email address, <strong>${email}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or as a reply to this message if you don't have WhatsApp.`;
-  }
-
-  let pricingDesc = `The price for your ticket is: <strong>${price.markup(
-    price.individual,
-    paymentMethod.split("@")[0].toLowerCase()
-  )} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
-
-  // Replace placeholders in the HTML
-  const personalizedHtml = htmlContent
-    .replace("${name}", name)
-    .replace("${vfcash}", paymentDetails)
-    .replace("{pricingDesc}", pricingDesc)
-    .replace("{PHONE}", PHONE)
-    .replaceAll(
-      "{DATE}",
-      `${EVENT_DATE.getUTCDate()}/${
-        EVENT_DATE.getUTCMonth() + 1
-      }/${EVENT_DATE.getUTCFullYear()}`
-    )
-    .replaceAll("${year}", YEAR.toString());
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
-  await transporter.sendMail({
-    from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
-    to: email,
-    subject: "Regarding your eTicket.",
-    html: personalizedHtml,
-  });
-}
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Return number of tickets and number of paid tickets
   let query = await sql`SELECT COUNT(*) FROM attendees;`;
   let query2 = await sql`SELECT COUNT(*) FROM attendees WHERE paid = true;`;
