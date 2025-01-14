@@ -47,10 +47,10 @@ export async function sendBookingConfirmation(
 
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent
-    .replace("${name}", name)
+    .replaceAll("${name}", name)
     .replace("${vfcash}", paymentDetails)
     .replace("{pricingDesc}", pricingDesc)
-    .replace("{PHONE}", PHONE)
+    .replaceAll("{PHONE}", PHONE)
     .replaceAll(
       "{DATE}",
       `${EVENT_DATE.getUTCDate()}/${

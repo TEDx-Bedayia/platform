@@ -10,10 +10,10 @@ export async function sendEmail(email: string, name: string, uuid: string) {
 
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent
-    .replace("${name}", name)
-    .replace("${qrCodeURL}", `${HOST}/api/qr?uuid=${uuid}`)
-    .replace("${uuid}", uuid)
-    .replace("{EVENT_DESC}", EVENT_DESC)
+    .replaceAll("${name}", name)
+    .replaceAll("${qrCodeURL}", `${HOST}/api/qr?uuid=${uuid}`)
+    .replaceAll("${uuid}", uuid)
+    .replaceAll("{EVENT_DESC}", EVENT_DESC)
     .replaceAll("{PHONE}", PHONE)
     .replaceAll("${year}", YEAR.toString());
 
