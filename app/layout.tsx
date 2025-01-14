@@ -31,6 +31,30 @@ export const metadata: Metadata = {
       sizes: "16x16",
       type: "image/png",
     },
+    {
+      url: "/favicon.ico",
+      sizes: "256x256",
+      type: "image/x-icon",
+    },
+    {
+      url: "/apple-touch-icon.png",
+      sizes: "180x180",
+      type: "image/png",
+    },
+    {
+      url: "/site.webmanifest",
+      type: "application/manifest+json",
+    },
+    {
+      url: "/android-chrome-192x192.png",
+      sizes: "192x192",
+      type: "image/png",
+    },
+    {
+      url: "/android-chrome-512x512.png",
+      sizes: "512x512",
+      type: "image/png",
+    },
   ],
 };
 
