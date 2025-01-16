@@ -2,6 +2,8 @@ import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import { TicketType } from "../../utils/ticket-types";
+import { sendEmail } from "../payment-reciever/eTicketEmail";
+import { safeRandUUID } from "../payment-reciever/main";
 
 // Handler for POST requests
 export async function POST(request: NextRequest) {
@@ -36,7 +38,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (result.rows[0].type === "group") {
-      await sql`UPDATE groups SET email = ${email} WHERE email1 = ${oldEmail} OR email2 = ${oldEmail} OR email3 = ${oldEmail} OR email4 = ${oldEmail}`;
+      await sql`
+        UPDATE groups
+        SET 
+          email1 = CASE WHEN email1 = ${oldEmail} THEN ${email} ELSE email1 END,
+          email2 = CASE WHEN email2 = ${oldEmail} THEN ${email} ELSE email2 END,
+          email3 = CASE WHEN email3 = ${oldEmail} THEN ${email} ELSE email3 END,
+          email4 = CASE WHEN email4 = ${oldEmail} THEN ${email} ELSE email4 END
+        WHERE 
+          email1 = ${oldEmail} OR 
+          email2 = ${oldEmail} OR 
+          email3 = ${oldEmail} OR 
+          email4 = ${oldEmail}
+      `;
     }
 
     if (result.rows[0].paid === false) {
@@ -47,6 +61,14 @@ export async function POST(request: NextRequest) {
         result.rows[0].id,
         result.rows[0].type
       );
+    } else {
+      const newUUID = await safeRandUUID();
+      await sql`
+        UPDATE attendees
+        SET uuid = ${newUUID}
+        WHERE id = ${id} AND paid = true`;
+
+      await sendEmail(email, result.rows[0].full_name, newUUID);
     }
 
     return NextResponse.json(
