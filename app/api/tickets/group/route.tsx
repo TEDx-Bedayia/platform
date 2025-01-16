@@ -109,6 +109,18 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    return Response.json(
+      {
+        message: `Tickets Booked! Check your email to continue.${
+          paymentMethod === "CASH"
+            ? ` Your Attendee ID is ${id}. Use it to pay at the school office.`
+            : ""
+        }`,
+        success: true,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.log(error);
     await sql`DELETE FROM attendees WHERE email = ${emails[0]} OR email = ${emails[1]} OR email = ${emails[2]} OR email = ${emails[3]};`;
@@ -117,12 +129,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-
-  return Response.json({
-    success: true,
-    message:
-      "Tickets Submitted Successfully! Check your email for payment details to continue.",
-  });
 }
 
 async function submitTickets(
