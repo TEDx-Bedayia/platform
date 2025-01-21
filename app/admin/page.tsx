@@ -320,7 +320,63 @@ export default function AdminDashboard() {
                 applicant.phone.slice(8)}
             </span>
             <span style={{ fontSize: ".7rem" }}>
-              <span style={{ fontWeight: "700" }}>
+              <span
+                style={{ fontWeight: "700" }}
+                className={
+                  applicant.ticket_type != TicketType.GROUP && !applicant.paid
+                    ? styles.ticketType + " cursor-pointer"
+                    : ""
+                }
+                onClick={() => {
+                  if (
+                    applicant.ticket_type != TicketType.GROUP &&
+                    !applicant.paid
+                  )
+                    customAlert2(
+                      "",
+                      async (type: string) => {
+                        try {
+                          let response = await fetch(
+                            `/api/admin/tickets/update-type`,
+                            {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                key: `${localStorage.getItem("admin-token")}`,
+                              },
+                              body: JSON.stringify({
+                                id: applicant.id,
+                                type: type,
+                              }),
+                            }
+                          );
+
+                          if (response.ok) {
+                            setApplicants((prevApplicants) =>
+                              prevApplicants.map((prevApplicant) =>
+                                prevApplicant.id === applicant.id
+                                  ? { ...prevApplicant, ticket_type: type }
+                                  : prevApplicant
+                              )
+                            );
+                            return true;
+                          }
+
+                          return false;
+                        } catch (e) {
+                          return false;
+                        }
+                      },
+                      applicant.ticket_type,
+                      Object.values(TicketType).filter((value) => {
+                        return (
+                          value != TicketType.GROUP &&
+                          value != TicketType.SPEAKER
+                        );
+                      })
+                    );
+                }}
+              >
                 {applicant.ticket_type == TicketType.GROUP ||
                 applicant.ticket_type == TicketType.INDIVIDUAL
                   ? applicant.payment_method.split("@")[0]
