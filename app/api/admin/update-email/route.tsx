@@ -1,7 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 import { sendBookingConfirmation } from "../../utils/email-helper";
-import { TicketType } from "../../utils/ticket-types";
 import { sendEmail } from "../payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../payment-reciever/main";
 

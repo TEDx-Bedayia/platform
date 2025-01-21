@@ -84,7 +84,8 @@ export function customAlert(txt: string, closeable = true, verified = false) {
 export function customAlert2(
   displayName: string,
   callback: Function,
-  defaultVal = ""
+  defaultVal = "",
+  possibleValues: string[] = []
 ) {
   // Create a background overlay
   const overlay = document.createElement("div");
@@ -116,16 +117,6 @@ export function customAlert2(
 
   // Create the message
   const message = document.createElement("div");
-  const email_in = document.createElement("input");
-  email_in.type = "text";
-  email_in.id = "from";
-  email_in.name = "from";
-  email_in.value = defaultVal;
-  email_in.required = true;
-  email_in.placeholder = " ";
-  email_in.onchange = () => {
-    email_in.style.borderColor = "#0070f3";
-  };
   const label = document.createElement("label");
   label.htmlFor = "from";
   label.innerText = displayName;
@@ -140,6 +131,28 @@ export function customAlert2(
   label.style.color = "#aaa";
   label.style.transition = "all 0.2s ease-in-out";
   label.style.pointerEvents = "none";
+
+  const email_in = document.createElement(
+    possibleValues.length == 0 ? "input" : "select"
+  );
+  if (possibleValues.length == 0) {
+    (email_in as HTMLInputElement).type = "text";
+    (email_in as HTMLInputElement).placeholder = " ";
+  } else {
+    possibleValues.forEach((val) => {
+      const option = document.createElement("option");
+      option.value = val;
+      option.innerText = val;
+      email_in.appendChild(option);
+    });
+  }
+  email_in.id = "from";
+  email_in.name = "from";
+  email_in.value = defaultVal;
+  email_in.required = true;
+  email_in.onchange = () => {
+    email_in.style.borderColor = "#0070f3";
+  };
 
   email_in.style.width = "100%";
   email_in.style.padding = "0.75rem 10px";
