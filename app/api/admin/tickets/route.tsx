@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const { rows } = await sql`SELECT email FROM attendees WHERE paid = false;`;
+  const { rows } =
+    await sql`SELECT email FROM attendees WHERE paid = false AND type NOT 'speaker';`;
   let emails = "";
   rows.forEach((row) => {
     emails += row.email + ", ";
