@@ -177,9 +177,9 @@ async function submitOneTicket(
 export async function GET() {
   // Return number of tickets and number of paid tickets
   let query =
-    await sql`SELECT COUNT(*) FROM attendees WHERE type != 'speaker';`;
+    await sql`SELECT COUNT(*) FROM attendees WHERE type NOT IN ('speaker', 'giveaway');`;
   let query2 =
-    await sql`SELECT COUNT(*) FROM attendees WHERE paid = true AND type != 'speaker';`;
+    await sql`SELECT COUNT(*) FROM attendees WHERE paid = true AND type NOT IN ('speaker', 'giveaway');`;
   return Response.json(
     {
       total: query.rows[0].count,
