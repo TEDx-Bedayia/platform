@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   }
 
   const { rows } =
-    await sql`SELECT email FROM attendees WHERE paid = false AND type NOT 'speaker';`;
+    await sql`SELECT email FROM attendees WHERE paid = false AND type NOT IN ('speaker', 'discounted', 'giveaway');`;
   let emails = "";
   rows.forEach((row) => {
     emails += row.email + ", ";
