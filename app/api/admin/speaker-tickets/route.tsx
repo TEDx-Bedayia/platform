@@ -45,9 +45,11 @@ export async function GET(request: NextRequest) {
     let values: string[] = [];
     let uuids: UUID[] = [];
     for (let i = 0; i < SPEAKER_FREE_TICKETS; i++) {
-      let rotatingEmail = `${speakerEmail.split("@")[0]}+invitation${i + 1}@${
-        speakerEmail.split("@")[1]
-      }`;
+      let rotatingEmail = `${speakerEmail.split("@")[0]}+${
+        speakerEmail.split("@")[0] == "aly.m.s.mobarak"
+          ? speakerName.toLowerCase().split(" ").join("")
+          : ""
+      }invitation${i + 1}@${speakerEmail.split("@")[1]}`;
 
       let uuid = await safeRandUUID();
       uuids.push(uuid);
