@@ -50,12 +50,24 @@ export async function GET(
   }
 
   const filters: { [key: string]: string } = {
-    sent: `sent = ${request.nextUrl.searchParams.get("sent")}`,
-    email: `email = '${request.nextUrl.searchParams.get("email")}'`,
-    name: `full_name ILIKE '%${request.nextUrl.searchParams.get("name")}%'`,
-    paid: `paid = ${request.nextUrl.searchParams.get("paid")}`,
-    admitted: `admitted = ${request.nextUrl.searchParams.get("admitted")}`,
-    uuid: `uuid ILIKE '%${request.nextUrl.searchParams.get("uuid")}%'`,
+    sent: `sent = ${request.nextUrl.searchParams
+      .get("sent")
+      ?.replaceAll("'", "")}`,
+    email: `email = '${request.nextUrl.searchParams
+      .get("email")
+      ?.replaceAll("'", "")}'`,
+    name: `full_name ILIKE '%${request.nextUrl.searchParams
+      .get("name")
+      ?.replaceAll("'", "")}%'`,
+    paid: `paid = ${request.nextUrl.searchParams
+      .get("paid")
+      ?.replaceAll("'", "")}`,
+    admitted: `admitted = ${request.nextUrl.searchParams
+      .get("admitted")
+      ?.replaceAll("'", "")}`,
+    uuid: `uuid ILIKE '%${request.nextUrl.searchParams
+      .get("uuid")
+      ?.replaceAll("'", "")}%'`,
   };
 
   let filterQuery = "WHERE ";
