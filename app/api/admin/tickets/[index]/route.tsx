@@ -90,7 +90,9 @@ export async function GET(
        ` +
         filterQuery +
         `
-       ORDER BY id ASC
+       ORDER BY id ${
+         request.nextUrl.searchParams.get("desc") == "true" ? "DESC" : "ASC"
+       }
        LIMIT $1 OFFSET $2`,
       [itemsPerPage, index * itemsPerPage]
     );

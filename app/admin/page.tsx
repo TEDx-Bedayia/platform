@@ -87,7 +87,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState("");
-  const [variable, setVariable] = useState("clear");
+  const [variable, setVariable] = useState("desc");
   const [filter, setFilter] = useState("");
   const observer = useRef<IntersectionObserver | null>(null);
   const [devMode, setDevMode] = useState(false);
@@ -615,7 +615,7 @@ export default function AdminDashboard() {
             value={variable}
             onChange={(e) => setVariable(e.target.value)}
           >
-            <option value="clear">All</option>
+            <option value="desc">All</option>
             <option value="email">Email</option>
             <option value="tosend">Pending eTicket</option>
             <option value="sent">Sent</option>
@@ -647,8 +647,8 @@ export default function AdminDashboard() {
               color: "#fff",
             }}
             onClick={() => {
-              if (variable === "clear") {
-                setFilter("");
+              if (variable === "desc") {
+                setFilter(`?desc=${encodeURIComponent(search)}`);
               } else if (variable === "tosend") {
                 setFilter(`?sent=false&paid=true`);
               } else {
