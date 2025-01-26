@@ -4,4 +4,5 @@ export enum TicketType {
   SPEAKER = "speaker",
   GIVEAWAY = "giveaway",
   DISCOUNTED = "discounted",
+  TEACHER = "teacher",
 }
