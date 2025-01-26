@@ -52,6 +52,12 @@ export function handleMisspelling(email: string): string {
     email = email.replace(cmo, "com");
   }
 
+  // replace .co with .com at the end of the email
+  const co = /(?<=\.)co$/;
+  if (co.test(email)) {
+    email = email.replace(co, "com");
+  }
+
   return email;
 }
 
