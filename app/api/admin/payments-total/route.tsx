@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
         WHEN type = '${TicketType.INDIVIDUAL}' THEN ${price.individual}
         WHEN type = '${TicketType.GROUP}' THEN ${price.group} 
         WHEN type = '${TicketType.DISCOUNTED}' THEN ${price.discounted}
+        WHEN type = '${TicketType.TEACHER}' THEN ${price.teacher}
         ELSE 0
     END
     ) AS total_price
