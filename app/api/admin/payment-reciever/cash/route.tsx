@@ -1,5 +1,6 @@
 import { price } from "@/app/api/tickets/price/prices";
 import { ResponseCode } from "@/app/api/utils/response-codes";
+import { TicketType } from "@/app/api/utils/ticket-types";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { pay } from "../main";
@@ -46,6 +47,7 @@ export async function GET(request: NextRequest) {
     let email = res.rows[0].email;
     let name = res.rows[0].full_name;
     let amount = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
+    if (res.rows[0].type == TicketType.GROUP) amount = amount * 4;
 
     return Response.json(
       {
