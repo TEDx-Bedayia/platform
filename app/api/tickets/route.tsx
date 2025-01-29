@@ -178,10 +178,13 @@ export async function GET() {
   // Return number of tickets and number of paid tickets
   let query = await sql`SELECT COUNT(*) FROM attendees;`;
   let query2 = await sql`SELECT COUNT(*) FROM attendees WHERE paid = true;`;
+  let query3 =
+    await sql`SELECT COUNT(*) FROM attendees WHERE paid = true AND type IN ('individual', 'group', 'teacher', 'discounted');`;
   return Response.json(
     {
       total: query.rows[0].count,
       paid: query2.rows[0].count,
+      actual: query3.rows[0].count,
     },
     { status: 200 }
   );

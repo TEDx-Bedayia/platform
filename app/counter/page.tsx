@@ -6,6 +6,7 @@ const title = Poppins({ weight: ["400"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["700"], subsets: ["latin"] });
 export default function TicketCounter() {
   const [ticketCount, setTicketCount] = useState(0);
+  const [actualSales, setActualSales] = useState(0);
   const [paidCount, setPaidCount] = useState(0);
 
   useEffect(() => {
@@ -14,6 +15,7 @@ export default function TicketCounter() {
       .then((data) => {
         setTicketCount(data.total);
         setPaidCount(data.paid);
+        setActualSales(data.actual);
       });
   }, []);
 
@@ -51,7 +53,7 @@ export default function TicketCounter() {
           bottom: "20%",
         }}
       >
-        Sold: {paidCount}
+        Seats Reserved: {paidCount} ({actualSales})
       </span>
     </div>
   );
