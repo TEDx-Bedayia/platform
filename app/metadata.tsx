@@ -11,7 +11,7 @@ export const DISCOUNTED_TICKET_PRICE = 300; // Change to discounted ticket price
 
 export const TICKET_WINDOW = [
   new Date("2025-01-01T22:00:00Z"),
-  new Date("2025-01-31T23:59:59Z"),
+  new Date("2025-01-29T23:59:59Z"),
 ]; // Change to actual ticket window
 export const EVENT_DATE = new Date("2025-01-31T23:59:59Z"); // Change to event date
 export const HOST = "https://tedxbedayia.com"; // Change to your domain
