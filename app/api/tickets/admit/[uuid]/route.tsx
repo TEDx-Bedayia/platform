@@ -45,7 +45,7 @@ export async function GET(
   try {
     // Update the admitted status for the specified applicant
     const result = await sql.query(
-      "UPDATE attendees SET admitted = true WHERE paid = true AND admitted = false AND uuid = $1 RETURNING *",
+      "UPDATE attendees SET admitted_at = NOW() WHERE paid = true AND admitted_at IS NULL AND uuid = $1 RETURNING *",
       [uuid]
     );
 
@@ -56,7 +56,10 @@ export async function GET(
           { error: "Applicant not found." },
           { status: 404, headers: headers }
         );
-      } else if (query.rows[0].admitted) {
+      } else if (
+        query.rows[0].admitted_at !== null &&
+        Date.now() - query.rows[0].admitted_at > 5 * 1000
+      ) {
         return NextResponse.json(
           { error: "Applicant already admitted." },
           { status: 400, headers: headers }
