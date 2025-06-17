@@ -62,9 +62,11 @@ export async function GET(
     paid: `paid = ${request.nextUrl.searchParams
       .get("paid")
       ?.replaceAll("'", "")}`,
-    admitted: `admitted = ${request.nextUrl.searchParams
-      .get("admitted")
-      ?.replaceAll("'", "")}`,
+    admitted:
+      request.nextUrl.searchParams.get("admitted")?.replaceAll("'", "") ==
+      "false"
+        ? `admitted_at IS NULL`
+        : "admitted_at IS NOT NULL",
     uuid: `uuid ILIKE '%${request.nextUrl.searchParams
       .get("uuid")
       ?.replaceAll("'", "")}%'`,
@@ -85,7 +87,7 @@ export async function GET(
     // SQL query to fetch paginated applicants using LIMIT and OFFSET
     const result = await sql.query(
       `SELECT id, full_name, email, type AS "ticket_type", 
-              payment_method, paid, admitted, sent, phone, created_at
+              payment_method, paid, admitted_at, sent, phone, created_at, uuid
        FROM attendees
        ` +
         filterQuery +

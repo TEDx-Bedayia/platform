@@ -25,10 +25,11 @@ type Applicant = {
   payment_method: string;
   created_at: string;
   paid: boolean;
-  admitted: boolean;
+  admitted_at: string | null;
   id: number;
   sent: boolean;
   phone: string;
+  uuid?: string;
 };
 
 const title = Poppins({ weight: "700", subsets: ["latin"] });
@@ -410,6 +411,8 @@ export default function AdminDashboard() {
             </span>
           </div>
 
+          <span style={{ fontSize: ".75rem" }}>{applicant.uuid}</span>
+
           <div
             style={{
               display: "flex",
@@ -420,11 +423,13 @@ export default function AdminDashboard() {
             {applicant.paid && (
               <button
                 className={`${styles.admitButton} ${
-                  applicant.admitted ? styles.deadmit : styles.admit
+                  applicant.admitted_at != null ? styles.deadmit : styles.admit
                 }`}
-                onClick={() => admitApplicant(applicant.id, applicant.admitted)}
+                onClick={() =>
+                  admitApplicant(applicant.id, applicant.admitted_at == null)
+                }
               >
-                {applicant.admitted ? "De Admit" : "Admit"}
+                {applicant.admitted_at != null ? "De Admit" : "Admit"}
               </button>
             )}
             {applicant.paid && !applicant.sent && (
@@ -545,14 +550,17 @@ export default function AdminDashboard() {
         "Content-Type": "application/json",
         key: `${localStorage.getItem("admin-token")}`,
       },
-      body: JSON.stringify({ admitted: !admitted }),
+      body: JSON.stringify({ admitted }),
     });
 
     if (response.ok) {
       setApplicants((prevApplicants) =>
         prevApplicants.map((applicant) =>
           applicant.id === id
-            ? { ...applicant, admitted: !admitted }
+            ? {
+                ...applicant,
+                admitted_at: admitted ? new Date().toTimeString() : null,
+              }
             : applicant
         )
       );
