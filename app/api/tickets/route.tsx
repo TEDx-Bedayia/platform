@@ -152,7 +152,10 @@ async function submitOneTicket(
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE email = ${email}`;
-    console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
+    console.error(
+      "[CRITICAL ERROR] LESS SECURE APP MAY NOT TURNED ON FOR GMAIL"
+    );
+    console.error(error);
     return Response.json(
       {
         message:

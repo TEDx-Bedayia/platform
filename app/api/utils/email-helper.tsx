@@ -59,13 +59,28 @@ export async function sendBookingConfirmation(
     )
     .replaceAll("${year}", YEAR.toString());
 
+  // const transporter = nodemailer.createTransport({
+  //   service: "gmail",
+  //   secure: false,
+  //   auth: {
+  //     user: process.env.EMAIL,
+  //     pass: process.env.EMAIL_PASSWORD,
+  //   },
+  // });
+
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
     auth: {
+      type: "OAuth2",
       user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD,
+      clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      refreshToken: process.env.REFRESH_TOKEN,
     },
   });
+
   await transporter.sendMail({
     from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
     to: email,
