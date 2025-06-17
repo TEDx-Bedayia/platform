@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
-import { TicketType } from "../api/utils/ticket-types";
+import { getTicketTypeName, TicketType } from "../api/utils/ticket-types";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
   check,
@@ -377,14 +377,32 @@ export default function AdminDashboard() {
                     );
                 }}
               >
-                {applicant.ticket_type == TicketType.GROUP ||
+                {/* {applicant.ticket_type == TicketType.GROUP ||
                 applicant.ticket_type == TicketType.INDIVIDUAL
                   ? applicant.payment_method.split("@")[0]
-                  : applicant.ticket_type.toUpperCase()}
+                  : getTicketTypeName(
+                      applicant.ticket_type as TicketType
+                    ).toUpperCase()} */}
+
+                {getTicketTypeName(
+                  applicant.ticket_type as TicketType
+                ).toUpperCase()}
               </span>
               <span>
+                {/* {applicant.payment_method.split("@")[1] != undefined &&
+                  " " + applicant.payment_method.split("@")[1]}{" "}
+                {applicant.ticket_type != TicketType.GROUP &&
+                applicant.ticket_type != TicketType.INDIVIDUAL
+                  ? `(${applicant.payment_method.split("@")[0]})`
+                  : ""} */}
+
                 {applicant.payment_method.split("@")[1] != undefined &&
-                  ": " + applicant.payment_method.split("@")[1]}{" "}
+                  " " + applicant.payment_method.split("@")[1]}
+                {` (`}
+                <span style={{ fontWeight: 700 }}>
+                  {applicant.payment_method.split("@")[0]}
+                </span>
+                {")"}
               </span>
               <span style={{ fontSize: ".5rem", marginLeft: ".25rem" }}>
                 {formatDate(new Date(applicant.created_at))}
