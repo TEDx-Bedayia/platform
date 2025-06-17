@@ -27,13 +27,10 @@ export default function SpeakerTickets() {
   };
 
   useEffect(() => {
-    if (
-      !localStorage.getItem("admin-token") &&
-      !localStorage.getItem("school-token")
-    ) {
+    if (!localStorage.getItem("admin-token")) {
       window.location.href = "/admin/login";
     }
-  });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     addLoader();
