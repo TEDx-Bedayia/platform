@@ -33,9 +33,9 @@ export async function GET(request: NextRequest) {
 
   from = "TLDA@" + from.trim();
 
-  let email_if_needed = params.get("email_id");
-  if (email_if_needed !== null) email_if_needed = email_if_needed.trim();
-  else email_if_needed = "";
+  let id_if_needed = params.get("identification");
+  if (id_if_needed !== null) id_if_needed = id_if_needed.trim();
+  else id_if_needed = "";
 
-  return await pay(from, amount, date, email_if_needed);
+  return await pay(from, amount, date, id_if_needed);
 }

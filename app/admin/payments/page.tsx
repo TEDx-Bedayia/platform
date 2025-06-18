@@ -2,11 +2,154 @@
 import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
+import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
+import { createRoot } from "react-dom/client";
 import { customAlert, customAlert2 } from "../custom-alert";
 import styles from "./payments.module.css";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
+
+function IDCheckPopup(
+  name: string,
+  email: string,
+  amount: number,
+  id: string,
+  handed_amount: number
+) {
+  return (
+    <div className={styles.idCheckPopup}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100%",
+          rotate: "-45deg",
+          marginBottom: "1em",
+        }}
+      >
+        {ticketIcon}
+      </div>
+      <p>
+        <span style={{ fontWeight: "bold" }}>{name}</span> (ID: {id})
+      </p>
+      <p>{email}</p>
+      <p>{amount} EGP</p>
+      <p style={{ marginTop: "0.5rem", fontWeight: "bold" }}>
+        Does this information look correct?
+      </p>
+
+      <div className="flex flex-row gap-8 items-center justify-center w-full mt-4">
+        <button
+          style={{ ...title.style, color: "#fff" }}
+          className={styles.cancelButton}
+          onClick={() => removeIDCheckPopup()}
+        >
+          {whiteCross}
+        </button>
+
+        <button
+          style={{ ...title.style, color: "#fff" }}
+          className={styles.confirmButton}
+          onClick={async () =>
+            removeIDCheckPopup(async () => {
+              addLoader();
+              // Do Complex Logic to Accept Payment
+              const response = await fetch(
+                `/api/admin/payment-reciever/cash?from=${encodeURIComponent(
+                  id
+                )}&amount=${encodeURIComponent(
+                  handed_amount.toString()
+                )}&date=${encodeURIComponent(
+                  new Date().toISOString().split("T")[0]
+                )}`,
+                {
+                  method: "GET",
+                  headers: {
+                    key: localStorage.getItem("school-token")
+                      ? (localStorage.getItem("school-token") as string)
+                      : (localStorage.getItem("admin-token") as string),
+                  },
+                }
+              );
+
+              removeLoader();
+
+              if (response.ok) {
+                const { refund, paid } = await response.json();
+                if (!refund && paid != -1) {
+                  let refundText =
+                    " Refund " +
+                    (parseInt(handed_amount.toString()) - paid) +
+                    " EGP.";
+                  let ifRefund =
+                    parseInt(handed_amount.toString()) - paid > 0
+                      ? refundText
+                      : "";
+                  customAlert(
+                    paid + " EGP were accepted successfully." + ifRefund,
+                    true,
+                    true
+                  );
+                } else if (
+                  paid == -1 &&
+                  parseInt(handed_amount.toString()) == 0
+                )
+                  customAlert("Speaker Ticket Accepted.", true, true);
+                else customAlert("Refund Inserted.", true, true);
+                document.getElementById("reset-form")?.click();
+              } else {
+                const json = await response.json();
+                customAlert(json.message);
+              }
+            })
+          }
+        >
+          {whiteCheck}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function showIDCheckPopup(
+  name: string,
+  email: string,
+  amount: number,
+  id: string,
+  handed_amount: number
+) {
+  const popup = IDCheckPopup(name, email, amount, id, handed_amount);
+  const popupContainer = document.createElement("div");
+  popupContainer.id = "id-check-popup-container";
+  popupContainer.className = styles.popupContainer;
+  const root = createRoot(popupContainer);
+  root.render(popup);
+  document.body.appendChild(popupContainer);
+
+  // Trigger the opening animation (after the element is mounted in the DOM)
+  setTimeout(() => {
+    popupContainer.style.opacity = "1"; // Fade in the overlay
+    popupContainer.getElementsByTagName("div")[0].style.transform = "scale(1)"; // Scale to full size
+    popupContainer.getElementsByTagName("div")[0].style.opacity = "1"; // Make alert box fully visible
+  }, 10); // Small timeout to ensure animation starts after element is in the DOM
+}
+
+function removeIDCheckPopup(callback?: () => void) {
+  const popupContainer = document.getElementById("id-check-popup-container");
+  if (popupContainer) {
+    popupContainer.style.opacity = "0"; // Fade out the overlay
+    popupContainer.getElementsByTagName("div")[0].style.transform =
+      "scale(0.8)"; // Scale down the alert box
+    popupContainer.getElementsByTagName("div")[0].style.opacity = "0"; // Make alert box invisible
+
+    // Remove the popup after the animation ends
+    setTimeout(() => {
+      popupContainer.remove();
+      if (callback) callback();
+    }, 300);
+  }
+}
 
 export default function Payments() {
   const getCurrentDate = () => {
@@ -130,12 +273,60 @@ export default function Payments() {
     }
   });
 
+  const resetForm = () => {
+    setFormData({
+      method: type == "admin" ? formData.method : "CASH",
+      from: "",
+      amount: "",
+      date: getCurrentDate(),
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     addLoader();
     e.preventDefault();
     if (formData.method && formData.from && formData.amount && formData.date) {
       const { method, from, amount, date } = formData;
-      // Show Loader
+
+      if (!isNaN(Number(from)) && method.trim() == "CASH") {
+        // We're dealing with an ID input.
+        if (Number(from) <= 0 || Number(from) > 500000) {
+          removeLoader();
+          setTimeout(() => {
+            customAlert("Invalid ID.");
+          }, 300);
+          return;
+        }
+
+        const fetchTicketInfo = await fetch(
+          `/api/admin/query-ticket?id=${encodeURIComponent(from)}`,
+          {
+            method: "GET",
+            headers: {
+              key: localStorage.getItem("school-token")
+                ? (localStorage.getItem("school-token") as string)
+                : (localStorage.getItem("admin-token") as string),
+            },
+          }
+        );
+
+        if (fetchTicketInfo.ok) {
+          const ticketData = await fetchTicketInfo.json();
+          // Use a custom alert
+          showIDCheckPopup(
+            ticketData.name,
+            ticketData.email,
+            ticketData.amount,
+            from,
+            Number(amount)
+          );
+        } else {
+          const { message } = await fetchTicketInfo.json();
+          customAlert(message);
+        }
+        removeLoader();
+        return;
+      }
 
       const response = await fetch(
         `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
@@ -153,8 +344,6 @@ export default function Payments() {
         }
       );
 
-      // Hide Loader
-
       if (response.ok) {
         let { refund, paid } = await response.json();
         if (!refund && paid != -1) {
@@ -168,34 +357,22 @@ export default function Payments() {
         } else if (paid == -1 && parseInt(amount) == 0)
           customAlert("Speaker Ticket Accepted.", true, true);
         else customAlert("Refund Inserted.", true, true);
-        formData.method = type == "admin" ? formData.method : "CASH";
-        formData.from = "";
-        formData.amount = "";
-        formData.date = getCurrentDate();
-        setFormData({ ...formData });
+        resetForm();
       } else {
         const json = await response.json();
         let message = json.message;
-        if (response.status == ResponseCode.EMAIL_REQUIRED) {
-          customAlert2("Email(s)", async (email: string) => {
-            if (
-              !RegExp(
-                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(,[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$/
-              ).test(email)
-            ) {
+        if (response.status == ResponseCode.TICKET_AMBIGUITY) {
+          customAlert2("ID(s)", async (id: string) => {
+            if (!RegExp(/^[0-9]+(,[0-9]+)*$/).test(id)) {
               return false;
             }
             addLoader();
-            // setTimeout(() => {
-            //   removeLoader();
-            //   customAlert("Email sent to " + email);
-            // }, 1000);
             const response = await fetch(
               `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
                 from
               )}&amount=${encodeURIComponent(amount)}&date=${encodeURIComponent(
                 date
-              )}&email_id=${encodeURIComponent(email)}`,
+              )}&identification=${encodeURIComponent(id)}`,
               {
                 method: "GET",
                 headers: {
@@ -313,6 +490,12 @@ export default function Payments() {
 
           <button type="submit">Submit Payment</button>
         </form>
+
+        <button
+          className="hidden overflow-hidden invisible pointer-events-none absolute top-0 left-0"
+          onClick={resetForm}
+          id="reset-form"
+        ></button>
 
         <span
           style={{

@@ -1,9 +1,10 @@
 import { price } from "@/app/api/tickets/price/prices";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import { TicketType } from "@/app/api/utils/ticket-types";
-import { sql } from "@vercel/postgres";
+import { Pool, sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
-import { pay } from "../main";
+import { sendEmail } from "../eTicketEmail";
+import { pay, safeRandUUID } from "../main";
 
 export const maxDuration = 15;
 
@@ -37,30 +38,6 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!isNaN(Number(from))) {
-    let res = await sql`SELECT * FROM attendees WHERE id = ${Number(from)}`;
-
-    if (res.rowCount === 0) {
-      return Response.json({ message: "User not found." }, { status: 404 });
-    }
-
-    let email = res.rows[0].email;
-    let name = res.rows[0].full_name;
-    let amount = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
-    if (res.rows[0].type == TicketType.GROUP) amount = amount * 4;
-
-    return Response.json(
-      {
-        email,
-        message:
-          "Please Check Name: " +
-          name +
-          `. Also, they should pay ${amount} EGP.`,
-      },
-      { status: ResponseCode.UPDATE_ID }
-    );
-  }
-
   let amount = params.get("amount");
   if (amount === null) {
     return Response.json({ message: "Amount is required." }, { status: 400 });
@@ -69,6 +46,83 @@ export async function GET(request: NextRequest) {
   let date = params.get("date");
   if (date === null) {
     return Response.json({ message: "Date is required." }, { status: 400 });
+  }
+
+  if (!isNaN(Number(from))) {
+    let res = await sql`SELECT * FROM attendees WHERE id = ${Number(from)}`;
+
+    if (res.rowCount === 0) {
+      return Response.json({ message: "User not found." }, { status: 404 });
+    }
+
+    if (res.rows[0].paid) {
+      return Response.json(
+        { message: "User has already paid." },
+        { status: 400 }
+      );
+    }
+
+    let toBePaid = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
+    if (res.rows[0].type == TicketType.GROUP) toBePaid = toBePaid * 4;
+    if (Number(amount) < toBePaid) {
+      return Response.json(
+        { message: "Amount is less than the required amount." },
+        { status: 400 }
+      );
+    }
+
+    try {
+      if (res.rows[0].type != TicketType.GROUP) {
+        let randUUID = await safeRandUUID();
+        await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${res.rows[0].id}`;
+        await sendEmail(res.rows[0].email, res.rows[0].full_name, randUUID);
+      } else {
+        let groupMembersIDs =
+          await sql`SELECT id1, id2, id3, id4 FROM groups WHERE id1 = ${res.rows[0].id} OR id2 = ${res.rows[0].id} OR id3 = ${res.rows[0].id} OR id4 = ${res.rows[0].id}`;
+
+        let randUUIDs = [];
+        for (let i = 0; i < 4 * (groupMembersIDs.rows.length ?? 0); i++) {
+          randUUIDs.push(await safeRandUUID());
+        }
+
+        let ids = [
+          groupMembersIDs.rows.map((row) => row.id1),
+          groupMembersIDs.rows.map((row) => row.id2),
+          groupMembersIDs.rows.map((row) => row.id3),
+          groupMembersIDs.rows.map((row) => row.id4),
+        ];
+
+        let accepted = await sql.query(
+          `
+              UPDATE attendees
+              SET paid = true, uuid = data.uuid
+              FROM (
+                SELECT unnest($1::int[]) AS id, unnest($2::uuid[]) AS uuid
+              ) AS data
+              WHERE attendees.id = data.id
+              RETURNING *
+              `,
+          [ids, randUUIDs] // Parameters passed as arrays
+        );
+
+        accepted.rows.forEach(async (row) => {
+          await sendEmail(row.email, row.full_name, row.uuid);
+        });
+      }
+
+      await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${
+        "CASH@" + from
+      }, ${toBePaid}, ${amount}, ${date})`;
+    } catch (e) {
+      console.error(e);
+      await sql`UPDATE attendees SET paid = false, uuid = NULL WHERE id = ${from}`;
+      return Response.json(
+        { message: "Err #7109. Contact Support or Try Again." },
+        { status: 500 }
+      );
+    }
+
+    return Response.json({ refund: false, paid: toBePaid }, { status: 200 });
   }
 
   from = "CASH@" + from.trim();

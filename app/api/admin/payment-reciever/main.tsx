@@ -19,7 +19,7 @@ export async function pay(
   from: string,
   amount: string,
   date: string,
-  email_if_needed: string
+  id_if_needed: string
 ) {
   if (
     process.env.ADMIN_KEY === undefined ||
@@ -109,21 +109,21 @@ export async function pay(
     parseInt(amount) < total &&
     parseInt(amount) >= price.individual &&
     containsIndv &&
-    email_if_needed === ""
+    id_if_needed === ""
   ) {
     return Response.json(
       {
-        message:
-          "Not enough money to pay for all tickets. Identify using Emails.",
+        message: "Not enough money to pay for all tickets. Identify using IDs.",
+        found: unpaid,
       },
-      { status: ResponseCode.EMAIL_REQUIRED }
+      { status: ResponseCode.TICKET_AMBIGUITY }
     );
   }
 
-  if (email_if_needed !== "") {
+  if (id_if_needed !== "") {
     let queryio = "";
-    email_if_needed.split(",").forEach((email) => {
-      queryio += `email = '${email}' OR `;
+    id_if_needed.split(",").forEach((id) => {
+      queryio += `id = '${id}' OR `;
     });
     queryio = queryio.slice(0, -4);
     query = await sql.query(
@@ -258,9 +258,10 @@ export async function pay(
         return Response.json(
           {
             message:
-              "Not enough money to pay for all tickets. Identify using Emails.",
+              "Not enough money to pay for all tickets. Identify using IDs.",
+            found: unpaid,
           },
-          { status: ResponseCode.EMAIL_REQUIRED }
+          { status: ResponseCode.TICKET_AMBIGUITY }
         );
       }
 

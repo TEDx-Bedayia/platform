@@ -95,6 +95,80 @@
   background-color: #005bb5;
 }
 
+.idCheckPopup {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 85%;
+  transform: scale(0.9); /* Start with a slightly smaller scale */
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Animation on transform and opacity */
+  box-sizing: border-box;
+}
+
+.idCheckPopup h2 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #333;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+}
+
+.idCheckPopup p {
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.idCheckPopup button {
+  color: #fff;
+  padding: 4px 4px;
+  text-align: center;
+  border: none;
+  border-radius: 100rem;
+  aspect-ratio: 1;
+  scale: 1.5;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirmButton {
+  background-color: #1f9c5a;
+}
+
+.confirmButton:hover {
+  background-color: #147a43;
+}
+
+.cancelButton {
+  background-color: #b02a37;
+}
+
+.cancelButton:hover {
+  background-color: #8f1f2b;
+}
+
+.popupContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0; /* Start with invisible */
+  transition: opacity 0.3s ease; /* Animation for opening/closing */
+  color: #333;
+}
+
 /* Responsive design */
 @media (max-width: 500px) {
   .formContainer {
