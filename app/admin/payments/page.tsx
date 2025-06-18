@@ -274,7 +274,7 @@ export default function Payments() {
   });
 
   const resetForm = () => {
-    formData.method = type == "admin" ? "" : "CASH";
+    formData.method = type == "admin" ? formData.method : "CASH";
     formData.from = "";
     formData.amount = "";
     formData.date = getCurrentDate();
@@ -401,7 +401,7 @@ export default function Payments() {
               if (parseInt(amount) - paid > 0) {
                 formData.amount = (paid - parseInt(amount)).toString();
               } else {
-                formData.method = type == "admin" ? "" : "CASH";
+                formData.method = type == "admin" ? formData.method : "CASH";
                 formData.from = "";
                 formData.amount = "";
                 formData.date = getCurrentDate();
