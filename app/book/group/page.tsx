@@ -325,6 +325,7 @@ export default function GroupTickets() {
             >
               <div
                 className={styles.paymentMethodSelector}
+                id="payment-method"
                 onClick={() => {
                   document
                     .getElementById("paymentMethodOptions")
@@ -546,7 +547,7 @@ export default function GroupTickets() {
                         else if (formData.phone.length < 11)
                           document.getElementById("phone-input")!.focus();
                         else if (formData.paymentMethod == "")
-                          document.getElementById("payment-method")!.focus();
+                          document.getElementById("payment-method")!.click();
                       }
                     }}
                   >
