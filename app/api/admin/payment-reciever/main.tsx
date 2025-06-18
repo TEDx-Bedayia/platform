@@ -100,7 +100,7 @@ export async function pay(
   let containsIndv = false;
   for (let i = 0; i < unpaid.length; i++) {
     total += unpaid[i].price;
-    if (unpaid[i].type == TicketType.INDIVIDUAL) {
+    if (unpaid[i].type != TicketType.GROUP) {
       containsIndv = true;
     }
   }
