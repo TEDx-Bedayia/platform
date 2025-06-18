@@ -4,7 +4,12 @@ import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
 
-export async function sendEmail(email: string, name: string, uuid: string) {
+export async function sendEmail(
+  email: string,
+  name: string,
+  uuid: string,
+  id: string
+) {
   const filePath = path.join(process.cwd(), "public/eTicket-template.html");
   const htmlContent = await promises.readFile(filePath, "utf8");
 
@@ -42,9 +47,7 @@ export async function sendEmail(email: string, name: string, uuid: string) {
     });
 
     let qq = await sql.query(
-      "UPDATE attendees SET sent = true WHERE email = '" +
-        email +
-        "' RETURNING *"
+      "UPDATE attendees SET sent = true WHERE id = '" + id + "' RETURNING *"
     );
 
     if (qq.rowCount === 0) {

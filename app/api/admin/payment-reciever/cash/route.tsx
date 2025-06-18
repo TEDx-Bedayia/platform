@@ -75,7 +75,12 @@ export async function GET(request: NextRequest) {
       if (res.rows[0].type != TicketType.GROUP) {
         let randUUID = await safeRandUUID();
         await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${res.rows[0].id}`;
-        await sendEmail(res.rows[0].email, res.rows[0].full_name, randUUID);
+        await sendEmail(
+          res.rows[0].email,
+          res.rows[0].full_name,
+          randUUID,
+          res.rows[0].id
+        );
       } else {
         let groupMembersIDs =
           await sql`SELECT id1, id2, id3, id4 FROM groups WHERE id1 = ${res.rows[0].id} OR id2 = ${res.rows[0].id} OR id3 = ${res.rows[0].id} OR id4 = ${res.rows[0].id}`;
@@ -106,7 +111,7 @@ export async function GET(request: NextRequest) {
         );
 
         accepted.rows.forEach(async (row) => {
-          await sendEmail(row.email, row.full_name, row.uuid);
+          await sendEmail(row.email, row.full_name, row.uuid, row.id);
         });
       }
 

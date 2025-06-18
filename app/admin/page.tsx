@@ -378,25 +378,11 @@ export default function AdminDashboard() {
                     );
                 }}
               >
-                {/* {applicant.ticket_type == TicketType.GROUP ||
-                applicant.ticket_type == TicketType.INDIVIDUAL
-                  ? applicant.payment_method.split("@")[0]
-                  : getTicketTypeName(
-                      applicant.ticket_type as TicketType
-                    ).toUpperCase()} */}
-
                 {getTicketTypeName(
                   applicant.ticket_type as TicketType
                 ).toUpperCase()}
               </span>
               <span>
-                {/* {applicant.payment_method.split("@")[1] != undefined &&
-                  " " + applicant.payment_method.split("@")[1]}{" "}
-                {applicant.ticket_type != TicketType.GROUP &&
-                applicant.ticket_type != TicketType.INDIVIDUAL
-                  ? `(${applicant.payment_method.split("@")[0]})`
-                  : ""} */}
-
                 {applicant.payment_method.split("@")[1] != undefined &&
                   " " + applicant.payment_method.split("@")[1]}
                 {` (`}

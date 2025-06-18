@@ -197,34 +197,6 @@ async function submitTickets(
     return Response.json({ message: "Invalid Phone Number." }, { status: 400 });
   }
 
-  let query =
-    await sql`SELECT * FROM attendees WHERE email = ${emails[0]} OR email = ${emails[1]} OR email = ${emails[2]} OR email = ${emails[3]};`;
-
-  let errTxt = "";
-  if (query.rows.length > 0) {
-    if (query.rows.length == 1) {
-      errTxt = "There's a registered attendee with ";
-    } else {
-      errTxt = "There are attendees with ";
-    }
-  }
-  for (let i = 0; i < query.rows.length; i++) {
-    let email = query.rows[i].email;
-
-    errTxt += `${names[emails.indexOf(email)]}'s email`;
-    if (i != query.rows.length - 1) {
-      errTxt += ", ";
-    }
-  }
-  if (errTxt != "") {
-    return Response.json(
-      {
-        message: errTxt + ". Contact us if you believe this is a mistake.",
-      },
-      { status: 400 }
-    );
-  }
-
   let q = "";
   for (let i = 0; i < emails.length; i++) {
     q += `('${emails[i]}', '${names[i]}', '${paymentMethod}', '${phone}', '${TicketType.GROUP}')`;

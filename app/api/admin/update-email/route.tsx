@@ -67,7 +67,12 @@ export async function POST(request: NextRequest) {
         SET uuid = ${newUUID}
         WHERE id = ${id} AND paid = true`;
 
-      await sendEmail(email, result.rows[0].full_name, newUUID);
+      await sendEmail(
+        email,
+        result.rows[0].full_name,
+        newUUID,
+        result.rows[0].id
+      );
     }
 
     return NextResponse.json(

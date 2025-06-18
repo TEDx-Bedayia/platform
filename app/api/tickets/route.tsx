@@ -108,22 +108,6 @@ async function submitOneTicket(
     return Response.json({ message: "Invalid Name." }, { status: 400 });
   }
 
-  let query = await sql`SELECT * FROM attendees WHERE email = ${email};`;
-  const email1 = email.split("@")[0].split("+")[0];
-  const email2 = email.split("@")[1];
-  let add = "a";
-  if (email.split("+").length > 1) {
-    add = add + generateRandomString(3);
-  }
-  if (query.rows.length > 0) {
-    return Response.json(
-      {
-        message: `An attendee with this email already exists. If you'd still like to book a ticket with the same email, please set the email to: ${email1}+${add}@${email2}. You will recieve your ticket on ${email1}@${email2} normally.`,
-      },
-      { status: 400 }
-    );
-  }
-
   let id;
   try {
     let res = await sql.query(
