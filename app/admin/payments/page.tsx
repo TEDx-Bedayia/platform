@@ -395,7 +395,9 @@ export default function Payments() {
                   paid +
                     " EGP were accepted successfully. Refund " +
                     (parseInt(amount) - paid) +
-                    " EGP."
+                    " EGP.",
+                  true,
+                  true
                 );
               else customAlert("Refund Inserted.");
               if (parseInt(amount) - paid > 0) {
