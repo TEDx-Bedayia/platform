@@ -68,7 +68,7 @@ export async function pay(
 
   if (from === "CASH" && query.rows[0].type == TicketType.GROUP) {
     let xx =
-      await sql`SELECT * FROM groups WHERE email1 = ${query.rows[0].email} OR email2 = ${query.rows[0].email} OR email3 = ${query.rows[0].email} OR email4 = ${query.rows[0].email}`;
+      await sql`SELECT * FROM groups WHERE id1 = ${query.rows[0].id} OR id2 = ${query.rows[0].id} OR id3 = ${query.rows[0].id} OR id4 = ${query.rows[0].id}`;
     if (xx.rows.length === 0) {
       return Response.json(
         {
@@ -79,7 +79,7 @@ export async function pay(
       );
     }
     query = await sql.query(
-      `SELECT * FROM attendees WHERE payment_method = 'CASH' AND paid = false AND email = '${xx.rows[0].email1}' OR email = '${xx.rows[0].email2}' OR email = '${xx.rows[0].email3}' OR email = '${xx.rows[0].email4}'`
+      `SELECT * FROM attendees WHERE payment_method = 'CASH' AND paid = false AND id = '${xx.rows[0].id1}' OR id = '${xx.rows[0].id2}' OR id = '${xx.rows[0].id3}' OR id = '${xx.rows[0].id4}'`
     );
   }
 
@@ -146,7 +146,7 @@ export async function pay(
       // If the row is a group ticket get the other emails as well
       if (row.type === TicketType.GROUP) {
         const group =
-          await sql`SELECT * FROM groups WHERE email1 = ${row.email} OR email2 = ${row.email} OR email3 = ${row.email} OR email4 = ${row.email}`;
+          await sql`SELECT * FROM groups WHERE id1 = ${row.id} OR id2 = ${row.id} OR id3 = ${row.id} OR id4 = ${row.id}`;
         if (group.rows.length === 0) {
           return Response.json(
             {
@@ -157,15 +157,15 @@ export async function pay(
           );
         }
         const groupMembers = [
-          group.rows[0].email1,
-          group.rows[0].email2,
-          group.rows[0].email3,
-          group.rows[0].email4,
+          group.rows[0].id1,
+          group.rows[0].id2,
+          group.rows[0].id3,
+          group.rows[0].id4,
         ];
 
         queryio = "";
-        groupMembers.forEach((email) => {
-          if (email != row.email) queryio += `email = '${email}' OR `;
+        groupMembers.forEach((id) => {
+          if (id != row.id) queryio += `id = '${id}' OR `;
         });
         queryio = queryio.slice(0, -4);
         query = await sql.query(
@@ -226,7 +226,7 @@ export async function pay(
       for (let i = 0; i < unpaid.length; i++) {
         if (unpaid[i].type == TicketType.GROUP) {
           let group =
-            await sql`SELECT * FROM groups WHERE email1 = ${unpaid[i].email} OR email2 = ${unpaid[i].email} OR email3 = ${unpaid[i].email} OR email4 = ${unpaid[i].email}`;
+            await sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
           if (group.rows.length === 0) {
             return Response.json(
               {
@@ -239,10 +239,10 @@ export async function pay(
           if (uniqueGroupsToPayFor.indexOf(group.rows[0].grpid) === -1) {
             uniqueGroupsToPayFor.push(group.rows[0].grpid);
             uniqueGroupsToPayForData[group.rows[0].grpid as string] = [
-              group.rows[0].email1 as string,
-              group.rows[0].email2 as string,
-              group.rows[0].email3 as string,
-              group.rows[0].email4 as string,
+              group.rows[0].id1 as string,
+              group.rows[0].id2 as string,
+              group.rows[0].id3 as string,
+              group.rows[0].id4 as string,
             ];
           }
         }
@@ -272,7 +272,7 @@ export async function pay(
         if (paid <= parseInt(amount)) {
           // Collect all rows to update
           const rowsToUpdate = unpaid.filter((x) =>
-            groupMembers.includes(x.email)
+            groupMembers.includes(x.id)
           );
 
           let safeUUIDs: { [key: number]: string } = {};
