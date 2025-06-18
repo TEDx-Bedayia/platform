@@ -53,7 +53,7 @@ export default function TicketCounter() {
           bottom: "20%",
         }}
       >
-        Seats Reserved: {paidCount} ({actualSales})
+        Seats Reserved: {paidCount} | Actual Sales: {actualSales}
       </span>
     </div>
   );
