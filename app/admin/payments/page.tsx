@@ -274,6 +274,11 @@ export default function Payments() {
   });
 
   const resetForm = () => {
+    formData.method = type == "admin" ? "" : "CASH";
+    formData.from = "";
+    formData.amount = "";
+    formData.date = getCurrentDate();
+
     setFormData({
       method: type == "admin" ? formData.method : "CASH",
       from: "",
@@ -399,7 +404,7 @@ export default function Payments() {
                 formData.method = type == "admin" ? "" : "CASH";
                 formData.from = "";
                 formData.amount = "";
-                formData.date = "";
+                formData.date = getCurrentDate();
               }
               setFormData({ ...formData });
             } else {
