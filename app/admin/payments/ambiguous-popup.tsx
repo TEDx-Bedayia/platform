@@ -249,7 +249,7 @@ const AmbiguityResolver: React.FC<AmbiguityResolverProps> = ({
   return (
     <div
       className={
-        "p-8 pt-6 rounded-3xl w-[50rem] max-h-[90vh] overflow-scroll relative " +
+        "p-8 pt-6 rounded-3xl w-[50rem] max-h-[90vh] overflow-y-scroll relative " +
         styles.ambiguousPopup
       }
     >
