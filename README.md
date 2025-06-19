@@ -1,8 +1,6 @@
-This is TEDxBedayia'25!
+# TEDxBedayia'25
 
-# New Features
-
-- eTicket System v1.0
+- eTicket System
 - Ground Breaking Design
 - Best Team Ever!
 
