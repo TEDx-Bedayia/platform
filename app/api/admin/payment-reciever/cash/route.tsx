@@ -1,7 +1,6 @@
 import { price } from "@/app/api/tickets/price/prices";
-import { ResponseCode } from "@/app/api/utils/response-codes";
 import { TicketType } from "@/app/api/utils/ticket-types";
-import { Pool, sql } from "@vercel/postgres";
+import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { sendEmail } from "../eTicketEmail";
 import { pay, safeRandUUID } from "../main";
