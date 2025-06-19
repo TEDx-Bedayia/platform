@@ -26,6 +26,9 @@ export default function RootLayout({
           <Link href={"/admin/payments"}>New Payment</Link>
           <Link href={"/admin"}>Dashboard</Link>
           <Link href={"/admin/pay-history"}>Payment Logs</Link>
+          <Link href={"/admin/manage-marketing-members"}>
+            Marketing Members
+          </Link>
         </nav>
       )}
 
