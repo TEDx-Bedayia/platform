@@ -60,7 +60,7 @@ export async function GET(
           { status: 404, headers: headers }
         );
       } else if (query.rows[0].admitted_at !== null) {
-        if (Date.now() - query.rows[0].admitted_at < 5 * 1000) {
+        if (Date.now() - query.rows[0].admitted_at < 2.5 * 1000) {
           const res = await sql.query(
             "SELECT * FROM attendees WHERE uuid = $1",
             [uuid]
