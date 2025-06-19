@@ -132,5 +132,5 @@ export async function GET(request: NextRequest) {
 
   from = "CASH@" + from.trim();
 
-  return await pay(from, amount, date, "");
+  return await pay(from, amount, date, params.get("identification") ?? "");
 }

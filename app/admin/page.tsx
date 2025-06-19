@@ -18,19 +18,7 @@ import {
 import { EVENT_DATE } from "../metadata";
 import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
-type Applicant = {
-  full_name: string;
-  email: string;
-  ticket_type: string;
-  payment_method: string;
-  created_at: string;
-  paid: boolean;
-  admitted_at: string | null;
-  id: number;
-  sent: boolean;
-  phone: string;
-  uuid?: string;
-};
+import { Applicant } from "./types/Applicant";
 
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 

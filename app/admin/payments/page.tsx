@@ -1,12 +1,14 @@
 "use client";
 import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods";
+import { hidePopup, showPopup } from "@/app/api/utils/generic-popup";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
-import { customAlert, customAlert2 } from "../custom-alert";
+import { customAlert } from "../custom-alert";
+import { Applicant } from "../types/Applicant";
+import AmbiguityResolver from "./ambiguous-popup";
 import styles from "./payments.module.css";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
@@ -43,7 +45,7 @@ function IDCheckPopup(
         <button
           style={{ ...title.style, color: "#fff" }}
           className={styles.cancelButton}
-          onClick={() => removeIDCheckPopup()}
+          onClick={() => hidePopup("id-check-popup-container")}
         >
           {whiteCross}
         </button>
@@ -52,7 +54,7 @@ function IDCheckPopup(
           style={{ ...title.style, color: "#fff" }}
           className={styles.confirmButton}
           onClick={async () =>
-            removeIDCheckPopup(async () => {
+            hidePopup("id-check-popup-container", async () => {
               addLoader();
               // Do Complex Logic to Accept Payment
               const response = await fetch(
@@ -110,45 +112,6 @@ function IDCheckPopup(
       </div>
     </div>
   );
-}
-
-function showIDCheckPopup(
-  name: string,
-  email: string,
-  amount: number,
-  id: string,
-  handed_amount: number
-) {
-  const popup = IDCheckPopup(name, email, amount, id, handed_amount);
-  const popupContainer = document.createElement("div");
-  popupContainer.id = "id-check-popup-container";
-  popupContainer.className = styles.popupContainer;
-  const root = createRoot(popupContainer);
-  root.render(popup);
-  document.body.appendChild(popupContainer);
-
-  // Trigger the opening animation (after the element is mounted in the DOM)
-  setTimeout(() => {
-    popupContainer.style.opacity = "1"; // Fade in the overlay
-    popupContainer.getElementsByTagName("div")[0].style.transform = "scale(1)"; // Scale to full size
-    popupContainer.getElementsByTagName("div")[0].style.opacity = "1"; // Make alert box fully visible
-  }, 10); // Small timeout to ensure animation starts after element is in the DOM
-}
-
-function removeIDCheckPopup(callback?: () => void) {
-  const popupContainer = document.getElementById("id-check-popup-container");
-  if (popupContainer) {
-    popupContainer.style.opacity = "0"; // Fade out the overlay
-    popupContainer.getElementsByTagName("div")[0].style.transform =
-      "scale(0.8)"; // Scale down the alert box
-    popupContainer.getElementsByTagName("div")[0].style.opacity = "0"; // Make alert box invisible
-
-    // Remove the popup after the animation ends
-    setTimeout(() => {
-      popupContainer.remove();
-      if (callback) callback();
-    }, 300);
-  }
 }
 
 export default function Payments() {
@@ -317,13 +280,15 @@ export default function Payments() {
 
         if (fetchTicketInfo.ok) {
           const ticketData = await fetchTicketInfo.json();
-          // Use a custom alert
-          showIDCheckPopup(
-            ticketData.name,
-            ticketData.email,
-            ticketData.amount,
-            from,
-            Number(amount)
+          showPopup(
+            IDCheckPopup(
+              ticketData.name,
+              ticketData.email,
+              ticketData.amount,
+              from,
+              Number(amount)
+            ),
+            "id-check-popup-container"
           );
         } else {
           const { message } = await fetchTicketInfo.json();
@@ -367,55 +332,114 @@ export default function Payments() {
         const json = await response.json();
         let message = json.message;
         if (response.status == ResponseCode.TICKET_AMBIGUITY) {
-          customAlert2("ID(s)", async (id: string) => {
-            if (!RegExp(/^[0-9]+(,[0-9]+)*$/).test(id)) {
-              return false;
-            }
-            addLoader();
-            const response = await fetch(
-              `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
-                from
-              )}&amount=${encodeURIComponent(amount)}&date=${encodeURIComponent(
-                date
-              )}&identification=${encodeURIComponent(id)}`,
-              {
-                method: "GET",
-                headers: {
-                  key: localStorage.getItem("school-token")
-                    ? (localStorage.getItem("school-token") as string)
-                    : (localStorage.getItem("admin-token") as string),
-                },
-              }
-            );
+          // customAlert2("ID(s)", async (id: string) => {
+          //   if (!RegExp(/^[0-9]+(,[0-9]+)*$/).test(id)) {
+          //     return false;
+          //   }
+          //   addLoader();
+          //   const response = await fetch(
+          //     `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
+          //       from
+          //     )}&amount=${encodeURIComponent(amount)}&date=${encodeURIComponent(
+          //       date
+          //     )}&identification=${encodeURIComponent(id)}`,
+          //     {
+          //       method: "GET",
+          //       headers: {
+          //         key: localStorage.getItem("school-token")
+          //           ? (localStorage.getItem("school-token") as string)
+          //           : (localStorage.getItem("admin-token") as string),
+          //       },
+          //     }
+          //   );
 
-            if (response.ok) {
-              let { refund, paid } = await response.json();
-              if (!refund)
-                customAlert(
-                  paid +
-                    " EGP were accepted successfully. Refund " +
-                    (parseInt(amount) - paid) +
-                    " EGP.",
-                  true,
-                  true
+          //   if (response.ok) {
+          //     let { refund, paid } = await response.json();
+          //     if (!refund)
+          //       customAlert(
+          //         paid +
+          //           " EGP were accepted successfully. Refund " +
+          //           (parseInt(amount) - paid) +
+          //           " EGP.",
+          //         true,
+          //         true
+          //       );
+          //     else customAlert("Refund Inserted.");
+          //     if (parseInt(amount) - paid > 0) {
+          //       formData.amount = (paid - parseInt(amount)).toString();
+          //     } else {
+          //       formData.method = type == "admin" ? formData.method : "CASH";
+          //       formData.from = "";
+          //       formData.amount = "";
+          //       formData.date = getCurrentDate();
+          //     }
+          //     setFormData({ ...formData });
+          //   } else {
+          //     const { message } = await response.json();
+          //     customAlert(message);
+          //   }
+          //   removeLoader();
+          //   return true;
+          // });
+
+          const found = json.found as Applicant[];
+          showPopup(
+            <AmbiguityResolver
+              found={found}
+              groupMembers={json.groupMembers}
+              amountIn={Number(amount)}
+              callback={async (idList: number[]) => {
+                addLoader();
+                const response = await fetch(
+                  `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
+                    from
+                  )}&amount=${encodeURIComponent(
+                    amount
+                  )}&date=${encodeURIComponent(
+                    date
+                  )}&identification=${encodeURIComponent(idList.join(","))}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      key: localStorage.getItem("school-token")
+                        ? (localStorage.getItem("school-token") as string)
+                        : (localStorage.getItem("admin-token") as string),
+                    },
+                  }
                 );
-              else customAlert("Refund Inserted.");
-              if (parseInt(amount) - paid > 0) {
-                formData.amount = (paid - parseInt(amount)).toString();
-              } else {
-                formData.method = type == "admin" ? formData.method : "CASH";
-                formData.from = "";
-                formData.amount = "";
-                formData.date = getCurrentDate();
-              }
-              setFormData({ ...formData });
-            } else {
-              const { message } = await response.json();
-              customAlert(message);
-            }
-            removeLoader();
-            return true;
-          });
+
+                if (response.ok) {
+                  let { refund, paid } = await response.json();
+                  if (!refund)
+                    customAlert(
+                      paid +
+                        " EGP were accepted successfully. Refund " +
+                        (parseInt(amount) - paid) +
+                        " EGP.",
+                      true,
+                      true
+                    );
+                  else customAlert("Refund Inserted.");
+                  if (parseInt(amount) - paid > 0) {
+                    formData.amount = (paid - parseInt(amount)).toString();
+                  } else {
+                    formData.method =
+                      type == "admin" ? formData.method : "CASH";
+                    formData.from = "";
+                    formData.amount = "";
+                    formData.date = getCurrentDate();
+                  }
+                  setFormData({ ...formData });
+                } else {
+                  const { message } = await response.json();
+                  customAlert(message);
+                }
+                removeLoader();
+                return true;
+              }}
+            />,
+            "ambiguity-popup-container"
+          );
         } else if (response.status == ResponseCode.UPDATE_ID) {
           customAlert(message);
           setFormData({

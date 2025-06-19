@@ -153,22 +153,6 @@
   background-color: #8f1f2b;
 }
 
-.popupContainer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0; /* Start with invisible */
-  transition: opacity 0.3s ease; /* Animation for opening/closing */
-  color: #333;
-}
-
 /* Responsive design */
 @media (max-width: 500px) {
   .formContainer {

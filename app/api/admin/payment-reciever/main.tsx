@@ -1,4 +1,6 @@
+import { Applicant } from "@/app/admin/types/Applicant";
 import { sql } from "@vercel/postgres";
+import { group } from "console";
 import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
 import { ResponseCode } from "../../utils/response-codes";
@@ -66,7 +68,11 @@ export async function pay(
     );
   }
 
-  if (from === "CASH" && query.rows[0].type == TicketType.GROUP) {
+  if (
+    from === "CASH" &&
+    query.rows[0].type == TicketType.GROUP &&
+    query.rows.length == 1
+  ) {
     let xx =
       await sql`SELECT * FROM groups WHERE id1 = ${query.rows[0].id} OR id2 = ${query.rows[0].id} OR id3 = ${query.rows[0].id} OR id4 = ${query.rows[0].id}`;
     if (xx.rows.length === 0) {
@@ -83,7 +89,7 @@ export async function pay(
     );
   }
 
-  let unpaid = [];
+  let unpaid: any[] = [];
   for (let i = 0; i < query.rows.length; i++) {
     let row = query.rows[i];
     if (row.paid === false) {
@@ -98,10 +104,13 @@ export async function pay(
 
   let total = 0;
   let containsIndv = false;
+  let containsGroup = false;
   for (let i = 0; i < unpaid.length; i++) {
     total += unpaid[i].price;
     if (unpaid[i].type != TicketType.GROUP) {
       containsIndv = true;
+    } else {
+      containsGroup = true;
     }
   }
 
@@ -111,10 +120,63 @@ export async function pay(
     containsIndv &&
     id_if_needed === ""
   ) {
+    let found = unpaid;
+    let groupMembers = {} as { [key: string]: Applicant[] };
+    let processedIDs = new Set<string>();
+
+    if (containsGroup) {
+      for (let i = 0; i < unpaid.length; i++) {
+        if (
+          unpaid[i].type === TicketType.GROUP &&
+          !processedIDs.has(unpaid[i].id)
+        ) {
+          const group =
+            await sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
+          if (group.rows.length === 0) {
+            return Response.json(
+              {
+                message:
+                  "Not found. Try Again or Refund (Ticket isn't marked as paid yet). #3687",
+              },
+              { status: 400 }
+            );
+          }
+          let grpMemberIDs = [
+            group.rows[0].id1,
+            group.rows[0].id2,
+            group.rows[0].id3,
+            group.rows[0].id4,
+          ].filter((id) => id !== unpaid[i].id);
+
+          processedIDs.add(group.rows[0].id1);
+          processedIDs.add(group.rows[0].id2);
+          processedIDs.add(group.rows[0].id3);
+          processedIDs.add(group.rows[0].id4);
+
+          found = found.filter((x) => !grpMemberIDs.includes(x.id));
+
+          const grpMembersQuery = await sql.query(
+            `SELECT * FROM attendees WHERE id IN (${grpMemberIDs.join(
+              ","
+            )}) AND payment_method = '${from}' AND paid = false`
+          );
+
+          groupMembers[unpaid[i].id] = [];
+          grpMembersQuery.rows.forEach((member) => {
+            groupMembers[unpaid[i].id].push(member as Applicant);
+          });
+        }
+      }
+    }
+    found = found.map((x) => {
+      x.ticket_type = x.type;
+      return x;
+    });
     return Response.json(
       {
         message: "Not enough money to pay for all tickets. Identify using IDs.",
-        found: unpaid,
+        found,
+        groupMembers,
       },
       { status: ResponseCode.TICKET_AMBIGUITY }
     );
@@ -255,11 +317,29 @@ export async function pay(
         parseInt(amount) >= price.individual &&
         groupIDs.length != 1
       ) {
+        // TODO fix
+        let found: any[] = [];
+        let groupMembers: { [key: string]: Applicant[] } = {};
+        groupIDs.forEach((id) => {
+          found.push(
+            ...unpaid.filter((x) => uniqueGroupsToPayForData[id][0] === x.id)
+          );
+          groupMembers[uniqueGroupsToPayForData[id][0]] = unpaid.filter(
+            (x) =>
+              uniqueGroupsToPayForData[id].includes(x.id) &&
+              !found.includes(x.id)
+          );
+        });
+        found = found.map((x) => {
+          x.ticket_type = x.type;
+          return x;
+        });
         return Response.json(
           {
             message:
               "Not enough money to pay for all tickets. Identify using IDs.",
-            found: unpaid,
+            found,
+            groupMembers,
           },
           { status: ResponseCode.TICKET_AMBIGUITY }
         );
