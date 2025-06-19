@@ -5,18 +5,6 @@ import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../custom-alert";
 import styles from "./history.module.css"; // Import CSS styles
 
-type Applicant = {
-  full_name: string;
-  email: string;
-  ticket_type: string;
-  payment_method: string;
-  paid: boolean;
-  admitted: boolean;
-  id: number;
-  sent: boolean;
-  phone: string;
-};
-
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
