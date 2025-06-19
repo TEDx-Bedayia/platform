@@ -98,6 +98,7 @@ export async function DELETE(request: NextRequest) {
 
   if (id === "-1") {
     await sql`DELETE FROM marketing_members`;
+    await sql`ALTER SEQUENCE marketing_members_id_seq RESTART WITH 1`;
     return Response.json({ message: "All members deleted." }, { status: 200 });
   }
 
