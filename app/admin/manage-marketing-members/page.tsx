@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
+import { addLoader, removeLoader } from "@/app/global_components/loader";
 import {
   check,
   keyIcon,
@@ -110,6 +111,8 @@ export default function MarketingMembers() {
       return;
     }
 
+    addLoader();
+
     fetch("/api/admin/manage-marketing-members/members", {
       method: "POST",
       headers: {
@@ -120,6 +123,7 @@ export default function MarketingMembers() {
     })
       .then((res) => res.json())
       .then((data) => {
+        removeLoader();
         if (data.member) {
           setMembers((prevMembers) => [...prevMembers, data.member]);
           customAlert(
@@ -142,6 +146,8 @@ export default function MarketingMembers() {
       return;
     }
 
+    addLoader();
+
     fetch(
       `/api/admin/manage-marketing-members/members?id=${encodeURIComponent(
         id
@@ -154,6 +160,7 @@ export default function MarketingMembers() {
       }
     )
       .then((res) => {
+        removeLoader();
         if (res.ok) {
           setMembers((prevMembers) =>
             prevMembers.filter((member) => member.id !== id)

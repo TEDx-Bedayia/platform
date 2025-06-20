@@ -1,0 +1,132 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.container .loginForm {
+  width: 90%;
+  max-width: 400px;
+  box-sizing: border-box;
+  gap: 20px;
+  border-radius: 1rem;
+  background: rgb(255, 255, 255, 0.2);
+  padding: 1.5rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: #ffffff20 1px solid;
+  z-index: 3 !important;
+}
+
+.container h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.container input {
+  background: rgba(255, 255, 255, 0.15);
+
+  color: #fff;
+  padding: 10px 42px;
+
+  border-radius: 100rem;
+  border: transparent 2px solid;
+  font-size: 1em;
+  height: 3rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
+}
+
+.container input:focus {
+  outline: none;
+  border: #b1aae4 2px solid;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.inputWrapper svg {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.5;
+  transition: all 0.3s ease-in-out;
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(335deg)
+    brightness(104%) contrast(102%);
+}
+
+.inputWrapper input:focus ~ svg,
+.inputWrapper input:not(:placeholder-shown) ~ svg {
+  opacity: 1;
+  filter: invert(80%) sepia(8%) saturate(915%) hue-rotate(296deg)
+    brightness(103%) contrast(105%);
+}
+
+.inputWrapper label {
+  position: absolute;
+  top: 2px;
+  left: 24px;
+  padding: 10px 20px;
+  color: #ffffff;
+  opacity: 0.5;
+  font-size: 1em;
+  pointer-events: none;
+  transition: all ease 300ms;
+}
+
+.inputWrapper input:focus + label,
+.inputWrapper input:not(:placeholder-shown) + label {
+  font-size: 0.55em;
+  top: -4px;
+  color: #ffccda;
+  opacity: 1;
+  font-weight: 700;
+}
+
+.container input {
+  padding-bottom: 0px !important;
+}
+
+.container button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 12px 0px;
+  text-align: center;
+  border: none;
+  border-radius: 100rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.container button:hover {
+  background-color: #0056b3;
+}
+
+.container input:-webkit-autofill,
+.container input:-webkit-autofill:hover,
+.container input:-webkit-autofill:focus,
+.container input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #ffffff;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px #23232329;
+}
