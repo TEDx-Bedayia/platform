@@ -55,12 +55,11 @@ export default function MarketingMembers() {
         if (data.members) {
           setMembers(data.members);
         } else {
-          console.error("Failed to fetch members:", data);
           customAlert(data.message || "Failed to fetch members");
         }
         setIsLoading(false);
       })
-      .catch((error) => console.error("Error fetching members:", error));
+      .catch((error) => customAlert("Failed to fetch members."));
   }
 
   useEffect(() => {
@@ -87,11 +86,10 @@ export default function MarketingMembers() {
         if (data.pass) {
           setPassword(data.pass);
         } else {
-          console.error("Failed to fetch password:", data);
           customAlert(data.message || "Failed to fetch password");
         }
       })
-      .catch((error) => console.error("Error fetching password:", error));
+      .catch((error) => customAlert("Error fetching password."));
 
     // Fetch members when the component mounts
     fetchMembers();
@@ -128,11 +126,10 @@ export default function MarketingMembers() {
             "Member added successfully. Please share the username and password with them privately."
           );
         } else {
-          console.error("Failed to create member:", data);
           customAlert(data.message || "Failed to create member");
         }
       })
-      .catch((error) => console.error("Error creating member:", error));
+      .catch((error) => customAlert("Error creating member."));
   }
 
   function deleteMember(id: number) {
@@ -163,11 +160,10 @@ export default function MarketingMembers() {
           );
           customAlert("Member deleted successfully.");
         } else {
-          console.error("Failed to delete member");
           customAlert("Failed to delete member");
         }
       })
-      .catch((error) => console.error("Error deleting member:", error));
+      .catch((error) => customAlert("Error deleting member."));
   }
 
   function deleteAllMembers() {
@@ -191,11 +187,10 @@ export default function MarketingMembers() {
           setMembers([]);
           customAlert("All members deleted successfully.");
         } else {
-          console.error("Failed to delete all members");
           customAlert("Failed to delete all members");
         }
       })
-      .catch((error) => console.error("Error deleting all members:", error));
+      .catch((error) => customAlert("Error deleting all members."));
   }
 
   return (
@@ -277,6 +272,8 @@ export default function MarketingMembers() {
           </motion.div>
         )}
       </div>
+      <br />
+      <h2 className={title.className}>Rush Hour Management</h2>
     </section>
   );
 }
