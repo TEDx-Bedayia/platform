@@ -8,11 +8,7 @@
 }
 
 .container {
-  background: linear-gradient(
-    45deg,
-    #c33764,
-    #1d2671
-  ); /* Gradient background for visual interest */
+  background-image: url("/asfalt-light.png");
 
   color: #fff; /* White text for readability */
   margin: 0;
@@ -25,8 +21,8 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background-size: 150% 150%;
-  animation: backgroundAnimation 5s ease infinite;
+  /* background-size: 150% 150%;
+  animation: backgroundAnimation 5s ease infinite; */
   /* z-index: -2; */
 }
 
