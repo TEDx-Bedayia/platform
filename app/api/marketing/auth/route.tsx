@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   }
 
   let user =
-    await sql`SELECT * FROM marketing_members WHERE username = ${username}`;
+    await sql`SELECT * FROM marketing_members WHERE username = ${username.toLowerCase()}`;
 
   if (
     user.rows.length != 0 &&
