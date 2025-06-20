@@ -59,6 +59,8 @@ export default function AdminLogin() {
         if (token) {
           localStorage.setItem(type + "-token", token);
           if (type == "admin") window.location.href = "/admin";
+          else if (type == "marketing")
+            window.location.href = "/admin/manage-marketing-members";
           else window.location.href = "/admin/payments";
         }
       } else {

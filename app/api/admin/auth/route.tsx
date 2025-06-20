@@ -43,6 +43,22 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
     }
+
+    if (
+      username === process.env.MARKETING_USERNAME &&
+      password === process.env.MARKETING_PASSWORD &&
+      params.get("name")?.toString().toLowerCase().trim() ===
+        "marketing management" &&
+      process.env.MARKETING_KEY &&
+      process.env.MARKETING_USERNAME &&
+      process.env.MARKETING_PASSWORD
+    ) {
+      return Response.json(
+        { token: process.env.MARKETING_KEY, type: "marketing" },
+        { status: 200 }
+      );
+    }
+
     return Response.json({ message: "Invalid Credentials." }, { status: 403 });
   } catch (error) {
     return Response.json(
