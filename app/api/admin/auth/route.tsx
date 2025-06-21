@@ -47,8 +47,7 @@ export async function POST(request: NextRequest) {
     if (
       username === process.env.MARKETING_USERNAME &&
       password === process.env.MARKETING_PASSWORD &&
-      params.get("name")?.toString().toLowerCase().trim() ===
-        "marketing management" &&
+      params.get("name")?.toString().toLowerCase().trim() === "marketing" &&
       process.env.MARKETING_KEY &&
       process.env.MARKETING_USERNAME &&
       process.env.MARKETING_PASSWORD

@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import {
   check,
+  hashtag,
   keyIcon,
   onePerson,
   onePersonSm,
   shieldLock,
+  ticketIcon,
   trash,
   whiteCheck,
   whiteCheckLg,
@@ -37,6 +39,15 @@ export default function MarketingMembers() {
   const [rushHourDate, setRushHourDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const [memberActivity, setMemberActivity] = useState<
+    Record<
+      string,
+      Record<number, { attendeeId: number; price: number; createdAt: string }[]>
+    >
+  >({});
+
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
   function fetchMembers() {
     const token =
       localStorage.getItem("admin-token") ||
@@ -62,6 +73,61 @@ export default function MarketingMembers() {
         setIsLoading(false);
       })
       .catch((error) => customAlert("Failed to fetch members."));
+  }
+
+  function fetchMemberActivity() {
+    const token =
+      localStorage.getItem("admin-token") ||
+      localStorage.getItem("marketing-token");
+
+    if (!token) {
+      window.location.href = "/admin/login";
+      return;
+    }
+
+    fetch("/api/admin/manage-marketing-members/member-activity", {
+      headers: {
+        key: token,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // TODO
+        if (data.activity) {
+          // Group by createdAt DATE without TIME then by memberId
+          const groupedActivity = data.activity.reduce(
+            (acc: any, item: any) => {
+              // DD/MM/YYYY
+              const date = new Date(item.createdAt).toLocaleDateString(
+                "en-GB",
+                {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }
+              );
+              if (!acc[date]) {
+                acc[date] = {};
+              }
+              if (!acc[date][item.memberId]) {
+                acc[date][item.memberId] = [];
+              }
+              acc[date][item.memberId].push({
+                attendeeId: item.attendeeId,
+                price: item.price,
+                createdAt: item.createdAt,
+              });
+              return acc;
+            },
+            {}
+          );
+          setMemberActivity(groupedActivity);
+          console.log("Member Activity:", groupedActivity);
+        } else {
+          customAlert(data.message || "Failed to fetch member activity");
+        }
+      })
+      .catch((error) => customAlert("Error fetching member activity."));
   }
 
   useEffect(() => {
@@ -110,6 +176,8 @@ export default function MarketingMembers() {
       })
       .catch((error) => customAlert("Error fetching rush hour date."));
     fetchMembers();
+
+    fetchMemberActivity();
   }, []);
 
   function createMember(name: string) {
@@ -224,6 +292,167 @@ export default function MarketingMembers() {
         schedules.
       </p>
       <br />
+      <h2 className={title.className}>Rush Hour Management</h2>
+      {/* Date Input w/button for next rush hour day */}
+      <div className="flex items-center gap-2">
+        <h3>Next Rush Hour Date:</h3>
+        <input
+          type="date"
+          className="bg-white text-black p-2 rounded-md border border-[#014f86]"
+          value={rushHourDate ? rushHourDate.toISOString().split("T")[0] : ""}
+          onChange={(e) => setRushHourDate(new Date(e.target.value))}
+        />
+        <button
+          className="scale-125 hover:scale-150 transition-all duration-300 origin-bottom-left"
+          onClick={async () => {
+            if (rushHourDate) {
+              addLoader();
+              const response = await fetch(
+                "/api/admin/manage-marketing-members/rush-hour-date",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    key:
+                      (localStorage.getItem("admin-token") ||
+                        localStorage.getItem("marketing-token")) ??
+                      "",
+                  },
+                  body: JSON.stringify({ date: rushHourDate.toISOString() }),
+                }
+              );
+              const data = await response.json();
+              if (data.date) {
+                setRushHourDate(new Date(data.date));
+                customAlert("Rush hour date updated successfully.");
+              } else {
+                customAlert(data.message || "Failed to update date");
+              }
+              removeLoader();
+            }
+          }}
+        >
+          {check}
+        </button>
+      </div>
+      <br />
+      <div
+        className={
+          styles.rushDateSelector +
+          " flex flex-wrap w-[90%] max-w-[400px] items-center justify-center max-phone:flex-col gap-4"
+        }
+      >
+        {/* Loop over all dates (keys) */}
+        {Object.entries(memberActivity).map(([date, members]) => (
+          <span
+            key={date}
+            className={selectedDate === date ? styles.selected : ""}
+            onClick={() => setSelectedDate(date)}
+          >
+            {date}
+          </span>
+        ))}
+      </div>
+      <br />
+      {selectedDate && (
+        <div className={styles.activityContainer}>
+          <div className={styles.activityList}>
+            {Object.entries(memberActivity[selectedDate] || {}).map(
+              ([memberId, activities]) => (
+                <div key={memberId} className={styles.activityItem}>
+                  <h4 className={ubuntu.className} style={{ width: "30%" }}>
+                    {members
+                      .filter((m) => m.id === Number(memberId))
+                      .map((m) => m.name)}
+                  </h4>
+                  <div style={{ width: "40%" }}>
+                    <div
+                      className={styles.detailContainer}
+                      style={{ marginBottom: "0.5rem" }}
+                    >
+                      <span>{hashtag}</span>
+                      <span>{activities.length} ticket(s).</span>
+                    </div>
+
+                    <div className={styles.detailContainer}>
+                      <span className="font-bold">EGP</span>
+                      <span>
+                        {activities.reduce(
+                          (total, activity) => total + activity.price,
+                          0
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className="h-full aspect-square p-5 rounded-[20px] bg-[#1f9c5a] hover:bg-[#147a43] transition-all duration-300"
+                    onClick={async () => {
+                      addLoader();
+                      const response = await fetch(
+                        "/api/admin/manage-marketing-members/accept-tickets",
+                        {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            key:
+                              (localStorage.getItem("admin-token") ||
+                                localStorage.getItem("marketing-token")) ??
+                              "",
+                          },
+                          body: JSON.stringify({
+                            memberId: Number(memberId),
+                            date: selectedDate,
+                          }),
+                        }
+                      );
+                      const data = await response.json();
+                      removeLoader();
+                      if (response.ok) {
+                        setMemberActivity((prev) => {
+                          const newActivity = { ...prev };
+                          delete newActivity[selectedDate][Number(memberId)];
+                          return newActivity;
+                        });
+                        customAlert(
+                          `You have confirmed receiving ${activities.reduce(
+                            (total, activity) => total + activity.price,
+                            0
+                          )} EGP from ${members
+                            .filter((m) => m.id === Number(memberId))
+                            .map(
+                              (m) => m.name
+                            )} for rush hour / individual tickets on ${selectedDate}.`
+                        );
+                      } else {
+                        customAlert(
+                          data.message || "Failed to accept tickets."
+                        );
+                      }
+                    }}
+                  >
+                    {whiteCheckLg}
+                  </button>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      )}
+      {!selectedDate && (
+        <div className="flex flex-col items-center justify-center">
+          <h3 className={title.className}>
+            {Object.entries(memberActivity).length > 0
+              ? "No Date Selected"
+              : "All Done"}
+          </h3>
+          {Object.entries(memberActivity).length > 0 && (
+            <p className={ubuntu.className}>
+              Click on a date to view pending rush hour tickets.
+            </p>
+          )}
+        </div>
+      )}
+      <br />
       <h2 className={title.className}>Member List</h2>
       <div className="flex flex-col gap-2 w-full items-center">
         {members.map((member) => (
@@ -239,7 +468,10 @@ export default function MarketingMembers() {
             </h3>
 
             <div style={{ width: "40%" }}>
-              <div className={styles.detailContainer}>
+              <div
+                className={styles.detailContainer}
+                style={{ marginBottom: "0.5rem" }}
+              >
                 <span>{onePersonSm}</span>
                 <span>{member.username}</span>
               </div>
@@ -294,50 +526,6 @@ export default function MarketingMembers() {
             </button>
           </motion.div>
         )}
-      </div>
-      <br />
-      <h2 className={title.className}>Rush Hour Management</h2>
-      {/* Date Input w/button for next rush hour day */}
-      <div className="flex items-center gap-2">
-        <h3>Next Rush Hour Date:</h3>
-        <input
-          type="date"
-          className="bg-white text-black p-2 rounded-md border border-gray-300"
-          value={rushHourDate ? rushHourDate.toISOString().split("T")[0] : ""}
-          onChange={(e) => setRushHourDate(new Date(e.target.value))}
-        />
-        <button
-          className="scale-125 hover:scale-150 transition-all duration-300 origin-bottom-left"
-          onClick={async () => {
-            if (rushHourDate) {
-              addLoader();
-              const response = await fetch(
-                "/api/admin/manage-marketing-members/rush-hour-date",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    key:
-                      (localStorage.getItem("admin-token") ||
-                        localStorage.getItem("marketing-token")) ??
-                      "",
-                  },
-                  body: JSON.stringify({ date: rushHourDate.toISOString() }),
-                }
-              );
-              const data = await response.json();
-              if (data.date) {
-                setRushHourDate(new Date(data.date));
-                customAlert("Rush hour date updated successfully.");
-              } else {
-                customAlert(data.message || "Failed to update date");
-              }
-              removeLoader();
-            }
-          }}
-        >
-          {check}
-        </button>
       </div>
     </section>
   );

@@ -24,7 +24,6 @@
 .detailContainer {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
   gap: 0.25rem;
   justify-content: start;
 }
@@ -87,4 +86,37 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.rushDateSelector span {
+  font-size: 1rem;
+  color: #000;
+  padding: 4px 12px;
+  border-radius: 100rem;
+  background-color: #fff;
+  border: 2px solid #014f86;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.rushDateSelector span:hover,
+.rushDateSelector span.selected {
+  background-color: #014f86; /* Light hover effect */
+  color: #fff;
+}
+
+.activityItem {
+  background-color: #fff; /* White background for cards */
+  border-radius: 20px; /* Softer, rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 2px solid #014f86;
+  box-sizing: border-box;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  width: 90vw;
+  max-width: 600px; /* Limit width for better readability */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }

@@ -64,6 +64,13 @@ export default function MarketingRushHourDashboard() {
 
   return (
     <>
+      <span
+        className="text-gray-300 absolute top-4 left-1/2 -translate-x-1/2 cursor-pointer opacity-90"
+        onClick={() => (window.location.href = "/marketing/logout")}
+      >
+        Logged in as: <span className="font-bold">{name}</span>. Click to
+        Logout.
+      </span>
       {name != "" && (
         <section id="marketing-dashboard" className={styles.container}>
           <h1>Submit Ticket(s)</h1>
@@ -243,7 +250,30 @@ export default function MarketingRushHourDashboard() {
                 OR
               </div>
               <center className="mt-4">
-                <button className={styles.noEmailButton}>No Email</button>
+                <button
+                  className={styles.noEmailButton}
+                  onClick={() => {
+                    if (type === "individual") {
+                      customAlert(
+                        "You cannot submit a ticket without an email for individual tickets. They can go to the school office and pay there."
+                      );
+                      return;
+                    }
+                    if (
+                      !payerInfo.name ||
+                      !payerInfo.grade ||
+                      payerInfo.paid <= 0
+                    ) {
+                      customAlert(
+                        "Please fill in all fields before submitting."
+                      );
+                      return;
+                    }
+                    customAlert("T");
+                  }}
+                >
+                  No Email
+                </button>
               </center>
             </div>
             <p className="text-xs text-gray-200 mt-3 text-center">

@@ -8,7 +8,7 @@ export async function sendEmail(
   email: string,
   name: string,
   uuid: string,
-  id: string
+  id?: string
 ) {
   const filePath = path.join(process.cwd(), "public/eTicket-template.html");
   const htmlContent = await promises.readFile(filePath, "utf8");
@@ -46,13 +46,15 @@ export async function sendEmail(
       html: personalizedHtml,
     });
 
-    let qq = await sql.query(
-      "UPDATE attendees SET sent = true WHERE id = '" + id + "' RETURNING *"
-    );
+    if (id) {
+      let qq = await sql.query(
+        "UPDATE attendees SET sent = true WHERE id = '" + id + "' RETURNING *"
+      );
 
-    if (qq.rowCount === 0) {
-      console.error("SQL ERROR; sent = false but it's sent.");
-      return false;
+      if (qq.rowCount === 0) {
+        console.error("SQL ERROR; sent = false but it's sent.");
+        return false;
+      }
     }
 
     return true;

@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { price } from "../../tickets/price/prices";
 import { verifyEmail } from "../../utils/input-sanitization";
 import { SQLSettings } from "../../utils/sql-settings";
+import { TicketType } from "../../utils/ticket-types";
 
 export async function POST(request: NextRequest) {
   let body: any;
@@ -88,8 +89,9 @@ export async function POST(request: NextRequest) {
     const currentDate = new Date();
     // Compare after stripping away time information whether the dates are equal or not
     if (
+      type === TicketType.DISCOUNTED &&
       new Date(rushHourDate).setHours(0, 0, 0, 0) !==
-      currentDate.setHours(0, 0, 0, 0)
+        currentDate.setHours(0, 0, 0, 0)
     ) {
       client.release();
       return Response.json(

@@ -1,0 +1,70 @@
+import { sql } from "@vercel/postgres";
+import { randomUUID } from "crypto";
+import { NextRequest } from "next/server";
+import { sendEmail } from "../../payment-reciever/eTicketEmail";
+
+export async function POST(request: NextRequest) {
+  if (
+    process.env.ADMIN_KEY === undefined ||
+    !process.env.ADMIN_KEY ||
+    !process.env.MARKETING_KEY ||
+    process.env.MARKETING_KEY === undefined
+  ) {
+    return Response.json(
+      { message: "Key is not set. Contact the maintainer." },
+      { status: 500 }
+    );
+  }
+
+  if (
+    request.headers.get("key") !== process.env.ADMIN_KEY &&
+    request.headers.get("key") !== process.env.MARKETING_KEY
+  ) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    const { memberId, date } = body;
+
+    const dateObj = new Date(
+      `${date.slice(6, 10)}-${date.slice(3, 5)}-${date.slice(0, 2)}`
+    );
+
+    if (!memberId || !date) {
+      return Response.json(
+        { message: "Member ID and Date are required." },
+        { status: 400 }
+      );
+    }
+
+    let client = await sql.connect();
+    const result = await client.query(
+      `UPDATE rush_hour SET processed = TRUE WHERE marketing_member_id = $1 AND created_at::date = $2 AND processed = FALSE RETURNING *`,
+      [memberId, dateObj]
+    );
+
+    result.rows.forEach(async (row) => {
+      const attendeeId = row.attendee_id;
+      if (attendeeId) {
+        const attendee = await client.query(
+          `UPDATE attendees SET paid = TRUE, sent = TRUE, uuid = $1 WHERE id = $2 AND paid = FALSE RETURNING *`,
+          [randomUUID(), attendeeId]
+        );
+
+        await sendEmail(
+          attendee.rows[0].email,
+          attendee.rows[0].full_name,
+          attendee.rows[0].uuid
+        );
+      }
+    });
+
+    client.release();
+
+    return Response.json({ message: "Success." }, { status: 200 });
+  } catch (error) {
+    console.error("Error accepting ticket:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
+}
