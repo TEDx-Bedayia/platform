@@ -34,6 +34,7 @@ export default function MarketingMembers() {
 
   const [members, setMembers] = useState<MarketingMember[]>([]);
   const [password, setPassword] = useState<string>("Loading...");
+  const [rushHourDate, setRushHourDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   function fetchMembers() {
@@ -92,7 +93,22 @@ export default function MarketingMembers() {
       })
       .catch((error) => customAlert("Error fetching password."));
 
-    // Fetch members when the component mounts
+    fetch("/api/admin/manage-marketing-members/rush-hour-date", {
+      method: "GET",
+      headers: {
+        key:
+          (localStorage.getItem("admin-token") ||
+            localStorage.getItem("marketing-token")) ??
+          "",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.date) {
+          setRushHourDate(new Date(data.date));
+        }
+      })
+      .catch((error) => customAlert("Error fetching rush hour date."));
     fetchMembers();
   }, []);
 
@@ -281,6 +297,48 @@ export default function MarketingMembers() {
       </div>
       <br />
       <h2 className={title.className}>Rush Hour Management</h2>
+      {/* Date Input w/button for next rush hour day */}
+      <div className="flex items-center gap-2">
+        <h3>Next Rush Hour Date:</h3>
+        <input
+          type="date"
+          className="bg-white text-black p-2 rounded-md border border-gray-300"
+          value={rushHourDate ? rushHourDate.toISOString().split("T")[0] : ""}
+          onChange={(e) => setRushHourDate(new Date(e.target.value))}
+        />
+        <button
+          className="scale-125 hover:scale-150 transition-all duration-300 origin-bottom-left"
+          onClick={async () => {
+            if (rushHourDate) {
+              addLoader();
+              const response = await fetch(
+                "/api/admin/manage-marketing-members/rush-hour-date",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    key:
+                      (localStorage.getItem("admin-token") ||
+                        localStorage.getItem("marketing-token")) ??
+                      "",
+                  },
+                  body: JSON.stringify({ date: rushHourDate.toISOString() }),
+                }
+              );
+              const data = await response.json();
+              if (data.date) {
+                setRushHourDate(new Date(data.date));
+                customAlert("Rush hour date updated successfully.");
+              } else {
+                customAlert(data.message || "Failed to update date");
+              }
+              removeLoader();
+            }
+          }}
+        >
+          {check}
+        </button>
+      </div>
     </section>
   );
 }

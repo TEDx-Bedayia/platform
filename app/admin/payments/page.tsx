@@ -440,12 +440,6 @@ export default function Payments() {
             />,
             "ambiguity-popup-container"
           );
-        } else if (response.status == ResponseCode.UPDATE_ID) {
-          customAlert(message);
-          setFormData({
-            ...formData,
-            from: json.email,
-          });
         } else customAlert(message);
       }
     } else {

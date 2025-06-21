@@ -10,6 +10,8 @@ import {
   Field,
   PaymentMethod,
 } from "../api/tickets/payment-methods/payment-methods";
+import { verifyEmail } from "../api/utils/input-sanitization";
+import { ResponseCode } from "../api/utils/response-codes";
 import "../book/htmlcolor.css";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
@@ -58,6 +60,7 @@ export default function MarketingRushHourDashboard() {
   });
 
   const [type, setType] = useState<"discounted" | "individual">("discounted");
+  const [email, setEmail] = useState<string>("");
 
   return (
     <>
@@ -130,7 +133,7 @@ export default function MarketingRushHourDashboard() {
                       })
                     }
                   />
-                  <label htmlFor="paid">Money</label>
+                  <label htmlFor="paid">Paid</label>
                   <span className={styles.icon + " text-xs text-white"}>
                     EGP
                   </span>
@@ -164,9 +167,9 @@ export default function MarketingRushHourDashboard() {
                   name="email"
                   id="email-input"
                   placeholder=" "
-                  value={""}
+                  value={email}
                   required={true}
-                  onChange={(e) => ""}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <label htmlFor="email">Email for Ticket(s)</label>
                 {emailIcon}
@@ -174,6 +177,64 @@ export default function MarketingRushHourDashboard() {
                   className={
                     "rounded-full absolute right-0 top-1/2 -translate-y-1/2 bg-[#007bff] hover:bg-[#0056b3] mr-2 h-8 w-12 flex items-center justify-center text-white transition-all duration-300"
                   }
+                  onClick={async () => {
+                    if (
+                      email &&
+                      email.trim() !== "" &&
+                      payerInfo.name &&
+                      payerInfo.grade &&
+                      payerInfo.paid > 0
+                    ) {
+                      // Handle email submission
+                      if (verifyEmail(email)) {
+                        // Email is valid, proceed with submission
+                        addLoader();
+                        const response = await fetch("/api/marketing/submit", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            username:
+                              localStorage.getItem("marketing-username") || "",
+                            password:
+                              localStorage.getItem("marketing-password") || "",
+                          },
+                          body: JSON.stringify({
+                            name: payerInfo.name,
+                            grade: payerInfo.grade,
+                            email: email,
+                            type: type,
+                            ticketCount: ticketCount,
+                            paid: payerInfo.paid,
+                          }),
+                        });
+                        if (response.ok) {
+                          customAlert("Accepted!");
+                          // Reset form fields
+                          setPayerInfo({ name: "", grade: "", paid: 0 });
+                          setEmail("");
+                          setTicketCount(1);
+                        } else if (response.status === 400) {
+                          const data = await response.json();
+                          customAlert(data.message);
+                        } else if (response.status === 401) {
+                          customAlert("Invalid marketing member credentials.");
+                        } else {
+                          customAlert(
+                            "An unexpected error occurred. Please try again later."
+                          );
+                        }
+                        removeLoader();
+                      } else {
+                        customAlert("Please enter a valid email address.");
+                        return;
+                      }
+                    } else {
+                      customAlert(
+                        "Please fill in all fields before submitting."
+                      );
+                      return;
+                    }
+                  }}
                 >
                   {forwardArrowLg}
                 </button>
