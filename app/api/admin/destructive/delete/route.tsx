@@ -1,3 +1,4 @@
+import { SQLSettings } from "@/app/api/utils/sql-settings";
 import { EVENT_DATE } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
@@ -39,11 +40,20 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    await sql`DELETE FROM groups`;
-    await sql`DELETE FROM attendees`;
-    await sql`DELETE FROM pay_backup`;
-    await sql`ALTER SEQUENCE attendees_id_seq RESTART WITH 1`;
-    await sql`ALTER SEQUENCE groups_grpid_seq RESTART WITH 1`;
+    const client = await sql.connect();
+    await client.sql`DELETE FROM groups`;
+    await client.sql`DELETE FROM attendees`;
+    await client.sql`DELETE FROM pay_backup`;
+    await client.sql`ALTER SEQUENCE attendees_id_seq RESTART WITH 1`;
+    await client.sql`ALTER SEQUENCE groups_grpid_seq RESTART WITH 1`;
+
+    await client.sql`DELETE FROM marketing_members`;
+    await client.sql`DELETE FROM rush_hour`;
+    await client.sql`ALTER SEQUENCE marketing_members_id_seq RESTART WITH 1`;
+    await client.sql`ALTER SEQUENCE rush_hour_id_seq RESTART WITH 1`;
+
+    await client.query(`SET ${SQLSettings.RUSH_HOUR_DATE} = NULL`);
+    client.release();
     return NextResponse.json({ message: "Data deleted." }, { status: 200 });
   } catch (error) {
     console.error("Error deleting data:", error);
