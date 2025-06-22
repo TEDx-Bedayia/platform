@@ -332,56 +332,6 @@ export default function Payments() {
         const json = await response.json();
         let message = json.message;
         if (response.status == ResponseCode.TICKET_AMBIGUITY) {
-          // customAlert2("ID(s)", async (id: string) => {
-          //   if (!RegExp(/^[0-9]+(,[0-9]+)*$/).test(id)) {
-          //     return false;
-          //   }
-          //   addLoader();
-          //   const response = await fetch(
-          //     `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
-          //       from
-          //     )}&amount=${encodeURIComponent(amount)}&date=${encodeURIComponent(
-          //       date
-          //     )}&identification=${encodeURIComponent(id)}`,
-          //     {
-          //       method: "GET",
-          //       headers: {
-          //         key: localStorage.getItem("school-token")
-          //           ? (localStorage.getItem("school-token") as string)
-          //           : (localStorage.getItem("admin-token") as string),
-          //       },
-          //     }
-          //   );
-
-          //   if (response.ok) {
-          //     let { refund, paid } = await response.json();
-          //     if (!refund)
-          //       customAlert(
-          //         paid +
-          //           " EGP were accepted successfully. Refund " +
-          //           (parseInt(amount) - paid) +
-          //           " EGP.",
-          //         true,
-          //         true
-          //       );
-          //     else customAlert("Refund Inserted.");
-          //     if (parseInt(amount) - paid > 0) {
-          //       formData.amount = (paid - parseInt(amount)).toString();
-          //     } else {
-          //       formData.method = type == "admin" ? formData.method : "CASH";
-          //       formData.from = "";
-          //       formData.amount = "";
-          //       formData.date = getCurrentDate();
-          //     }
-          //     setFormData({ ...formData });
-          //   } else {
-          //     const { message } = await response.json();
-          //     customAlert(message);
-          //   }
-          //   removeLoader();
-          //   return true;
-          // });
-
           const found = json.found as Applicant[];
           showPopup(
             <AmbiguityResolver
