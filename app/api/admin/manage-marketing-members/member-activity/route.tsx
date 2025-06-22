@@ -40,12 +40,17 @@ export async function GET(request: NextRequest) {
       .filter((x) => x != null)
       .join(",");
 
-    let attendees = await sql.query(
-      `SELECT id, type FROM attendees WHERE id IN (${idsOrNull})`
-    );
+    let attendees = [];
+    if (idsOrNull !== "") {
+      attendees = (
+        await sql.query(
+          `SELECT id, type FROM attendees WHERE id IN (${idsOrNull})`
+        )
+      ).rows;
+    }
 
     rows = rows.map((row) => {
-      const attendee = attendees.rows.find(
+      const attendee = attendees.find(
         (attendee) => attendee.id === row.attendeeId
       );
       return {

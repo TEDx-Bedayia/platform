@@ -2,28 +2,20 @@
 import { useEffect, useState } from "react";
 import styles from "./marketing-dashboard.module.css";
 
-import { motion } from "framer-motion";
-
-import { Poppins, Ubuntu } from "next/font/google";
+import { Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
-import {
-  Field,
-  PaymentMethod,
-} from "../api/tickets/payment-methods/payment-methods";
+import { showPopup } from "../api/utils/generic-popup";
 import { verifyEmail } from "../api/utils/input-sanitization";
-import { ResponseCode } from "../api/utils/response-codes";
 import "../book/htmlcolor.css";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
   downArrow,
   emailIcon,
-  forwardArrow,
   forwardArrowLg,
   gradCap,
   onePersonMd,
   upArrow,
 } from "../icons";
-const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function MarketingRushHourDashboard() {
@@ -252,7 +244,7 @@ export default function MarketingRushHourDashboard() {
               <center className="mt-4">
                 <button
                   className={styles.noEmailButton}
-                  onClick={() => {
+                  onClick={async () => {
                     if (type === "individual") {
                       customAlert(
                         "You cannot submit a ticket without an email for individual tickets. They can go to the school office and pay there."
@@ -269,7 +261,44 @@ export default function MarketingRushHourDashboard() {
                       );
                       return;
                     }
-                    customAlert("T");
+
+                    addLoader();
+                    const response = await fetch("/api/marketing/gen-code", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        username:
+                          localStorage.getItem("marketing-username") || "",
+                        password:
+                          localStorage.getItem("marketing-password") || "",
+                      },
+                      body: JSON.stringify({
+                        name: payerInfo.name,
+                        grade: payerInfo.grade,
+                        type: type,
+                        ticketCount: ticketCount,
+                        paid: payerInfo.paid,
+                      }),
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                      customAlert(
+                        `Accepted! The codes are: ${data.codes.join(
+                          ", "
+                        )}. Please share them with the person who paid. They can go to tedxbedayia.com/book?rush and enter the codes to get their tickets.`
+                      );
+                      // Reset form fields
+                      setPayerInfo({ name: "", grade: "", paid: 0 });
+                      setEmail("");
+                      setTicketCount(1);
+                    } else if (data.message) {
+                      customAlert(data.message);
+                    } else {
+                      customAlert(
+                        "An unexpected error occurred. Please try again later."
+                      );
+                    }
+                    removeLoader();
                   }}
                 >
                   No Email
