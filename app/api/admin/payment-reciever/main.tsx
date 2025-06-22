@@ -1,6 +1,5 @@
 import { Applicant } from "@/app/admin/types/Applicant";
 import { sql } from "@vercel/postgres";
-import { group } from "console";
 import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
 import { ResponseCode } from "../../utils/response-codes";
@@ -35,11 +34,14 @@ export async function pay(
     );
   }
 
+  const client = await sql.connect();
+
   if (parseInt(amount) < 0) {
-    await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from.replaceAll(
+    await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from.replaceAll(
       "@",
       " "
     )}, 0, ${amount}, ${date})`;
+    client.release();
     return Response.json(
       { refund: true, message: "Refund Inserted." },
       { status: 200 }
@@ -53,12 +55,13 @@ export async function pay(
 
     toAdd = ` AND email = '${identification}'`;
   }
-  let query = await sql.query(
+  let query = await client.query(
     `SELECT * FROM attendees WHERE payment_method = '${from}' AND paid = false` +
       toAdd
   );
 
   if (query.rows.length === 0) {
+    client.release();
     return Response.json(
       {
         message:
@@ -74,8 +77,9 @@ export async function pay(
     query.rows.length == 1
   ) {
     let xx =
-      await sql`SELECT * FROM groups WHERE id1 = ${query.rows[0].id} OR id2 = ${query.rows[0].id} OR id3 = ${query.rows[0].id} OR id4 = ${query.rows[0].id}`;
+      await client.sql`SELECT * FROM groups WHERE id1 = ${query.rows[0].id} OR id2 = ${query.rows[0].id} OR id3 = ${query.rows[0].id} OR id4 = ${query.rows[0].id}`;
     if (xx.rows.length === 0) {
+      client.release();
       return Response.json(
         {
           message:
@@ -84,7 +88,7 @@ export async function pay(
         { status: 400 }
       );
     }
-    query = await sql.query(
+    query = await client.query(
       `SELECT * FROM attendees WHERE payment_method = 'CASH' AND paid = false AND id = '${xx.rows[0].id1}' OR id = '${xx.rows[0].id2}' OR id = '${xx.rows[0].id3}' OR id = '${xx.rows[0].id4}'`
     );
   }
@@ -99,6 +103,7 @@ export async function pay(
   }
 
   if (unpaid.length === 0) {
+    client.release();
     return Response.json({ message: "Nobody to pay for." }, { status: 400 });
   }
 
@@ -131,8 +136,9 @@ export async function pay(
           !processedIDs.has(unpaid[i].id)
         ) {
           const group =
-            await sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
+            await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
           if (group.rows.length === 0) {
+            client.release();
             return Response.json(
               {
                 message:
@@ -155,7 +161,7 @@ export async function pay(
 
           found = found.filter((x) => !grpMemberIDs.includes(x.id));
 
-          const grpMembersQuery = await sql.query(
+          const grpMembersQuery = await client.query(
             `SELECT * FROM attendees WHERE id IN (${grpMemberIDs.join(
               ","
             )}) AND payment_method = '${from}' AND paid = false`
@@ -172,6 +178,7 @@ export async function pay(
       x.ticket_type = x.type;
       return x;
     });
+    client.release();
     return Response.json(
       {
         message: "Not enough money to pay for all tickets. Identify using IDs.",
@@ -188,7 +195,7 @@ export async function pay(
       queryio += `id = '${id}' OR `;
     });
     queryio = queryio.slice(0, -4);
-    query = await sql.query(
+    query = await client.query(
       `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio} AND paid = false`
     );
 
@@ -208,8 +215,9 @@ export async function pay(
       // If the row is a group ticket get the other emails as well
       if (row.type === TicketType.GROUP) {
         const group =
-          await sql`SELECT * FROM groups WHERE id1 = ${row.id} OR id2 = ${row.id} OR id3 = ${row.id} OR id4 = ${row.id}`;
+          await client.sql`SELECT * FROM groups WHERE id1 = ${row.id} OR id2 = ${row.id} OR id3 = ${row.id} OR id4 = ${row.id}`;
         if (group.rows.length === 0) {
+          client.release();
           return Response.json(
             {
               message:
@@ -230,7 +238,7 @@ export async function pay(
           if (id != row.id) queryio += `id = '${id}' OR `;
         });
         queryio = queryio.slice(0, -4);
-        query = await sql.query(
+        query = await client.query(
           `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio} AND paid = false`
         );
 
@@ -245,6 +253,7 @@ export async function pay(
     }
 
     if (unpaid.length === 0) {
+      client.release();
       return Response.json({ message: "Nobody to pay for." }, { status: 400 });
     }
 
@@ -267,9 +276,10 @@ export async function pay(
       if (paid <= parseInt(amount)) {
         let randUUID = await safeRandUUID();
         try {
-          await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
+          await client.sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
         } catch (e) {
           paid -= unpaid[i].price;
+          client.release();
           return Response.json(
             { message: "Err #7109. Contact Support or Try Again." },
             { status: 500 }
@@ -288,8 +298,9 @@ export async function pay(
       for (let i = 0; i < unpaid.length; i++) {
         if (unpaid[i].type == TicketType.GROUP) {
           let group =
-            await sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
+            await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
           if (group.rows.length === 0) {
+            client.release();
             return Response.json(
               {
                 message:
@@ -334,6 +345,7 @@ export async function pay(
           x.ticket_type = x.type;
           return x;
         });
+        client.release();
         return Response.json(
           {
             message:
@@ -373,7 +385,7 @@ export async function pay(
 
           // Batch SQL Update
           try {
-            await sql.query(
+            await client.query(
               `
               UPDATE attendees
               SET paid = true, uuid = data.uuid
@@ -396,6 +408,7 @@ export async function pay(
           } catch (e) {
             paid -= price.group * 4;
             console.error(e);
+            client.release();
             return Response.json(
               { message: "Err #7109. Contact Support or Try Again." },
               { status: 500 }
@@ -412,9 +425,10 @@ export async function pay(
     }
     if (paid != 0 && paid <= total && paid <= parseInt(amount)) {
       if (parseInt(amount) != 0) {
-        await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
+        await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
       }
     } else if (paid == 0) {
+      client.release();
       return Response.json(
         {
           message:
@@ -436,6 +450,7 @@ export async function pay(
         );
       }
     } catch (e) {
+      client.release();
       return Response.json(
         { message: "Err #9194. Contact Support or Try Again." },
         { status: 500 }
@@ -446,6 +461,7 @@ export async function pay(
       console.error(
         "OH NO! INSANE ERROR! HUGE ERROR! MASSIVE ERROR! main.tsx line 282"
       );
+      client.release();
       return Response.json(
         {
           message:
@@ -454,11 +470,13 @@ export async function pay(
         { status: 500 }
       );
     }
+    client.release();
     return Response.json(
       { refund: false, paid, accepted: paidFor },
       { status: 200 }
     );
   } catch (e) {
+    client.release();
     return Response.json(e, { status: 500 });
   }
 }
