@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { memberId, date } = body;
+    const { memberId, date, paid } = body;
 
     const dateObj = new Date(
       `${date.slice(6, 10)}-${date.slice(3, 5)}-${date.slice(0, 2)}`
@@ -44,11 +44,15 @@ export async function POST(request: NextRequest) {
       [memberId, dateObj]
     );
 
+    let stream = "Marketing@" + memberId;
+
+    client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${stream}, ${paid}, ${paid}, NOW())`;
+
     result.rows.forEach(async (row) => {
       const attendeeId = row.attendee_id;
       if (attendeeId) {
         const attendee = await client.query(
-          `UPDATE attendees SET paid = TRUE, sent = TRUE, uuid = $1 WHERE id = $2 AND paid = FALSE RETURNING *`,
+          `UPDATE attendees SET paid = TRUE, uuid = $1, sent = TRUE WHERE id = $2 AND paid = FALSE RETURNING *`,
           [randomUUID(), attendeeId]
         );
 

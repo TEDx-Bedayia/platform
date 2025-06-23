@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     body = await request.json();
   } catch (error) {
     return Response.json(
-      { message: "Please provide a valid JSON body.", error: error },
+      { message: "Please provide a valid JSON body." },
       { status: 400 }
     );
   }

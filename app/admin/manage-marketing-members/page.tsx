@@ -402,6 +402,10 @@ export default function MarketingMembers() {
                           body: JSON.stringify({
                             memberId: Number(memberId),
                             date: selectedDate,
+                            paid: activities.reduce(
+                              (total, activity) => total + activity.price,
+                              0
+                            ),
                           }),
                         }
                       );

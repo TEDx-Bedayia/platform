@@ -80,7 +80,8 @@
   text-align: center;
 }
 
-.container form {
+.container form,
+.codeInputDialog {
   width: 400px;
   border-radius: 1rem;
   background: rgb(255, 255, 255, 0.2);
@@ -338,7 +339,8 @@
   align-items: center;
 }
 
-.container button[type="submit"] {
+.container button[type="submit"],
+.codeInputDialog button {
   background-color: #007bff;
   /* background: linear-gradient(45deg, #007bff, #0056b3); */
   color: #fff;
@@ -372,7 +374,8 @@
 }
 
 @media (max-width: 600px) {
-  .container form {
+  .container form,
+  .codeInputDialog {
     padding: 15px;
     width: 80vw;
     backdrop-filter: blur(20px) !important;
@@ -394,4 +397,9 @@
     );
     filter: blur(4px);
   }
+}
+
+.codeInputDialog h2 {
+  margin-bottom: 0;
+  font-size: 1.2em;
 }
