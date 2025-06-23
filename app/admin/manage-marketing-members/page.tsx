@@ -92,7 +92,6 @@ export default function MarketingMembers() {
     })
       .then((res) => res.json())
       .then((data) => {
-        // TODO
         if (data.activity) {
           // Group by createdAt DATE without TIME then by memberId
           const groupedActivity = data.activity.reduce(

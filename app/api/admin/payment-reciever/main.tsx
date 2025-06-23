@@ -328,7 +328,6 @@ export async function pay(
         parseInt(amount) >= price.individual &&
         groupIDs.length != 1
       ) {
-        // TODO fix
         let found: any[] = [];
         let groupMembers: { [key: string]: Applicant[] } = {};
         groupIDs.forEach((id) => {
