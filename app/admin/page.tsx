@@ -385,7 +385,12 @@ export default function AdminDashboard() {
             </span>
           </div>
 
-          <span style={{ fontSize: ".75rem" }}>{applicant.uuid}</span>
+          <a
+            style={{ fontSize: ".75rem" }}
+            href={`/api/qr?uuid=${applicant.uuid}`}
+          >
+            {applicant.uuid}
+          </a>
 
           <div
             style={{
@@ -592,7 +597,7 @@ export default function AdminDashboard() {
           {speakerTicketIcon}
         </div>
 
-        <span className="text-green-700">Speaker Tickets</span>
+        <span className="text-green-700">Invitations</span>
       </div>
 
       <h1 style={{ ...title.style, fontWeight: 700 }}>All Tickets</h1>

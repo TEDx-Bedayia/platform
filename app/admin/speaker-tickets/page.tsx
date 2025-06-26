@@ -39,7 +39,10 @@ export default function SpeakerTickets() {
       const response = await fetch(
         `/api/admin/speaker-tickets?speaker=${encodeURIComponent(
           email
-        )}&name=${encodeURIComponent(speakerName)}`,
+        )}&name=${encodeURIComponent(speakerName)}&number=${encodeURIComponent(
+          (document.getElementById("number-of-tickets") as HTMLInputElement)
+            .value
+        )}`,
         {
           method: "GET",
           headers: {
@@ -49,7 +52,7 @@ export default function SpeakerTickets() {
       );
 
       if (response.ok) {
-        customAlert("Speaker Ticket Accepted.");
+        customAlert("Free Ticket(s) Accepted.");
         setEmail("");
         setSpeakerName("");
       } else {
@@ -68,7 +71,9 @@ export default function SpeakerTickets() {
     <section id="admin-payments">
       <div className={styles.pageContainer}>
         <form onSubmit={handleSubmit} className={styles.formContainer}>
-          <h2 style={{ ...title.style, fontWeight: 700 }}>Speaker Tickets</h2>
+          <h2 style={{ ...title.style, fontWeight: 700 }}>
+            Speaker Tickets / Invitations
+          </h2>
 
           <div className={styles.formGroup}>
             <input
@@ -80,7 +85,7 @@ export default function SpeakerTickets() {
               placeholder=" "
               required
             />
-            <label htmlFor="email">Speaker&apos;s Email Address</label>
+            <label htmlFor="email">Email Address</label>
           </div>
 
           <div className={styles.formGroup}>
@@ -93,7 +98,19 @@ export default function SpeakerTickets() {
               placeholder=" "
               required
             />
-            <label htmlFor="speaker-name">Speaker&apos;s Full Name</label>
+            <label htmlFor="speaker-name">Full Name</label>
+          </div>
+
+          <div className={styles.formGroup}>
+            <input
+              type="number"
+              id="number-of-tickets"
+              name="number-of-tickets"
+              min="1"
+              defaultValue={2}
+              required
+            />
+            <label htmlFor="number-of-tickets">Number of Tickets</label>
           </div>
 
           <button type="submit">Send Tickets</button>
