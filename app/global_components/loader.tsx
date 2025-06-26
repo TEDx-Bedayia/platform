@@ -34,6 +34,7 @@ export function Loader() {
 }
 
 export function addLoader() {
+  if (document.getElementById("loader-root")) return; // Prevent adding multiple loaders
   // Create a new div element to serve as a root for the loader
   const loaderContainer = document.createElement("div");
   loaderContainer.id = "loader-root"; // Assign a unique ID to the root container
@@ -69,7 +70,9 @@ export function removeLoader() {
 
     // Remove the overlay from the DOM after the animation completes
     setTimeout(() => {
-      document.body.removeChild(loaderContainer);
+      if (loaderContainer.parentNode) {
+        document.body.removeChild(loaderContainer);
+      }
     }, 300); // Match the duration of the fade-out animation
   }
   document.body.style.pointerEvents = "auto"; // Re-enable pointer events on the body
