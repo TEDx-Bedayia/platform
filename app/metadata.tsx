@@ -21,7 +21,7 @@ export const EVENT_DESC =
 
 export const YEAR = 25;
 
-export const SPEAKER_FREE_TICKETS = 2; // Change to number of free tickets for speakers
+export const SPEAKER_FREE_TICKETS = 2; // Change to default number of free tickets
 
 export const support: Author = {
   name: "Aly Mobarak",

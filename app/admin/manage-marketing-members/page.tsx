@@ -5,13 +5,9 @@ import { addLoader, removeLoader } from "@/app/global_components/loader";
 import {
   check,
   hashtag,
-  keyIcon,
-  onePerson,
   onePersonSm,
   shieldLock,
-  ticketIcon,
   trash,
-  whiteCheck,
   whiteCheckLg,
 } from "@/app/icons";
 import { motion } from "framer-motion";
@@ -48,7 +44,7 @@ export default function MarketingMembers() {
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  function fetchMembers() {
+  async function fetchMembers() {
     const token =
       localStorage.getItem("admin-token") ||
       localStorage.getItem("marketing-token");
@@ -58,24 +54,28 @@ export default function MarketingMembers() {
       return;
     }
 
-    fetch("/api/admin/manage-marketing-members/members", {
-      headers: {
-        key: token,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.members) {
-          setMembers(data.members);
-        } else {
-          customAlert(data.message || "Failed to fetch members");
+    try {
+      const response = await fetch(
+        "/api/admin/manage-marketing-members/members",
+        {
+          headers: {
+            key: token,
+          },
         }
-        setIsLoading(false);
-      })
-      .catch((error) => customAlert("Failed to fetch members."));
+      );
+      const data = await response.json();
+      if (data.members) {
+        setMembers(data.members);
+      } else {
+        customAlert(data.message || "Failed to fetch members");
+      }
+      setIsLoading(false);
+    } catch (error) {
+      customAlert("Failed to fetch members.");
+    }
   }
 
-  function fetchMemberActivity() {
+  async function fetchMemberActivity() {
     const token =
       localStorage.getItem("admin-token") ||
       localStorage.getItem("marketing-token");
@@ -85,48 +85,46 @@ export default function MarketingMembers() {
       return;
     }
 
-    fetch("/api/admin/manage-marketing-members/member-activity", {
-      headers: {
-        key: token,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.activity) {
-          // Group by createdAt DATE without TIME then by memberId
-          const groupedActivity = data.activity.reduce(
-            (acc: any, item: any) => {
-              // DD/MM/YYYY
-              const date = new Date(item.createdAt).toLocaleDateString(
-                "en-GB",
-                {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                }
-              );
-              if (!acc[date]) {
-                acc[date] = {};
-              }
-              if (!acc[date][item.memberId]) {
-                acc[date][item.memberId] = [];
-              }
-              acc[date][item.memberId].push({
-                attendeeId: item.attendeeId,
-                price: item.price,
-                createdAt: item.createdAt,
-              });
-              return acc;
-            },
-            {}
-          );
-          setMemberActivity(groupedActivity);
-          console.log("Member Activity:", groupedActivity);
-        } else {
-          customAlert(data.message || "Failed to fetch member activity");
+    try {
+      const response = await fetch(
+        "/api/admin/manage-marketing-members/member-activity",
+        {
+          headers: {
+            key: token,
+          },
         }
-      })
-      .catch((error) => customAlert("Error fetching member activity."));
+      );
+      const data = await response.json();
+      if (data.activity) {
+        // Group by createdAt DATE without TIME then by memberId
+        const groupedActivity = data.activity.reduce((acc: any, item: any) => {
+          // DD/MM/YYYY
+          const date = new Date(item.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+          if (!acc[date]) {
+            acc[date] = {};
+          }
+          if (!acc[date][item.memberId]) {
+            acc[date][item.memberId] = [];
+          }
+          acc[date][item.memberId].push({
+            attendeeId: item.attendeeId,
+            price: item.price,
+            createdAt: item.createdAt,
+          });
+          return acc;
+        }, {});
+        setMemberActivity(groupedActivity);
+        console.log("Member Activity:", groupedActivity);
+      } else {
+        customAlert(data.message || "Failed to fetch member activity");
+      }
+    } catch (error) {
+      customAlert("Error fetching member activity.");
+    }
   }
 
   useEffect(() => {
@@ -138,45 +136,64 @@ export default function MarketingMembers() {
       return;
     }
 
-    fetch("/api/admin/manage-marketing-members/get-pass", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        key:
-          (localStorage.getItem("admin-token") ||
-            localStorage.getItem("marketing-token")) ??
-          "",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    async function runEffect() {
+      addLoader();
+
+      try {
+        const response = await fetch(
+          "/api/admin/manage-marketing-members/get-pass",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              key:
+                (localStorage.getItem("admin-token") ||
+                  localStorage.getItem("marketing-token")) ??
+                "",
+            },
+          }
+        );
+        const data = await response.json();
         if (data.pass) {
           setPassword(data.pass);
         } else {
           customAlert(data.message || "Failed to fetch password");
         }
-      })
-      .catch((error) => customAlert("Error fetching password."));
+      } catch (error) {
+        customAlert("Error fetching password.");
+      }
 
-    fetch("/api/admin/manage-marketing-members/rush-hour-date", {
-      method: "GET",
-      headers: {
-        key:
-          (localStorage.getItem("admin-token") ||
-            localStorage.getItem("marketing-token")) ??
-          "",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+      try {
+        const response = await fetch(
+          "/api/admin/manage-marketing-members/rush-hour-date",
+          {
+            method: "GET",
+            headers: {
+              key:
+                (localStorage.getItem("admin-token") ||
+                  localStorage.getItem("marketing-token")) ??
+                "",
+            },
+          }
+        );
+        const data = await response.json();
         if (data.date) {
           setRushHourDate(new Date(data.date));
+        } else {
+          customAlert(data.message || "Failed to fetch rush hour date");
         }
-      })
-      .catch((error) => customAlert("Error fetching rush hour date."));
-    fetchMembers();
+      } catch (error) {
+        customAlert("Error fetching rush hour date.");
+      }
 
-    fetchMemberActivity();
+      await fetchMembers();
+
+      await fetchMemberActivity();
+
+      removeLoader();
+    }
+
+    runEffect();
   }, []);
 
   function createMember(name: string) {
