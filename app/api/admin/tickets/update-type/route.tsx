@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ message: "Invalid type." }, { status: 400 });
     }
     let q =
-      await sql`UPDATE attendees SET type = ${type} WHERE id = ${id} AND type NOT IN ('speaker', 'giveaway') AND paid = false RETURNING *`;
+      await sql`UPDATE attendees SET type = ${type} WHERE id = ${id} AND type NOT IN ('speaker') AND paid = false RETURNING *`;
     if (q.rowCount === 0) {
       return Response.json({ message: "Invalid request" }, { status: 400 });
     }

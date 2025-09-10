@@ -1,6 +1,8 @@
 import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
+import { safeRandUUID } from "../admin/payment-reciever/main";
 import { sendBookingConfirmation } from "../utils/email-helper";
 import {
   checkPhone,
@@ -26,18 +28,19 @@ export async function POST(request: NextRequest) {
     body = await request.json();
   } catch (error) {
     return Response.json(
-      { message: "Please provide a valid JSON body.", error: error },
+      { message: "Please provide a valid JSON body." },
       { status: 400 }
     );
   }
 
-  let paymentMethod: string, name, email, phone, add;
+  let paymentMethod: string, name, email, phone, add, code;
   try {
     name = body.name?.toString().trim();
     email = body.email?.toString().trim().toLowerCase();
     phone = body.phone?.toString().trim();
     paymentMethod = body.paymentMethod?.toString().trim()!;
     add = body.additionalFields;
+    if (body.code) code = body.code?.toString().trim();
   } catch (error) {
     return Response.json(
       { message: "Please fill out all required fields." },
@@ -49,7 +52,7 @@ export async function POST(request: NextRequest) {
     paymentMethod += "@" + add[paymentMethod.toLowerCase()].trim();
 
   try {
-    return await submitOneTicket(email!, name!, phone!, paymentMethod);
+    return await submitOneTicket(email!, name!, phone!, paymentMethod, code);
   } catch (error) {
     return Response.json({ message: "Error occurred." }, { status: 400 });
   }
@@ -59,7 +62,8 @@ async function submitOneTicket(
   email: string,
   name: string,
   phone: string,
-  paymentMethod: string | undefined
+  paymentMethod: string | undefined,
+  code: string | undefined = undefined
 ) {
   email = handleMisspelling(email);
   if (!verifyEmail(email)) {
@@ -108,27 +112,17 @@ async function submitOneTicket(
     return Response.json({ message: "Invalid Name." }, { status: 400 });
   }
 
-  let query = await sql`SELECT * FROM attendees WHERE email = ${email};`;
-  const email1 = email.split("@")[0].split("+")[0];
-  const email2 = email.split("@")[1];
-  let add = "a";
-  if (email.split("+").length > 1) {
-    add = add + generateRandomString(3);
-  }
-  if (query.rows.length > 0) {
-    return Response.json(
-      {
-        message: `An attendee with this email already exists. If you'd still like to book a ticket with the same email, please set the email to: ${email1}+${add}@${email2}. You will recieve your ticket on ${email1}@${email2} normally.`,
-      },
-      { status: 400 }
-    );
-  }
-
   let id;
   try {
     let res = await sql.query(
       `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ($1::text, $2::text, $3::text, $4::text, $5::text) RETURNING *;`,
-      [email, name, paymentMethod, phone, TicketType.INDIVIDUAL]
+      [
+        email,
+        name,
+        paymentMethod,
+        phone,
+        code ? TicketType.DISCOUNTED : TicketType.INDIVIDUAL,
+      ]
     );
     id = res.rows[0].id;
   } catch (error) {
@@ -137,6 +131,26 @@ async function submitOneTicket(
         message: "Error occurred. Please try again or contact us for help.",
       },
       { status: 400 }
+    );
+  }
+
+  if (code) {
+    let result =
+      await sql`UPDATE rush_hour SET code = NULL, attendee_id = ${id} WHERE code = ${code} RETURNING processed;`;
+    if (result.rows[0].processed === true) {
+      let uuid = await safeRandUUID();
+      await sql`UPDATE attendees SET paid = TRUE, uuid = ${uuid} WHERE id = ${id} AND paid = FALSE RETURNING *`;
+      await sendEmail(email, name, uuid, id);
+    }
+
+    return Response.json(
+      {
+        message: result.rows[0].processed
+          ? `The ticket was sent to your email! Congratulations for your Rush Hour Ticket!`
+          : `Our team is reviewing rush hour payments at this moment. Your ticket will be sent to your email once the payment is confirmed.`,
+        success: true,
+      },
+      { status: 200 }
     );
   }
 
@@ -151,8 +165,12 @@ async function submitOneTicket(
     );
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
-    await sql`DELETE FROM attendees WHERE email = ${email}`;
-    console.error("[CRITICAL ERROR] LESS SECURE APP NOT TURNED ON FOR GMAIL");
+    await sql`DELETE FROM attendees WHERE id = ${id}`;
+    await sql`SELECT setval('attendees_id_seq', (SELECT MAX(id) FROM attendees));`;
+    console.error(
+      "[CRITICAL ERROR] Sending email failed. Deleting attendee record."
+    );
+    console.error(error);
     return Response.json(
       {
         message:
@@ -163,7 +181,7 @@ async function submitOneTicket(
   }
   return Response.json(
     {
-      message: `Ticket Booked! Check your email to continue.${
+      message: `Ticket Booked Successfully! Please check your email to continue.${
         paymentMethod === "CASH"
           ? ` Your Attendee ID is ${id}. Use it to pay at the school office.`
           : ""

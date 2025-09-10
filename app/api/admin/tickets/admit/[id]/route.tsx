@@ -26,10 +26,18 @@ export async function POST(
 
   try {
     // Update the admitted status for the specified applicant
-    const result = await sql.query(
-      "UPDATE attendees SET admitted = $1 WHERE paid = true AND id = $2 RETURNING *",
-      [admitted, id]
-    );
+    let result;
+    if (admitted) {
+      result = await sql.query(
+        "UPDATE attendees SET admitted_at = NOW() WHERE paid = true AND id = $1 RETURNING *",
+        [id]
+      );
+    } else {
+      result = await sql.query(
+        "UPDATE attendees SET admitted_at = NULL WHERE paid = true AND id = $1 RETURNING *",
+        [id]
+      );
+    }
 
     if (result.rowCount === 0) {
       return NextResponse.json(

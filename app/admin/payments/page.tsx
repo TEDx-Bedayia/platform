@@ -1,12 +1,118 @@
 "use client";
 import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods";
+import { hidePopup, showPopup } from "@/app/api/utils/generic-popup";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
+import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
-import { customAlert, customAlert2 } from "../custom-alert";
+import { customAlert } from "../custom-alert";
+import { Applicant } from "../types/Applicant";
+import AmbiguityResolver from "./ambiguous-popup";
 import styles from "./payments.module.css";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
+
+function IDCheckPopup(
+  name: string,
+  email: string,
+  amount: number,
+  id: string,
+  handed_amount: number
+) {
+  return (
+    <div className={styles.idCheckPopup}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100%",
+          rotate: "-45deg",
+          marginBottom: "1em",
+        }}
+      >
+        {ticketIcon}
+      </div>
+      <p>
+        <span style={{ fontWeight: "bold" }}>{name}</span> (ID: {id})
+      </p>
+      <p>{email}</p>
+      <p>{amount} EGP</p>
+      <p style={{ marginTop: "0.5rem", fontWeight: "bold" }}>
+        Does this information look correct?
+      </p>
+
+      <div className="flex flex-row gap-8 items-center justify-center w-full mt-4">
+        <button
+          style={{ ...title.style, color: "#fff" }}
+          className={styles.cancelButton}
+          onClick={() => hidePopup("id-check-popup-container")}
+        >
+          {whiteCross}
+        </button>
+
+        <button
+          style={{ ...title.style, color: "#fff" }}
+          className={styles.confirmButton}
+          onClick={async () =>
+            hidePopup("id-check-popup-container", async () => {
+              addLoader();
+              // Do Complex Logic to Accept Payment
+              const response = await fetch(
+                `/api/admin/payment-reciever/cash?from=${encodeURIComponent(
+                  id
+                )}&amount=${encodeURIComponent(
+                  handed_amount.toString()
+                )}&date=${encodeURIComponent(
+                  new Date().toISOString().split("T")[0]
+                )}`,
+                {
+                  method: "GET",
+                  headers: {
+                    key: localStorage.getItem("school-token")
+                      ? (localStorage.getItem("school-token") as string)
+                      : (localStorage.getItem("admin-token") as string),
+                  },
+                }
+              );
+
+              removeLoader();
+
+              if (response.ok) {
+                const { refund, paid } = await response.json();
+                if (!refund && paid != -1) {
+                  let refundText =
+                    " Refund " +
+                    (parseInt(handed_amount.toString()) - paid) +
+                    " EGP.";
+                  let ifRefund =
+                    parseInt(handed_amount.toString()) - paid > 0
+                      ? refundText
+                      : "";
+                  customAlert(
+                    paid + " EGP were accepted successfully." + ifRefund,
+                    true,
+                    true
+                  );
+                } else if (
+                  paid == -1 &&
+                  parseInt(handed_amount.toString()) == 0
+                )
+                  customAlert("Speaker Ticket Accepted.", true, true);
+                else customAlert("Refund Inserted.", true, true);
+                document.getElementById("reset-form")?.click();
+              } else {
+                const json = await response.json();
+                customAlert(json.message);
+              }
+            })
+          }
+        >
+          {whiteCheck}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function Payments() {
   const getCurrentDate = () => {
@@ -130,12 +236,67 @@ export default function Payments() {
     }
   });
 
+  const resetForm = () => {
+    formData.method = type == "admin" ? formData.method : "CASH";
+    formData.from = "";
+    formData.amount = "";
+    formData.date = getCurrentDate();
+
+    setFormData({
+      method: type == "admin" ? formData.method : "CASH",
+      from: "",
+      amount: "",
+      date: getCurrentDate(),
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     addLoader();
     e.preventDefault();
     if (formData.method && formData.from && formData.amount && formData.date) {
       const { method, from, amount, date } = formData;
-      // Show Loader
+
+      if (!isNaN(Number(from)) && method.trim() == "CASH") {
+        // We're dealing with an ID input.
+        if (Number(from) <= 0 || Number(from) > 500000) {
+          removeLoader();
+          setTimeout(() => {
+            customAlert("Invalid ID.");
+          }, 300);
+          return;
+        }
+
+        const fetchTicketInfo = await fetch(
+          `/api/admin/query-ticket?id=${encodeURIComponent(from)}`,
+          {
+            method: "GET",
+            headers: {
+              key: localStorage.getItem("school-token")
+                ? (localStorage.getItem("school-token") as string)
+                : (localStorage.getItem("admin-token") as string),
+            },
+          }
+        );
+
+        if (fetchTicketInfo.ok) {
+          const ticketData = await fetchTicketInfo.json();
+          showPopup(
+            IDCheckPopup(
+              ticketData.name,
+              ticketData.email,
+              ticketData.amount,
+              from,
+              Number(amount)
+            ),
+            "id-check-popup-container"
+          );
+        } else {
+          const { message } = await fetchTicketInfo.json();
+          customAlert(message);
+        }
+        removeLoader();
+        return;
+      }
 
       const response = await fetch(
         `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
@@ -153,8 +314,6 @@ export default function Payments() {
         }
       );
 
-      // Hide Loader
-
       if (response.ok) {
         let { refund, paid } = await response.json();
         if (!refund && paid != -1) {
@@ -168,76 +327,69 @@ export default function Payments() {
         } else if (paid == -1 && parseInt(amount) == 0)
           customAlert("Speaker Ticket Accepted.", true, true);
         else customAlert("Refund Inserted.", true, true);
-        formData.method = type == "admin" ? formData.method : "CASH";
-        formData.from = "";
-        formData.amount = "";
-        formData.date = getCurrentDate();
-        setFormData({ ...formData });
+        resetForm();
       } else {
         const json = await response.json();
         let message = json.message;
-        if (response.status == ResponseCode.EMAIL_REQUIRED) {
-          customAlert2("Email(s)", async (email: string) => {
-            if (
-              !RegExp(
-                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(,[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$/
-              ).test(email)
-            ) {
-              return false;
-            }
-            addLoader();
-            // setTimeout(() => {
-            //   removeLoader();
-            //   customAlert("Email sent to " + email);
-            // }, 1000);
-            const response = await fetch(
-              `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
-                from
-              )}&amount=${encodeURIComponent(amount)}&date=${encodeURIComponent(
-                date
-              )}&email_id=${encodeURIComponent(email)}`,
-              {
-                method: "GET",
-                headers: {
-                  key: localStorage.getItem("school-token")
-                    ? (localStorage.getItem("school-token") as string)
-                    : (localStorage.getItem("admin-token") as string),
-                },
-              }
-            );
-
-            if (response.ok) {
-              let { refund, paid } = await response.json();
-              if (!refund)
-                customAlert(
-                  paid +
-                    " EGP were accepted successfully. Refund " +
-                    (parseInt(amount) - paid) +
-                    " EGP."
+        if (response.status == ResponseCode.TICKET_AMBIGUITY) {
+          const found = json.found as Applicant[];
+          showPopup(
+            <AmbiguityResolver
+              found={found}
+              groupMembers={json.groupMembers}
+              amountIn={Number(amount)}
+              callback={async (idList: number[]) => {
+                addLoader();
+                const response = await fetch(
+                  `/api/admin/payment-reciever/${method.toLowerCase()}?from=${encodeURIComponent(
+                    from
+                  )}&amount=${encodeURIComponent(
+                    amount
+                  )}&date=${encodeURIComponent(
+                    date
+                  )}&identification=${encodeURIComponent(idList.join(","))}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      key: localStorage.getItem("school-token")
+                        ? (localStorage.getItem("school-token") as string)
+                        : (localStorage.getItem("admin-token") as string),
+                    },
+                  }
                 );
-              else customAlert("Refund Inserted.");
-              if (parseInt(amount) - paid > 0) {
-                formData.amount = (paid - parseInt(amount)).toString();
-              } else {
-                formData.method = type == "admin" ? "" : "CASH";
-                formData.from = "";
-                formData.amount = "";
-                formData.date = "";
-              }
-              setFormData({ ...formData });
-            } else {
-              const { message } = await response.json();
-              customAlert(message);
-            }
-            removeLoader();
-            return true;
-          });
-        } else if (response.status == ResponseCode.UPDATE_ID) {
-          customAlert(message);
-          setFormData({
-            ...formData,
-            from: json.email,
-          });
+
+                if (response.ok) {
+                  let { refund, paid } = await response.json();
+                  if (!refund)
+                    customAlert(
+                      paid +
+                        " EGP were accepted successfully. Refund " +
+                        (parseInt(amount) - paid) +
+                        " EGP.",
+                      true,
+                      true
+                    );
+                  else customAlert("Refund Inserted.");
+                  if (parseInt(amount) - paid > 0) {
+                    formData.amount = (paid - parseInt(amount)).toString();
+                  } else {
+                    formData.method =
+                      type == "admin" ? formData.method : "CASH";
+                    formData.from = "";
+                    formData.amount = "";
+                    formData.date = getCurrentDate();
+                  }
+                  setFormData({ ...formData });
+                } else {
+                  const { message } = await response.json();
+                  customAlert(message);
+                }
+                removeLoader();
+                return true;
+              }}
+            />,
+            "ambiguity-popup-container"
+          );
         } else customAlert(message);
       }
     } else {
@@ -313,6 +465,12 @@ export default function Payments() {
 
           <button type="submit">Submit Payment</button>
         </form>
+
+        <button
+          className="hidden overflow-hidden invisible pointer-events-none absolute top-0 left-0"
+          onClick={resetForm}
+          id="reset-form"
+        ></button>
 
         <span
           style={{

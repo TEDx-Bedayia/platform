@@ -6,3 +6,12 @@ export enum TicketType {
   DISCOUNTED = "discounted",
   TEACHER = "teacher",
 }
+
+export function getTicketTypeName(type: TicketType): string {
+  switch (type) {
+    case TicketType.DISCOUNTED:
+      return "Rush Hour";
+    default:
+      return type.toString();
+  }
+}

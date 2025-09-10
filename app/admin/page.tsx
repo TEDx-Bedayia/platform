@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
-import { TicketType } from "../api/utils/ticket-types";
+import { getTicketTypeName, TicketType } from "../api/utils/ticket-types";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
   check,
@@ -18,18 +18,7 @@ import {
 import { EVENT_DATE } from "../metadata";
 import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
-type Applicant = {
-  full_name: string;
-  email: string;
-  ticket_type: string;
-  payment_method: string;
-  created_at: string;
-  paid: boolean;
-  admitted: boolean;
-  id: number;
-  sent: boolean;
-  phone: string;
-};
+import { Applicant } from "./types/Applicant";
 
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
@@ -377,20 +366,31 @@ export default function AdminDashboard() {
                     );
                 }}
               >
-                {applicant.ticket_type == TicketType.GROUP ||
-                applicant.ticket_type == TicketType.INDIVIDUAL
-                  ? applicant.payment_method.split("@")[0]
-                  : applicant.ticket_type.toUpperCase()}
+                {getTicketTypeName(
+                  applicant.ticket_type as TicketType
+                ).toUpperCase()}
               </span>
               <span>
                 {applicant.payment_method.split("@")[1] != undefined &&
-                  ": " + applicant.payment_method.split("@")[1]}{" "}
+                  " " + applicant.payment_method.split("@")[1]}
+                {` (`}
+                <span style={{ fontWeight: 700 }}>
+                  {applicant.payment_method.split("@")[0]}
+                </span>
+                {")"}
               </span>
               <span style={{ fontSize: ".5rem", marginLeft: ".25rem" }}>
                 {formatDate(new Date(applicant.created_at))}
               </span>
             </span>
           </div>
+
+          <a
+            style={{ fontSize: ".75rem" }}
+            href={`/api/qr?uuid=${applicant.uuid}`}
+          >
+            {applicant.uuid}
+          </a>
 
           <div
             style={{
@@ -402,11 +402,13 @@ export default function AdminDashboard() {
             {applicant.paid && (
               <button
                 className={`${styles.admitButton} ${
-                  applicant.admitted ? styles.deadmit : styles.admit
+                  applicant.admitted_at != null ? styles.deadmit : styles.admit
                 }`}
-                onClick={() => admitApplicant(applicant.id, applicant.admitted)}
+                onClick={() =>
+                  admitApplicant(applicant.id, applicant.admitted_at == null)
+                }
               >
-                {applicant.admitted ? "De Admit" : "Admit"}
+                {applicant.admitted_at != null ? "De Admit" : "Admit"}
               </button>
             )}
             {applicant.paid && !applicant.sent && (
@@ -527,14 +529,17 @@ export default function AdminDashboard() {
         "Content-Type": "application/json",
         key: `${localStorage.getItem("admin-token")}`,
       },
-      body: JSON.stringify({ admitted: !admitted }),
+      body: JSON.stringify({ admitted }),
     });
 
     if (response.ok) {
       setApplicants((prevApplicants) =>
         prevApplicants.map((applicant) =>
           applicant.id === id
-            ? { ...applicant, admitted: !admitted }
+            ? {
+                ...applicant,
+                admitted_at: admitted ? new Date().toTimeString() : null,
+              }
             : applicant
         )
       );
@@ -581,15 +586,19 @@ export default function AdminDashboard() {
         </button>
       )}
 
-      <button
-        className="absolute left-24 top-24 w-9 h-9 bg-green-200 overflow-hidden rounded-lg text-green-700 flex items-center justify-center scale-125 transition-all hover:bg-green-300 active:bg-green-400"
-        title="Add Speaker Tickets"
+      <div
+        className="absolute left-24 top-24 flex flex-row items-center gap-2 bg-green-200 transition-all cursor-pointer hover:bg-green-300 active:bg-green-400 rounded-lg p-2 pr-4"
         onClick={() => {
           window.location.href = "/admin/speaker-tickets";
         }}
+        title="Add Speaker Tickets"
       >
-        {speakerTicketIcon}
-      </button>
+        <div className="w-9 h-9 bg-transparent overflow-hidden rounded-lg text-green-700 flex items-center justify-center scale-125 -rotate-[25deg] transition-all ">
+          {speakerTicketIcon}
+        </div>
+
+        <span className="text-green-700">Invitations</span>
+      </div>
 
       <h1 style={{ ...title.style, fontWeight: 700 }}>All Tickets</h1>
       <div

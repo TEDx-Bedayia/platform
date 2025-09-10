@@ -34,6 +34,7 @@ export function Loader() {
 }
 
 export function addLoader() {
+  if (document.getElementById("loader-root")) return; // Prevent adding multiple loaders
   // Create a new div element to serve as a root for the loader
   const loaderContainer = document.createElement("div");
   loaderContainer.id = "loader-root"; // Assign a unique ID to the root container
@@ -44,6 +45,8 @@ export function addLoader() {
   loaderContainer.style.height = "100%";
   loaderContainer.style.zIndex = "9999";
   loaderContainer.style.pointerEvents = "auto"; // Ensure this container captures all pointer events
+  loaderContainer.style.opacity = "0"; // Start with invisible
+  loaderContainer.style.transition = "opacity 0.3s ease"; // Opening/Closing animation
 
   document.body.style.pointerEvents = "none"; // Disable pointer events on the body
   loaderContainer.focus(); // Focus on the loader container
@@ -54,13 +57,23 @@ export function addLoader() {
   // Create a root and render the Loader component inside it
   const root = createRoot(loaderContainer);
   root.render(<Loader />);
+  setTimeout(() => {
+    loaderContainer.style.opacity = "1"; // Fade in the overlay
+  }, 10); // Small timeout to ensure animation starts after element is in the DOM
 }
 
 export function removeLoader() {
   // Use the specific id to select the loader root container
   const loaderContainer = document.getElementById("loader-root");
   if (loaderContainer) {
-    loaderContainer.remove(); // Remove the entire loader root container
+    loaderContainer.style.opacity = "0";
+
+    // Remove the overlay from the DOM after the animation completes
+    setTimeout(() => {
+      if (loaderContainer.parentNode) {
+        document.body.removeChild(loaderContainer);
+      }
+    }, 300); // Match the duration of the fade-out animation
   }
   document.body.style.pointerEvents = "auto"; // Re-enable pointer events on the body
   document.body.focus();

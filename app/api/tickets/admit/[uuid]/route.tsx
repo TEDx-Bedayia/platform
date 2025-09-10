@@ -35,7 +35,10 @@ export async function GET(
   const eventDate = EVENT_DATE;
 
   // Calculate the absolute difference between the current date and the event date
-  if (Math.abs(currentDate.getTime() - eventDate.getTime()) > THRESHOLD) {
+  if (
+    Math.abs(currentDate.getTime() - eventDate.getTime()) > THRESHOLD &&
+    process.env.ADMIN_KEY !== "dev"
+  ) {
     return NextResponse.json(
       { error: `Event not started yet. ${eventDate.toLocaleDateString()}` },
       { status: 400, headers: headers }
@@ -45,7 +48,7 @@ export async function GET(
   try {
     // Update the admitted status for the specified applicant
     const result = await sql.query(
-      "UPDATE attendees SET admitted = true WHERE paid = true AND admitted = false AND uuid = $1 RETURNING *",
+      "UPDATE attendees SET admitted_at = NOW() WHERE paid = true AND admitted_at IS NULL AND uuid = $1 RETURNING *",
       [uuid]
     );
 
@@ -56,7 +59,17 @@ export async function GET(
           { error: "Applicant not found." },
           { status: 404, headers: headers }
         );
-      } else if (query.rows[0].admitted) {
+      } else if (query.rows[0].admitted_at !== null) {
+        if (Date.now() - query.rows[0].admitted_at < 2.5 * 1000) {
+          const res = await sql.query(
+            "SELECT * FROM attendees WHERE uuid = $1",
+            [uuid]
+          );
+          return NextResponse.json(
+            { success: true, applicant: res.rows[0] },
+            { status: 200, headers: headers }
+          );
+        }
         return NextResponse.json(
           { error: "Applicant already admitted." },
           { status: 400, headers: headers }

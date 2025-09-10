@@ -30,7 +30,12 @@ export async function GET(request: NextRequest) {
       q.rows[0].uuid = uuid;
     }
 
-    await sendEmail(q.rows[0].email, q.rows[0].full_name, q.rows[0].uuid);
+    await sendEmail(
+      q.rows[0].email,
+      q.rows[0].full_name,
+      q.rows[0].uuid,
+      q.rows[0].id
+    );
     return Response.json(
       { message: `Email sent to ${q.rows[0].email}.` },
       { status: 200 }

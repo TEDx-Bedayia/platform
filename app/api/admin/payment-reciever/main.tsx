@@ -1,3 +1,4 @@
+import { Applicant } from "@/app/admin/types/Applicant";
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
@@ -19,7 +20,7 @@ export async function pay(
   from: string,
   amount: string,
   date: string,
-  email_if_needed: string
+  id_if_needed: string
 ) {
   if (
     process.env.ADMIN_KEY === undefined ||
@@ -33,11 +34,14 @@ export async function pay(
     );
   }
 
+  const client = await sql.connect();
+
   if (parseInt(amount) < 0) {
-    await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from.replaceAll(
+    await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from.replaceAll(
       "@",
       " "
     )}, 0, ${amount}, ${date})`;
+    client.release();
     return Response.json(
       { refund: true, message: "Refund Inserted." },
       { status: 200 }
@@ -51,12 +55,13 @@ export async function pay(
 
     toAdd = ` AND email = '${identification}'`;
   }
-  let query = await sql.query(
+  let query = await client.query(
     `SELECT * FROM attendees WHERE payment_method = '${from}' AND paid = false` +
       toAdd
   );
 
   if (query.rows.length === 0) {
+    client.release();
     return Response.json(
       {
         message:
@@ -66,10 +71,15 @@ export async function pay(
     );
   }
 
-  if (from === "CASH" && query.rows[0].type == TicketType.GROUP) {
+  if (
+    from === "CASH" &&
+    query.rows[0].type == TicketType.GROUP &&
+    query.rows.length == 1
+  ) {
     let xx =
-      await sql`SELECT * FROM groups WHERE email1 = ${query.rows[0].email} OR email2 = ${query.rows[0].email} OR email3 = ${query.rows[0].email} OR email4 = ${query.rows[0].email}`;
+      await client.sql`SELECT * FROM groups WHERE id1 = ${query.rows[0].id} OR id2 = ${query.rows[0].id} OR id3 = ${query.rows[0].id} OR id4 = ${query.rows[0].id}`;
     if (xx.rows.length === 0) {
+      client.release();
       return Response.json(
         {
           message:
@@ -78,12 +88,12 @@ export async function pay(
         { status: 400 }
       );
     }
-    query = await sql.query(
-      `SELECT * FROM attendees WHERE payment_method = 'CASH' AND paid = false AND email = '${xx.rows[0].email1}' OR email = '${xx.rows[0].email2}' OR email = '${xx.rows[0].email3}' OR email = '${xx.rows[0].email4}'`
+    query = await client.query(
+      `SELECT * FROM attendees WHERE payment_method = 'CASH' AND paid = false AND id = '${xx.rows[0].id1}' OR id = '${xx.rows[0].id2}' OR id = '${xx.rows[0].id3}' OR id = '${xx.rows[0].id4}'`
     );
   }
 
-  let unpaid = [];
+  let unpaid: any[] = [];
   for (let i = 0; i < query.rows.length; i++) {
     let row = query.rows[i];
     if (row.paid === false) {
@@ -93,15 +103,19 @@ export async function pay(
   }
 
   if (unpaid.length === 0) {
+    client.release();
     return Response.json({ message: "Nobody to pay for." }, { status: 400 });
   }
 
   let total = 0;
   let containsIndv = false;
+  let containsGroup = false;
   for (let i = 0; i < unpaid.length; i++) {
     total += unpaid[i].price;
-    if (unpaid[i].type == TicketType.INDIVIDUAL) {
+    if (unpaid[i].type != TicketType.GROUP) {
       containsIndv = true;
+    } else {
+      containsGroup = true;
     }
   }
 
@@ -109,24 +123,79 @@ export async function pay(
     parseInt(amount) < total &&
     parseInt(amount) >= price.individual &&
     containsIndv &&
-    email_if_needed === ""
+    id_if_needed === ""
   ) {
+    let found = unpaid;
+    let groupMembers = {} as { [key: string]: Applicant[] };
+    let processedIDs = new Set<string>();
+
+    if (containsGroup) {
+      for (let i = 0; i < unpaid.length; i++) {
+        if (
+          unpaid[i].type === TicketType.GROUP &&
+          !processedIDs.has(unpaid[i].id)
+        ) {
+          const group =
+            await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
+          if (group.rows.length === 0) {
+            client.release();
+            return Response.json(
+              {
+                message:
+                  "Not found. Try Again or Refund (Ticket isn't marked as paid yet). #3687",
+              },
+              { status: 400 }
+            );
+          }
+          let grpMemberIDs = [
+            group.rows[0].id1,
+            group.rows[0].id2,
+            group.rows[0].id3,
+            group.rows[0].id4,
+          ].filter((id) => id !== unpaid[i].id);
+
+          processedIDs.add(group.rows[0].id1);
+          processedIDs.add(group.rows[0].id2);
+          processedIDs.add(group.rows[0].id3);
+          processedIDs.add(group.rows[0].id4);
+
+          found = found.filter((x) => !grpMemberIDs.includes(x.id));
+
+          const grpMembersQuery = await client.query(
+            `SELECT * FROM attendees WHERE id IN (${grpMemberIDs.join(
+              ","
+            )}) AND payment_method = '${from}' AND paid = false`
+          );
+
+          groupMembers[unpaid[i].id] = [];
+          grpMembersQuery.rows.forEach((member) => {
+            groupMembers[unpaid[i].id].push(member as Applicant);
+          });
+        }
+      }
+    }
+    found = found.map((x) => {
+      x.ticket_type = x.type;
+      return x;
+    });
+    client.release();
     return Response.json(
       {
-        message:
-          "Not enough money to pay for all tickets. Identify using Emails.",
+        message: "Not enough money to pay for all tickets. Identify using IDs.",
+        found,
+        groupMembers,
       },
-      { status: ResponseCode.EMAIL_REQUIRED }
+      { status: ResponseCode.TICKET_AMBIGUITY }
     );
   }
 
-  if (email_if_needed !== "") {
+  if (id_if_needed !== "") {
     let queryio = "";
-    email_if_needed.split(",").forEach((email) => {
-      queryio += `email = '${email}' OR `;
+    id_if_needed.split(",").forEach((id) => {
+      queryio += `id = '${id}' OR `;
     });
     queryio = queryio.slice(0, -4);
-    query = await sql.query(
+    query = await client.query(
       `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio} AND paid = false`
     );
 
@@ -146,8 +215,9 @@ export async function pay(
       // If the row is a group ticket get the other emails as well
       if (row.type === TicketType.GROUP) {
         const group =
-          await sql`SELECT * FROM groups WHERE email1 = ${row.email} OR email2 = ${row.email} OR email3 = ${row.email} OR email4 = ${row.email}`;
+          await client.sql`SELECT * FROM groups WHERE id1 = ${row.id} OR id2 = ${row.id} OR id3 = ${row.id} OR id4 = ${row.id}`;
         if (group.rows.length === 0) {
+          client.release();
           return Response.json(
             {
               message:
@@ -157,18 +227,18 @@ export async function pay(
           );
         }
         const groupMembers = [
-          group.rows[0].email1,
-          group.rows[0].email2,
-          group.rows[0].email3,
-          group.rows[0].email4,
+          group.rows[0].id1,
+          group.rows[0].id2,
+          group.rows[0].id3,
+          group.rows[0].id4,
         ];
 
         queryio = "";
-        groupMembers.forEach((email) => {
-          if (email != row.email) queryio += `email = '${email}' OR `;
+        groupMembers.forEach((id) => {
+          if (id != row.id) queryio += `id = '${id}' OR `;
         });
         queryio = queryio.slice(0, -4);
-        query = await sql.query(
+        query = await client.query(
           `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio} AND paid = false`
         );
 
@@ -183,6 +253,7 @@ export async function pay(
     }
 
     if (unpaid.length === 0) {
+      client.release();
       return Response.json({ message: "Nobody to pay for." }, { status: 400 });
     }
 
@@ -205,9 +276,10 @@ export async function pay(
       if (paid <= parseInt(amount)) {
         let randUUID = await safeRandUUID();
         try {
-          await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
+          await client.sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
         } catch (e) {
           paid -= unpaid[i].price;
+          client.release();
           return Response.json(
             { message: "Err #7109. Contact Support or Try Again." },
             { status: 500 }
@@ -226,8 +298,9 @@ export async function pay(
       for (let i = 0; i < unpaid.length; i++) {
         if (unpaid[i].type == TicketType.GROUP) {
           let group =
-            await sql`SELECT * FROM groups WHERE email1 = ${unpaid[i].email} OR email2 = ${unpaid[i].email} OR email3 = ${unpaid[i].email} OR email4 = ${unpaid[i].email}`;
+            await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
           if (group.rows.length === 0) {
+            client.release();
             return Response.json(
               {
                 message:
@@ -239,10 +312,10 @@ export async function pay(
           if (uniqueGroupsToPayFor.indexOf(group.rows[0].grpid) === -1) {
             uniqueGroupsToPayFor.push(group.rows[0].grpid);
             uniqueGroupsToPayForData[group.rows[0].grpid as string] = [
-              group.rows[0].email1 as string,
-              group.rows[0].email2 as string,
-              group.rows[0].email3 as string,
-              group.rows[0].email4 as string,
+              group.rows[0].id1 as string,
+              group.rows[0].id2 as string,
+              group.rows[0].id3 as string,
+              group.rows[0].id4 as string,
             ];
           }
         }
@@ -255,12 +328,31 @@ export async function pay(
         parseInt(amount) >= price.individual &&
         groupIDs.length != 1
       ) {
+        let found: any[] = [];
+        let groupMembers: { [key: string]: Applicant[] } = {};
+        groupIDs.forEach((id) => {
+          found.push(
+            ...unpaid.filter((x) => uniqueGroupsToPayForData[id][0] === x.id)
+          );
+          groupMembers[uniqueGroupsToPayForData[id][0]] = unpaid.filter(
+            (x) =>
+              uniqueGroupsToPayForData[id].includes(x.id) &&
+              !found.includes(x.id)
+          );
+        });
+        found = found.map((x) => {
+          x.ticket_type = x.type;
+          return x;
+        });
+        client.release();
         return Response.json(
           {
             message:
-              "Not enough money to pay for all tickets. Identify using Emails.",
+              "Not enough money to pay for all tickets. Identify using IDs.",
+            found,
+            groupMembers,
           },
-          { status: ResponseCode.EMAIL_REQUIRED }
+          { status: ResponseCode.TICKET_AMBIGUITY }
         );
       }
 
@@ -272,7 +364,7 @@ export async function pay(
         if (paid <= parseInt(amount)) {
           // Collect all rows to update
           const rowsToUpdate = unpaid.filter((x) =>
-            groupMembers.includes(x.email)
+            groupMembers.includes(x.id)
           );
 
           let safeUUIDs: { [key: number]: string } = {};
@@ -292,7 +384,7 @@ export async function pay(
 
           // Batch SQL Update
           try {
-            await sql.query(
+            await client.query(
               `
               UPDATE attendees
               SET paid = true, uuid = data.uuid
@@ -315,6 +407,7 @@ export async function pay(
           } catch (e) {
             paid -= price.group * 4;
             console.error(e);
+            client.release();
             return Response.json(
               { message: "Err #7109. Contact Support or Try Again." },
               { status: 500 }
@@ -331,9 +424,10 @@ export async function pay(
     }
     if (paid != 0 && paid <= total && paid <= parseInt(amount)) {
       if (parseInt(amount) != 0) {
-        await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
+        await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
       }
     } else if (paid == 0) {
+      client.release();
       return Response.json(
         {
           message:
@@ -350,10 +444,12 @@ export async function pay(
         await sendEmail(
           paidFor[i].email,
           paidFor[i].full_name,
-          paidFor[i].uuid
+          paidFor[i].uuid,
+          paidFor[i].id
         );
       }
     } catch (e) {
+      client.release();
       return Response.json(
         { message: "Err #9194. Contact Support or Try Again." },
         { status: 500 }
@@ -364,6 +460,7 @@ export async function pay(
       console.error(
         "OH NO! INSANE ERROR! HUGE ERROR! MASSIVE ERROR! main.tsx line 282"
       );
+      client.release();
       return Response.json(
         {
           message:
@@ -372,11 +469,13 @@ export async function pay(
         { status: 500 }
       );
     }
+    client.release();
     return Response.json(
       { refund: false, paid, accepted: paidFor },
       { status: 200 }
     );
   } catch (e) {
+    client.release();
     return Response.json(e, { status: 500 });
   }
 }

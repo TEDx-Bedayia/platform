@@ -8,11 +8,7 @@
 }
 
 .container {
-  background: linear-gradient(
-    45deg,
-    #c33764,
-    #1d2671
-  ); /* Gradient background for visual interest */
+  background-image: url("/asfalt-light.png");
 
   color: #fff; /* White text for readability */
   margin: 0;
@@ -25,8 +21,8 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background-size: 150% 150%;
-  animation: backgroundAnimation 5s ease infinite;
+  /* background-size: 150% 150%;
+  animation: backgroundAnimation 5s ease infinite; */
   /* z-index: -2; */
 }
 
@@ -84,7 +80,8 @@
   text-align: center;
 }
 
-.container form {
+.container form,
+.codeInputDialog {
   width: 400px;
   border-radius: 1rem;
   background: rgb(255, 255, 255, 0.2);
@@ -128,6 +125,12 @@
   padding-bottom: 0px !important;
 }
 
+.container input:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff80; /* Lighter text for disabled inputs */
+  cursor: not-allowed; /* Change cursor to indicate disabled state */
+}
+
 .container input:focus {
   outline: none;
   border: #b1aae4 2px solid;
@@ -161,6 +164,59 @@
   color: #ffccda;
   opacity: 1;
   font-weight: 700;
+}
+
+.checkboxContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: start;
+  margin-left: 16px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.checkboxContainer input {
+  display: none; /* Hide the default checkbox */
+}
+
+.checkboxContainer .checkMark {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  background-color: #ffffff20; /* Semi-transparent background */
+  border: 2px solid #ffffff40; /* Light border */
+  border-radius: 4px; /* Rounded corners */
+}
+
+/* Checkmark tick (appears only when checked) */
+.checkboxContainer input:checked + .checkMark::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 2px;
+  width: 7px;
+  height: 12.5px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkboxContainer input:checked + .checkMark {
+  background-color: #ffffff40;
+  border-color: #ffffff80; /* Lighter border when checked */
+}
+
+.checkboxContainer:hover .checkMark {
+  border-color: #ffffff80;
+}
+
+.checkboxContainer label {
+  color: #ffffff80;
+  font-size: 0.9em;
+  margin: 0;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .paymentMethodContainer {
@@ -283,7 +339,8 @@
   align-items: center;
 }
 
-.container button[type="submit"] {
+.container button[type="submit"],
+.codeInputDialog button {
   background-color: #007bff;
   /* background: linear-gradient(45deg, #007bff, #0056b3); */
   color: #fff;
@@ -317,7 +374,8 @@
 }
 
 @media (max-width: 600px) {
-  .container form {
+  .container form,
+  .codeInputDialog {
     padding: 15px;
     width: 80vw;
     backdrop-filter: blur(20px) !important;
@@ -339,4 +397,9 @@
     );
     filter: blur(4px);
   }
+}
+
+.codeInputDialog h2 {
+  margin-bottom: 0;
+  font-size: 1.2em;
 }

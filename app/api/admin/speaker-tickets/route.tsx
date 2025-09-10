@@ -10,6 +10,7 @@ import { UUID } from "crypto";
 import { promises } from "fs";
 import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 import path from "path";
 import { TicketType } from "../../utils/ticket-types";
 import { safeRandUUID } from "../payment-reciever/main";
@@ -40,16 +41,16 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  let number = Number(params.get("number")) || SPEAKER_FREE_TICKETS;
+
   try {
     // Create an entry with type speaker and rotating emails (invitation1, invitation2, etc.)
     let values: string[] = [];
     let uuids: UUID[] = [];
-    for (let i = 0; i < SPEAKER_FREE_TICKETS; i++) {
-      let rotatingEmail = `${speakerEmail.split("@")[0]}+${
-        speakerEmail.split("@")[0] == "aly.m.s.mobarak"
-          ? speakerName.toLowerCase().split(" ").join("")
-          : ""
-      }invitation${i + 1}@${speakerEmail.split("@")[1]}`;
+    for (let i = 0; i < number; i++) {
+      let rotatingEmail = `${speakerEmail.split("@")[0]}+invitation${i + 1}@${
+        speakerEmail.split("@")[1]
+      }`;
 
       let uuid = await safeRandUUID();
       uuids.push(uuid);
@@ -69,16 +70,30 @@ export async function GET(request: NextRequest) {
       )} RETURNING *`
     );
 
-    if (q.rowCount !== SPEAKER_FREE_TICKETS) {
+    if (q.rowCount !== number) {
       return Response.json(
         { message: "Error occurred while adding tickets." },
         { status: 400 }
       );
     }
 
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+      },
+    });
+
     // Send email with all tickets to speaker's email
-    for (let i = 0; i < SPEAKER_FREE_TICKETS; i++) {
+    for (let i = 0; i < number; i++) {
       await sendSpeakerTicket(
+        transporter,
         speakerEmail,
         uuids[i],
         `${speakerName}'s Invitation ${i + 1}`,
@@ -100,6 +115,10 @@ export async function POST(request: NextRequest) {
 }
 
 async function sendSpeakerTicket(
+  transporter: nodemailer.Transporter<
+    SMTPTransport.SentMessageInfo,
+    SMTPTransport.Options
+  >,
   speakerEmail: string,
   uuid: UUID,
   ticketName: string,
@@ -118,14 +137,6 @@ async function sendSpeakerTicket(
     .replaceAll("${year}", YEAR.toString());
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
     await transporter.sendMail({
       from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
       to: speakerEmail,

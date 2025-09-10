@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./book.module.css";
 
 import { motion } from "framer-motion";
@@ -15,6 +15,7 @@ import "./htmlcolor.css";
 import { addLoader, removeLoader } from "../global_components/loader";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
+
 export default function SingleTickets() {
   const [formData, setFormData] = useState({
     email: "",
@@ -28,6 +29,264 @@ export default function SingleTickets() {
   const [selectedPaymentFields, setSelectedPaymentFields] = useState(
     [] as Field[]
   );
+
+  const [code, setCode] = useState("");
+  const [askForCode, setAskForCode] = useState(false);
+
+  let CodeInputElement = () => {
+    const inputRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
+    const getFirstEmptyIndex = () => {
+      return inputRefs.current.findIndex((span) => {
+        return !span?.textContent || span.textContent.trim() === "";
+      });
+    };
+
+    const handleInput = (
+      e: React.FormEvent<HTMLSpanElement>,
+      index: number
+    ) => {
+      let value = e.currentTarget.textContent || "";
+      value = value.toUpperCase();
+
+      // Enforce 1 character only
+      if (value.length > 1) {
+        value = value.charAt(0);
+      }
+
+      e.currentTarget.textContent = value;
+
+      placeCaretAtEnd(e.currentTarget);
+
+      // Move focus to next box if not the last
+      if (value.length === 1 && index < inputRefs.current.length - 1) {
+        inputRefs.current[index + 1]?.focus();
+      }
+
+      if (index === inputRefs.current.length - 1) {
+        inputRefs.current[index]?.blur();
+      }
+    };
+
+    const handleKeyDown = (
+      e: React.KeyboardEvent<HTMLSpanElement>,
+      index: number
+    ) => {
+      const key = e.key;
+
+      if (e.key === "Tab") {
+        const correctIndex = getFirstEmptyIndex();
+        if (index !== correctIndex) {
+          e.preventDefault();
+          inputRefs.current[correctIndex]?.focus();
+        }
+      }
+
+      // Backspace: if current is empty, go back
+      if (key === "Backspace") {
+        const value = e.currentTarget.textContent;
+        if ((!value || value.length === 0) && index > 0) {
+          e.preventDefault();
+          inputRefs.current[index - 1]?.focus();
+          inputRefs.current[index - 1]!.textContent = ""; // Clear previous box
+        } else {
+          inputRefs.current[index]!.textContent = ""; // Clear current box
+        }
+        const correctIndex = getFirstEmptyIndex();
+        if (index !== correctIndex) {
+          e.preventDefault();
+          inputRefs.current[correctIndex]?.focus();
+        }
+        return;
+      }
+
+      // Block multiple keys
+      if (
+        e.currentTarget.textContent &&
+        e.currentTarget.textContent.length >= 1 &&
+        key.length === 1
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLSpanElement>) => {
+      e.preventDefault();
+      const pasted = e.clipboardData.getData("text").toUpperCase();
+
+      const clean = pasted.replace(/[^A-Z0-9]/gi, ""); // Remove dashes, symbols
+
+      for (let i = 0; i < clean.length && i < inputRefs.current.length; i++) {
+        const char = clean.charAt(i);
+        const span = inputRefs.current[i];
+        if (span) {
+          span.textContent = char;
+        }
+      }
+
+      // Focus next empty box
+      const nextEmpty =
+        clean.length < inputRefs.current.length
+          ? inputRefs.current[clean.length]
+          : null;
+      nextEmpty?.focus();
+      if (!nextEmpty) {
+        inputRefs.current[inputRefs.current.length - 1]?.focus();
+      }
+    };
+
+    const placeCaretAtEnd = (el: HTMLElement) => {
+      const range = document.createRange();
+      const sel = window.getSelection();
+
+      range.selectNodeContents(el);
+      range.collapse(false); // Move to end
+
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    };
+
+    return (
+      <motion.div
+        className="w-full h-full fixed top-0 left-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3, delay: 1 }}
+      >
+        <div className={styles.codeInputDialog}>
+          <div
+            className="absolute top-4 right-4 cursor-pointer text-white z-[600]"
+            onClick={() => {
+              window.history.pushState({}, "", `/book`);
+              setCode("");
+              setAskForCode(false);
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </div>
+          <h2>Enter Your Code</h2>
+          <div className="flex flex-row gap-2 w-full justify-center my-4 text-2xl">
+            {[...Array(9)].map((_, i) => {
+              // Add a dash after 4th element (index 4)
+              if (i === 4) {
+                return (
+                  <span key="dash" className="text-white font-bold">
+                    -
+                  </span>
+                );
+              }
+
+              const adjustedIndex = i > 4 ? i - 1 : i;
+
+              return (
+                <span
+                  key={i}
+                  ref={(el) => {
+                    inputRefs.current[adjustedIndex] = el;
+                  }}
+                  className="border-b border-white w-8 text-center outline-none"
+                  contentEditable
+                  suppressContentEditableWarning
+                  onInput={(e) => handleInput(e, adjustedIndex)}
+                  onKeyDown={(e) => handleKeyDown(e, adjustedIndex)}
+                  onPaste={(e) => handlePaste(e)}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter") {
+                      document.getElementById("submit-code-button")?.click();
+                    }
+                  }}
+                  onFocus={(e) => {
+                    const correctIndex = getFirstEmptyIndex();
+                    const currentIndex = inputRefs.current.findIndex(
+                      (el) => el === e.currentTarget
+                    );
+
+                    if (currentIndex !== correctIndex && correctIndex !== -1) {
+                      e.preventDefault();
+                      inputRefs.current[correctIndex]?.focus();
+                      return;
+                    } else if (correctIndex === -1) {
+                      // If all boxes are filled, focus the last one
+                      inputRefs.current[inputRefs.current.length - 1]?.focus();
+                      return;
+                    }
+
+                    placeCaretAtEnd(e.currentTarget);
+                  }}
+                ></span>
+              );
+            })}
+          </div>
+          <button
+            id="submit-code-button"
+            onClick={async () => {
+              const code = inputRefs.current
+                .map((span) => span?.textContent || "")
+                .join("")
+                .toUpperCase();
+              if (code.length !== 8) {
+                customAlert("Please enter a valid code.");
+                return;
+              }
+              if (code.trim() === "") {
+                customAlert("Please enter a valid code.");
+                return;
+              }
+              addLoader();
+
+              // customAlert("Code submitted successfully.");
+              const response = await fetch("/api/tickets/test-rush-code", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  code: `${code.slice(0, 4)}-${code.slice(4)}`,
+                }),
+              });
+              if (!response.ok) {
+                const errorData = await response.json();
+                customAlert(errorData.message || "An error occurred.");
+                removeLoader();
+                return;
+              }
+              removeLoader();
+
+              customAlert(
+                "Code Accepted! Please fill in your details and your ticket will arrive shortly (P.S. it may take us a day or two to verify your ticket)."
+              );
+              window.history.pushState({}, "", `/book`);
+              setCode(`${code.slice(0, 4)}-${code.slice(4)}`);
+              formData.paymentMethod = "CASH";
+              setAskForCode(false);
+            }}
+          >
+            Submit
+          </button>
+        </div>
+      </motion.div>
+    );
+  };
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("rush") !== null) {
+      setAskForCode(true);
+    }
+  }, [askForCode]);
 
   useEffect(() => {
     const fetchPaymentMethods = async () => {
@@ -157,7 +416,7 @@ export default function SingleTickets() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(code ? { ...formData, code } : formData),
     });
 
     if (response.ok) {
@@ -168,6 +427,8 @@ export default function SingleTickets() {
         paymentMethod: "",
         additionalFields: {} as { [key: string]: string },
       });
+      if (code) setAskForCode(true);
+      setCode("");
       setSelectedPaymentFields([]);
       customAlert((await response.json()).message ?? "Submitted.");
     } else {
@@ -178,30 +439,29 @@ export default function SingleTickets() {
 
   return (
     <section id="book-one-ticket" className={styles.container}>
+      {askForCode && <CodeInputElement />}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ ease: "easeOut", duration: 1.5 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Ticket</h1>
-        {/* <h3
-          style={{
-            ...title.style,
-            fontWeight: 400,
-            fontSize: ".5em",
-            textAlign: "center",
-          }}
-        >
-          1% vodafone imposed fee on E-Wallet
-        </h3> */}
-        <h2 style={{ ...title.style, fontWeight: 100 }}>400 EGP</h2>
+        <h2 style={{ ...title.style, fontWeight: 100 }}>
+          {code ? "Paid Ticket!" : "400 EGP"}
+        </h2>
       </motion.div>
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ ease: "anticipate", duration: 2 }}
+        className={askForCode ? "pointer-events-none" : ""}
       >
         <form onSubmit={handleSubmit} style={ubuntu.style}>
+          {code && (
+            <center>
+              <code className="text-gray-200">RUSH {code}</code>
+            </center>
+          )}
           <div className={styles.mainTextbox}>
             <div className={styles.inputWrapper}>
               <input
@@ -248,83 +508,85 @@ export default function SingleTickets() {
             </div>
           </div>
 
-          <div
-            id="paymentMethodContainer"
-            className={styles.paymentMethodContainer}
-          >
+          {!code && (
             <div
-              className={styles.paymentMethodSelector}
-              onClick={() => {
-                document
-                  .getElementById("paymentMethodOptions")
-                  ?.classList.toggle(styles.activeOption);
-
-                document
-                  .getElementsByClassName(styles.selectArrow)[0]
-                  .classList.toggle(styles.activeSVG);
-              }}
+              id="paymentMethodContainer"
+              className={styles.paymentMethodContainer}
             >
-              {paymentOptions.find(
-                (value) => value.identifier == formData.paymentMethod
-              )?.displayName == null ? (
-                <span style={{ padding: "0", margin: "0" }}>
-                  Select Payment Method
-                </span>
-              ) : (
-                <span style={{ color: "white", padding: "0", margin: "0" }}>
-                  {
-                    paymentOptions.find(
-                      (value) => value.identifier == formData.paymentMethod
-                    )?.displayName
-                  }
-                </span>
-              )}
+              <div
+                className={styles.paymentMethodSelector}
+                onClick={() => {
+                  document
+                    .getElementById("paymentMethodOptions")
+                    ?.classList.toggle(styles.activeOption);
+
+                  document
+                    .getElementsByClassName(styles.selectArrow)[0]
+                    .classList.toggle(styles.activeSVG);
+                }}
+              >
+                {paymentOptions.find(
+                  (value) => value.identifier == formData.paymentMethod
+                )?.displayName == null ? (
+                  <span style={{ padding: "0", margin: "0" }}>
+                    Select Payment Method
+                  </span>
+                ) : (
+                  <span style={{ color: "white", padding: "0", margin: "0" }}>
+                    {
+                      paymentOptions.find(
+                        (value) => value.identifier == formData.paymentMethod
+                      )?.displayName
+                    }
+                  </span>
+                )}
+              </div>
+              <div
+                id="paymentMethodOptions"
+                className={styles.paymentMethodOptions}
+              >
+                {paymentOptions.map((option) => (
+                  <div
+                    className={styles.paymentMethod}
+                    key={option.identifier}
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        paymentMethod: option.identifier,
+                        additionalFields: {},
+                      });
+
+                      setSelectedPaymentFields(option.fields || []);
+
+                      document
+                        .getElementById("paymentMethodOptions")
+                        ?.classList.toggle(styles.activeOption);
+                      document
+                        .getElementsByClassName(styles.selectArrow)[0]
+                        .classList.toggle(styles.activeSVG);
+                    }}
+                  >
+                    {option.displayName}
+                  </div>
+                ))}
+              </div>
+
+              <svg
+                className={styles.selectArrow}
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ zIndex: 101 }}
+              >
+                <path
+                  d="M6 8.825C5.8 8.825 5.6 8.725 5.5 8.625L2.2 5.325C1.9 5.025 1.9 4.525 2.2 4.225C2.5 3.925 3 3.925 3.3 4.225L6 6.925L8.7 4.225C9 3.925 9.5 3.925 9.8 4.225C10.1 4.525 10.1 5.025 9.8 5.325L6.6 8.525C6.4 8.725 6.2 8.825 6 8.825Z"
+                  fill="#fff"
+                />
+              </svg>
             </div>
-            <div
-              id="paymentMethodOptions"
-              className={styles.paymentMethodOptions}
-            >
-              {paymentOptions.map((option) => (
-                <div
-                  className={styles.paymentMethod}
-                  key={option.identifier}
-                  onClick={() => {
-                    setFormData({
-                      ...formData,
-                      paymentMethod: option.identifier,
-                      additionalFields: {},
-                    });
-
-                    setSelectedPaymentFields(option.fields || []);
-
-                    document
-                      .getElementById("paymentMethodOptions")
-                      ?.classList.toggle(styles.activeOption);
-                    document
-                      .getElementsByClassName(styles.selectArrow)[0]
-                      .classList.toggle(styles.activeSVG);
-                  }}
-                >
-                  {option.displayName}
-                </div>
-              ))}
-            </div>
-
-            <svg
-              className={styles.selectArrow}
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ zIndex: 101 }}
-            >
-              <path
-                d="M6 8.825C5.8 8.825 5.6 8.725 5.5 8.625L2.2 5.325C1.9 5.025 1.9 4.525 2.2 4.225C2.5 3.925 3 3.925 3.3 4.225L6 6.925L8.7 4.225C9 3.925 9.5 3.925 9.8 4.225C10.1 4.525 10.1 5.025 9.8 5.325L6.6 8.525C6.4 8.725 6.2 8.825 6 8.825Z"
-                fill="#fff"
-              />
-            </svg>
-          </div>
+          )}
 
           {/* Dynamically render additional fields based on selected payment method */}
           {selectedPaymentFields.length > 0 && (

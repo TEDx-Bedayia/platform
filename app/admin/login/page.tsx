@@ -59,6 +59,8 @@ export default function AdminLogin() {
         if (token) {
           localStorage.setItem(type + "-token", token);
           if (type == "admin") window.location.href = "/admin";
+          else if (type == "marketing")
+            window.location.href = "/admin/manage-marketing-members";
           else window.location.href = "/admin/payments";
         }
       } else {
@@ -74,7 +76,7 @@ export default function AdminLogin() {
   return (
     <div className={styles.pageContainer}>
       <form onSubmit={handleSubmit} className={styles.formContainer}>
-        <h2 className={title.className}>eTickets v1.0</h2>
+        <h2 className={title.className}>eTickets v1.1</h2>
 
         <div className={styles.formGroup}>
           <input

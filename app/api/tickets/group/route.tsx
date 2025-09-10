@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     body = await request.json();
   } catch (error) {
     return Response.json(
-      { message: "Please provide a valid JSON body.", error: error },
+      { message: "Please provide a valid JSON body." },
       { status: 400 }
     );
   }
@@ -76,14 +76,17 @@ export async function POST(request: NextRequest) {
       return resp;
     }
 
-    let id = (await resp.json()).id;
+    let ids = (await resp.json()).ids;
 
     try {
-      await sql`INSERT INTO groups (email1, email2, email3, email4) VALUES (${emails[0]}, ${emails[1]}, ${emails[2]}, ${emails[3]});`;
+      await sql`INSERT INTO groups (id1, id2, id3, id4) VALUES (${ids[0]}, ${ids[1]}, ${ids[2]}, ${ids[3]});`;
     } catch (error) {
-      await sql`DELETE FROM attendees WHERE email = ${emails[0]} OR email = ${emails[1]} OR email = ${emails[2]} OR email = ${emails[3]};`;
+      await sql`DELETE FROM attendees WHERE id = ${ids[0]} OR id = ${ids[1]} OR id = ${ids[2]} OR id = ${ids[3]};`;
       return Response.json(
-        { message: "Error submitting group." },
+        {
+          message:
+            "Error submitting group. Please try again or contact us for help.",
+        },
         { status: 500 }
       );
     }
@@ -94,17 +97,18 @@ export async function POST(request: NextRequest) {
         paymentMethod,
         name1,
         emails[0],
-        id,
+        ids[0],
         TicketType.GROUP
       );
     } catch (e) {
       console.error(
-        "[CRITICAL ERROR] LESS SECURE APPS NOT TURNED ON FOR GMAIL"
+        "[CRITICAL ERROR] CONFIRMATION EMAIL NOT SENT TO GROUP LEADER",
+        e
       );
       return Response.json(
         {
           message:
-            "Error Occurred. Please try again or contact us for help: SMTP_LSA_502.",
+            "Error Occurred. Please contact us for help and provide this code: SMTP_LSA_502.",
         },
         { status: 400 }
       );
@@ -112,9 +116,9 @@ export async function POST(request: NextRequest) {
 
     return Response.json(
       {
-        message: `Tickets Booked! Check your email to continue.${
+        message: `Group Tickets Booked Successfully! Please check your email to continue.${
           paymentMethod === "CASH"
-            ? ` Your Attendee ID is ${id}. Use it to pay at the school office.`
+            ? ` Your Group ID is ${ids[0]}. Use it to pay at the school office.`
             : ""
         }`,
         success: true,
@@ -122,15 +126,18 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log(error);
-    await sql`DELETE FROM attendees WHERE email = ${emails[0]} OR email = ${emails[1]} OR email = ${emails[2]} OR email = ${emails[3]};`;
+    console.error(error);
     return Response.json(
-      { message: "Error submitting group." },
+      {
+        message:
+          "Error submitting group. Please try again or contact us for help.",
+      },
       { status: 500 }
     );
   }
 }
 
+// Returns a response with the success status and 4 attendee IDs or an error message
 async function submitTickets(
   emails: any,
   names: any,
@@ -190,34 +197,6 @@ async function submitTickets(
     return Response.json({ message: "Invalid Phone Number." }, { status: 400 });
   }
 
-  let query =
-    await sql`SELECT * FROM attendees WHERE email = ${emails[0]} OR email = ${emails[1]} OR email = ${emails[2]} OR email = ${emails[3]};`;
-
-  let errTxt = "";
-  if (query.rows.length > 0) {
-    if (query.rows.length == 1) {
-      errTxt = "There's a registered attendee with ";
-    } else {
-      errTxt = "There are attendees with ";
-    }
-  }
-  for (let i = 0; i < query.rows.length; i++) {
-    let email = query.rows[i].email;
-
-    errTxt += `${names[emails.indexOf(email)]}'s email`;
-    if (i != query.rows.length - 1) {
-      errTxt += ", ";
-    }
-  }
-  if (errTxt != "") {
-    return Response.json(
-      {
-        message: errTxt + ". Contact us if you believe this is a mistake.",
-      },
-      { status: 400 }
-    );
-  }
-
   let q = "";
   for (let i = 0; i < emails.length; i++) {
     q += `('${emails[i]}', '${names[i]}', '${paymentMethod}', '${phone}', '${TicketType.GROUP}')`;
@@ -230,9 +209,9 @@ async function submitTickets(
     let res = await sql.query(
       `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ${q} RETURNING *;`
     );
-    let id = res.rows[0].id;
+    let ids = res.rows.map((row: any) => row.id);
 
-    return Response.json({ success: true, id });
+    return Response.json({ success: true, ids });
   } catch (err: any) {
     return Response.json({ success: false }, { status: 500 });
   }

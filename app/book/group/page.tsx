@@ -30,6 +30,8 @@ export default function GroupTickets() {
     [] as Field[]
   );
 
+  const [useSameEmail, setUseSameEmail] = useState(false);
+
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
@@ -120,6 +122,12 @@ export default function GroupTickets() {
 
       if (name == "name") names[index] = value;
       if (name == "email") emails[index] = value;
+      if (useSameEmail && index == 0) {
+        // If using the same email, set all emails to the first person's email
+        for (let i = 1; i < emails.length; i++) {
+          emails[i] = value;
+        }
+      }
 
       setFormData({
         ...formData,
@@ -174,29 +182,6 @@ export default function GroupTickets() {
       removeLoader();
       return;
     }
-    try {
-      for (let i = 0; i < 2; i++) {
-        if (formData.emails[i] == formData.emails[3]) {
-          customAlert(
-            "Please enter a unique email. Or set the email to " +
-              formData.emails[3].split("@")[0] +
-              (!formData.emails[3].includes("+") ? "+p" : "") +
-              4 +
-              "@" +
-              formData.emails[3].split("@")[1] +
-              " if you wish to recieve " +
-              formData.names[3] +
-              "'s ticket on the same email."
-          );
-          removeLoader();
-          return;
-        }
-      }
-    } catch (error) {
-      customAlert("Please check the inputted emails and try again.");
-      removeLoader();
-      return;
-    }
 
     const response = await fetch("/api/tickets/group", {
       method: "POST",
@@ -226,6 +211,7 @@ export default function GroupTickets() {
         paymentMethod: "",
         additionalFields: {} as { [key: string]: string },
       });
+      setUseSameEmail(false);
       setSelectedPaymentFields([]);
       customAlert((await response.json()).message ?? "Submitted.");
       setCurrentPerson(0);
@@ -245,16 +231,6 @@ export default function GroupTickets() {
         transition={{ ease: "easeOut", duration: 1.5 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Group Ticket</h1>
-        {/* <h3
-          style={{
-            ...title.style,
-            fontWeight: 400,
-            fontSize: ".5em",
-            textAlign: "center",
-          }}
-        >
-          1% vodafone imposed fee on E-Wallet
-        </h3> */}
         <h2 style={{ ...title.style, fontWeight: 100, marginBottom: ".5rem" }}>
           1, 400 EGP
         </h2>
@@ -294,11 +270,56 @@ export default function GroupTickets() {
                 id="email-input"
                 required={true}
                 value={formData.emails[currentPerson]}
+                disabled={useSameEmail && currentPerson != 0}
                 onChange={handleChange}
               />
               <label htmlFor="email">Email Address</label>
             </div>
           </div>
+
+          {currentPerson == 0 && (
+            <div className={styles.checkboxContainer}>
+              <input
+                type="checkbox"
+                id="same-email-checkbox"
+                checked={useSameEmail}
+                onChange={(e) => {
+                  setUseSameEmail(e.target.checked);
+                  if (e.target.checked) {
+                    setFormData({
+                      ...formData,
+                      emails: [
+                        formData.emails[0],
+                        formData.emails[0],
+                        formData.emails[0],
+                        formData.emails[0],
+                      ],
+                    });
+                  }
+                }}
+              />
+              <span
+                className={styles.checkMark}
+                onClick={() => {
+                  setUseSameEmail(!useSameEmail);
+                  if (!useSameEmail) {
+                    setFormData({
+                      ...formData,
+                      emails: [
+                        formData.emails[0],
+                        formData.emails[0],
+                        formData.emails[0],
+                        formData.emails[0],
+                      ],
+                    });
+                  }
+                }}
+              ></span>
+              <label htmlFor="same-email-checkbox">
+                Use the same email for all members
+              </label>
+            </div>
+          )}
 
           {currentPerson == 0 && (
             <div className={styles.mainTextbox}>
@@ -325,6 +346,7 @@ export default function GroupTickets() {
             >
               <div
                 className={styles.paymentMethodSelector}
+                id="payment-method"
                 onClick={() => {
                   document
                     .getElementById("paymentMethodOptions")
@@ -504,29 +526,6 @@ export default function GroupTickets() {
                               selectedPaymentFields[0].id
                             ] != null))
                       ) {
-                        for (let i = 0; i < 3; i++) {
-                          if (
-                            formData.emails[i] ==
-                              formData.emails[currentPerson] &&
-                            i != currentPerson
-                          ) {
-                            customAlert(
-                              "Please enter a unique email. Or set the email to " +
-                                formData.emails[currentPerson].split("@")[0] +
-                                (!formData.emails[currentPerson].includes("+")
-                                  ? "+p"
-                                  : "") +
-                                (currentPerson + 1) +
-                                "@" +
-                                formData.emails[currentPerson].split("@")[1] +
-                                " if you wish to recieve " +
-                                formData.names[currentPerson] +
-                                "'s ticket on the same email."
-                            );
-                            return;
-                          }
-                        }
-
                         document.getElementsByTagName(
                           "form"
                         )[0].style.transition = "opacity 300ms ease";
@@ -546,7 +545,7 @@ export default function GroupTickets() {
                         else if (formData.phone.length < 11)
                           document.getElementById("phone-input")!.focus();
                         else if (formData.paymentMethod == "")
-                          document.getElementById("payment-method")!.focus();
+                          document.getElementById("payment-method")!.click();
                       }
                     }}
                   >

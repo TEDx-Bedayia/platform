@@ -1,5 +1,3 @@
-import { a } from "framer-motion/client";
-
 export function customAlert(txt: string, closeable = true, verified = false) {
   // Create a background overlay
   const overlay = document.createElement("div");

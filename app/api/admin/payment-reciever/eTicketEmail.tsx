@@ -4,7 +4,12 @@ import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
 
-export async function sendEmail(email: string, name: string, uuid: string) {
+export async function sendEmail(
+  email: string,
+  name: string,
+  uuid: string,
+  id?: string
+) {
   const filePath = path.join(process.cwd(), "public/eTicket-template.html");
   const htmlContent = await promises.readFile(filePath, "utf8");
 
@@ -19,12 +24,18 @@ export async function sendEmail(email: string, name: string, uuid: string) {
 
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
+        type: "OAuth2",
         user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
       },
     });
+
     await transporter.sendMail({
       from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
       to: email,
@@ -35,15 +46,15 @@ export async function sendEmail(email: string, name: string, uuid: string) {
       html: personalizedHtml,
     });
 
-    let qq = await sql.query(
-      "UPDATE attendees SET sent = true WHERE email = '" +
-        email +
-        "' RETURNING *"
-    );
+    if (id) {
+      let qq = await sql.query(
+        "UPDATE attendees SET sent = true WHERE id = '" + id + "' RETURNING *"
+      );
 
-    if (qq.rowCount === 0) {
-      console.error("SQL ERROR; sent = false but it's sent.");
-      return false;
+      if (qq.rowCount === 0) {
+        console.error("SQL ERROR; sent = false but it's sent.");
+        return false;
+      }
     }
 
     return true;

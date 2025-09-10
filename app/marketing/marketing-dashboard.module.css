@@ -1,0 +1,227 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("/asfalt-light.png");
+}
+
+.container h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.container h2 {
+  font-size: 1em;
+  text-align: center;
+  margin-bottom: 0.25rem;
+  color: #fff;
+}
+
+.container .form {
+  width: 90%;
+  max-width: 400px;
+  box-sizing: border-box;
+  gap: 20px;
+  border-radius: 1rem;
+  background: rgb(255, 255, 255, 0.2);
+  padding: 1.5rem;
+  padding-top: 1rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  border: #ffffff20 1px solid;
+  z-index: 3 !important;
+
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.container input {
+  background: rgba(255, 255, 255, 0.15);
+
+  color: #fff;
+  padding: 10px 16px;
+  padding-left: 42px;
+
+  border-radius: 100rem;
+  border: transparent 2px solid;
+  font-size: 1em;
+  height: 3rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
+}
+
+.container input:focus {
+  outline: none;
+  border: #b1aae4 2px solid;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.inputWrapper > svg,
+.inputWrapper .icon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.5;
+  transition: all 0.3s ease-in-out;
+}
+
+.inputWrapper > svg {
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(335deg)
+    brightness(104%) contrast(102%);
+}
+
+.inputWrapper input:focus ~ svg,
+.inputWrapper input:not(:placeholder-shown) ~ svg,
+.inputWrapper input:focus ~ .icon,
+.inputWrapper input:not(:placeholder-shown) ~ .icon {
+  opacity: 1;
+}
+
+.inputWrapper input:focus ~ svg,
+.inputWrapper input:not(:placeholder-shown) ~ svg {
+  filter: invert(80%) sepia(8%) saturate(915%) hue-rotate(296deg)
+    brightness(103%) contrast(105%);
+}
+
+.inputWrapper label {
+  position: absolute;
+  top: 2px;
+  left: 24px;
+  padding: 10px 20px;
+  color: #ffffff;
+  opacity: 0.5;
+  font-size: 1em;
+  pointer-events: none;
+  transition: all ease 300ms;
+}
+
+.inputWrapper input:focus + label,
+.inputWrapper input:not(:placeholder-shown) + label {
+  font-size: 0.55em;
+  top: -4px;
+  color: #ffccda;
+  opacity: 1;
+  font-weight: 700;
+}
+
+.container input {
+  padding-bottom: 0px !important;
+}
+
+.ticketCount {
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.25);
+
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border-radius: 100rem;
+  border: #b1aae4 2px solid;
+  font-size: 1em;
+  /* height: 3rem; */
+  width: 40%;
+  box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
+}
+
+.ticketCount button {
+  background: rgba(0, 123, 255, 0.75);
+
+  /* border: #fff 1px solid; */
+  color: #fff;
+  padding: 4px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 100rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.ticketCount button:hover {
+  background-color: #0056b3;
+}
+
+.pickType {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  color: #fff;
+  border-radius: 100rem;
+  gap: 1rem;
+}
+
+.pickType div {
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 100rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  border: transparent 2px solid;
+}
+
+.pickType div:hover,
+.pickType div.selectedType {
+  border: #b1aae4 2px solid;
+}
+
+.pickType div:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pickType div.selectedType {
+  background: rgba(255, 255, 255, 0.25);
+  cursor: default;
+}
+
+.noEmailButton {
+  background-color: #007bff;
+  color: #fff;
+  padding: 12px 0px;
+  text-align: center;
+  border: none;
+  border-radius: 100rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 75%;
+}
+
+.noEmailButton:hover {
+  background-color: #0056b3;
+}
