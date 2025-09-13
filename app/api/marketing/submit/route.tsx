@@ -125,7 +125,8 @@ export async function POST(request: NextRequest) {
   }
   return Response.json(
     {
-      message: "Ticket submission successful.",
+      message:
+        "Accepted! If there are any errors (e.g. wrong email submitted), please contact your head and keep the cash money.",
       data: { name, grade, email, type, ticketCount },
     },
     { status: 200 }
