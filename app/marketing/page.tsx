@@ -207,7 +207,8 @@ export default function MarketingRushHourDashboard() {
                           }),
                         });
                         if (response.ok) {
-                          customAlert("Accepted!");
+                          const data = await response.json();
+                          customAlert(data.message);
                           // Reset form fields
                           setPayerInfo({ name: "", grade: "", paid: 0 });
                           setEmail("");
@@ -285,7 +286,7 @@ export default function MarketingRushHourDashboard() {
                       customAlert(
                         `Accepted! The codes are: ${data.codes.join(
                           ", "
-                        )}. Please share them with the person who paid. They can go to tedxbedayia.com/book?rush and enter the codes to get their tickets.`
+                        )}. Please share them with the person who paid. Tell them to go to tedxbedayia.com/book?rush and enter the codes to get their tickets.`
                       );
                       // Reset form fields
                       setPayerInfo({ name: "", grade: "", paid: 0 });
@@ -310,7 +311,8 @@ export default function MarketingRushHourDashboard() {
               in your hand. This is for your own safety. For telda and instapay
               rush hour tickets, tell them to book a normal ticket from the
               website and follow the instructions but transfer the discounted
-              amount, and include the word rush in their note.
+              amount, and include the word <strong>RUSH</strong> in their note.
+              Finance/Logistics will process those tickets.
             </p>
           </div>
         </section>
