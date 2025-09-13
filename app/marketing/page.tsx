@@ -155,7 +155,8 @@ export default function MarketingRushHourDashboard() {
               <p className="text-xs text-gray-200 mt-3 text-center">
                 If someone wants to buy a group ticket, go to
                 tedxbedayia.com/book/group and enter their details then tell
-                them to pay at the high school office.
+                them to pay at the high school office (or go pay using their
+                ID).
               </p>
             </div>
             <div className="h-[2px] bg-white rounded-full opacity-25 w-full" />
