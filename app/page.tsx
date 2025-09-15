@@ -204,12 +204,12 @@ export default function Home() {
               className="w-[33.5rem] pt-4 text-center font-body text-text-gray-light max-tablet:mt-2 max-phone:mt-3 max-phone:w-[85vw]"
               style={ubuntu.style}
             >
-              Buckle up for a journey of inspiration and innovation at TEDx!
-              Immerse yourself in a day filled with thought-provoking
-              conversations, extraordinary performances, and enlightening
-              experiences. Join us as we explore ideas worth spreading. Prepare
-              to connect to a kaleidoscope of minds like your own &ndash;
-              curious & hungry for change.{" "}
+              Step into a day packed with inspiring talks, 
+              powerful performances, and fresh perspectives. Together, 
+              we’ll uncover ideas worth spreading, spark meaningful conversations, 
+              and celebrate the power of innovation. Join a community of curious 
+              minds hungry for change &ndash;
+              this is where inspiration begins.{" "}
             </p>
 
             <div className="ml-2 mt-6 flex flex-row items-end justify-center gap-4 max-tablet:ml-0 max-phone:mt-[1.125rem] max-phone:flex-col max-phone:items-center max-phone:justify-center max-phone:gap-2">
@@ -382,7 +382,7 @@ export default function Home() {
         <center className="flex w-screen shrink-0 flex-row justify-center gap-5 text-start max-phone:flex-col">
           <div className="flex w-full flex-col gap-4 text-center">
             {infoItem(
-              "Friday, 31st of January, 2025",
+              "Friday, 26st of January, 2026",
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"
@@ -511,7 +511,7 @@ export default function Home() {
             className="font-body text-secondary-200"
             href="https://wa.me/201055782533"
           >
-            +201055782533
+            +201021991550
           </a>{" "}
           if you find any bugs.
         </div>
