@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
     }
 
     client.release();
-    return new Response("OK " + orderId, { status: 200 });
+    return new Response("OK", { status: 200 });
   } catch (error) {
     console.error("Error processing payment callback:", error);
     client.release();
