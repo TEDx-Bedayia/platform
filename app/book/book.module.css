@@ -359,9 +359,24 @@
   transition: background 0.3s ease;
 }
 
-.container button:hover {
+.container button[type="submit"]:hover {
   /* background: linear-gradient(-45deg, #007bff, #0056b3); */
   background-color: #0056b3;
+}
+
+.schoolOfficeButton {
+  background-color: transparent;
+  border: #007bff 4px solid;
+  color: #fff;
+  padding: 12px 0px;
+  text-align: center;
+  border-radius: 100rem;
+  font-weight: 400;
+  /* add letter spacing */
+  letter-spacing: 1px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .container input:-webkit-autofill,

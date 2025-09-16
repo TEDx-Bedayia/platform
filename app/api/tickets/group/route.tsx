@@ -82,12 +82,7 @@ export async function POST(request: NextRequest) {
     let ids = (await resp.json()).ids;
 
     let paymentUrl = "";
-    if (
-      getPaymentMethods()
-        .filter((m) => m.automatic)
-        .map((m) => m.identifier.toUpperCase())
-        .includes(paymentMethod.split("@")[0].toUpperCase())
-    ) {
+    if (paymentMethod === "CARD") {
       let amount = price.getPrice(TicketType.GROUP, "CARD") * 4;
 
       const initiateCardPaymentResponse = await initiateCardPayment(
@@ -96,8 +91,7 @@ export async function POST(request: NextRequest) {
         email1,
         amount,
         "group",
-        ids.join(","),
-        paymentMethod.startsWith("VFCASH") ? "VFCASH" : "CARD"
+        ids.join(",")
       );
 
       if (!initiateCardPaymentResponse.ok) {
@@ -133,12 +127,7 @@ export async function POST(request: NextRequest) {
         paymentUrl
       );
 
-      if (
-        getPaymentMethods()
-          .filter((m) => m.automatic)
-          .map((m) => m.identifier.toUpperCase())
-          .includes(paymentMethod.split("@")[0].toUpperCase())
-      ) {
+      if (paymentMethod === "CARD") {
         return Response.json(
           {
             paymentUrl,
