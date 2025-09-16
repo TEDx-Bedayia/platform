@@ -3,16 +3,17 @@ import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../admin/payment-reciever/main";
+import { initiateCardPayment } from "../utils/card-payment";
 import { sendBookingConfirmation } from "../utils/email-helper";
 import {
   checkPhone,
   checkSafety,
-  generateRandomString,
   handleMisspelling,
   verifyEmail,
   verifyPaymentMethod,
 } from "../utils/input-sanitization";
 import { TicketType } from "../utils/ticket-types";
+import { price } from "./price/prices";
 
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {
@@ -137,6 +138,17 @@ async function submitOneTicket(
   if (code) {
     let result =
       await sql`UPDATE rush_hour SET code = NULL, attendee_id = ${id} WHERE code = ${code} RETURNING processed;`;
+
+    if (result.rowCount === 0) {
+      // invalid code.. delete the attendee record since the code is invalid.
+      await sql`DELETE FROM attendees WHERE id = ${id}`;
+      await sql`SELECT setval('attendees_id_seq', (SELECT MAX(id) FROM attendees));`;
+      return Response.json(
+        { message: "Invalid rush hour code. Please try again." },
+        { status: 400 }
+      );
+    }
+
     if (result.rows[0].processed === true) {
       let uuid = await safeRandUUID();
       await sql`UPDATE attendees SET paid = TRUE, uuid = ${uuid} WHERE id = ${id} AND paid = FALSE RETURNING *`;
@@ -154,6 +166,29 @@ async function submitOneTicket(
     );
   }
 
+  let paymentUrl = "";
+  if (paymentMethod === "CARD") {
+    let amount = price.getPrice(TicketType.INDIVIDUAL, "CARD");
+
+    const initiateCardPaymentResponse = await initiateCardPayment(
+      name,
+      phone,
+      email,
+      amount,
+      "individual",
+      id
+    );
+
+    if (!initiateCardPaymentResponse.ok) {
+      // delete the attendee record since payment initiation failed.
+      await sql`DELETE FROM attendees WHERE id = ${id}`;
+      await sql`SELECT setval('attendees_id_seq', (SELECT MAX(id) FROM attendees));`;
+      return initiateCardPaymentResponse;
+    }
+
+    paymentUrl = (await initiateCardPaymentResponse.json()).paymentUrl;
+  }
+
   try {
     // send payment details and next steps.
     await sendBookingConfirmation(
@@ -161,8 +196,19 @@ async function submitOneTicket(
       name,
       email,
       id,
-      TicketType.INDIVIDUAL
+      TicketType.INDIVIDUAL,
+      paymentUrl
     );
+
+    if (paymentMethod === "CARD") {
+      return Response.json(
+        {
+          paymentUrl,
+          success: true,
+        },
+        { status: 200 }
+      );
+    }
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE id = ${id}`;

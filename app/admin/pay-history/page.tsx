@@ -190,6 +190,10 @@ export default function History() {
         {data
           .filter((x) => x.stream.startsWith("Marketing"))
           .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
+        EGP. Cards:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("Card"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
         EGP.
       </p>
       <div className={styles.transactionList}>

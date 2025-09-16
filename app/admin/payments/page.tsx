@@ -148,14 +148,14 @@ export default function Payments() {
             paymentMethods: PaymentMethod[];
           };
 
-          const methods: PaymentMethod[] = data.paymentMethods.map(
-            (method) => ({
+          const methods: PaymentMethod[] = data.paymentMethods
+            .filter((method) => method.identifier != "CARD")
+            .map((method) => ({
               displayName: method.displayName,
               identifier: method.identifier,
               to: method.to,
               fields: method.fields,
-            })
-          );
+            }));
 
           if (!localStorage.getItem("admin-token")) {
             setPaymentOptions(methods.filter((m) => m.identifier == "CASH"));

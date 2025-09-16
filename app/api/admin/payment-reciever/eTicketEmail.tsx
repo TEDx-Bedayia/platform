@@ -59,7 +59,7 @@ export async function sendEmail(
 
     return true;
   } catch (e) {
-    console.error("LESS SECURE APP NOT TURNED ON FOR GMAIL OR SQL ERROR");
+    console.error("GMAIL OR SQL ERROR");
     return false;
   }
 }

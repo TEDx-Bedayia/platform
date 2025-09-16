@@ -4,6 +4,7 @@ export interface PaymentMethod {
   displayName: string;
   identifier: string;
   to: string;
+  automatic?: boolean;
   fields: Field[];
 }
 
@@ -67,8 +68,16 @@ const CASH: PaymentMethod = {
   fields: [],
 };
 
+const CARD: PaymentMethod = {
+  displayName: "Credit/Debit Card (or Telda Card)",
+  identifier: "CARD",
+  to: "Paymob",
+  automatic: true,
+  fields: [],
+};
+
 export async function getPaymentMethods() {
-  return [TLDA, INSTAPAY, VFCASH, CASH];
+  return [CARD, TLDA, INSTAPAY, VFCASH, CASH];
 }
 
 export async function getIdentifiersForPaymentMethods() {
