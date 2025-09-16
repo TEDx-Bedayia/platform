@@ -10,7 +10,8 @@ export async function sendBookingConfirmation(
   name: string,
   email: string,
   ID: string,
-  ticketType: TicketType
+  ticketType: TicketType,
+  paymentUrl: string | undefined = undefined
 ) {
   const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
   const htmlContent = await promises.readFile(filePath, "utf8");
@@ -30,6 +31,8 @@ export async function sendBookingConfirmation(
     paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Then, please send us a screenshot of your payment with your username <strong>${
       paymentMethod.split("@")[1]
     }@instapay</strong> visible and send your Attendee ID, <strong>${ID}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or simply send the screenshot as a reply to this message if you don't have WhatsApp.`;
+  } else if (paymentMethod.split("@")[0] === "CARD") {
+    paymentDetails = `Please proceed with your card payment using the following link: <a href="${paymentUrl}" target="_blank" rel="noopener noreferrer">Payment Link</a>. Make sure to complete your payment to confirm your booking.`;
   }
 
   let pricingDesc =

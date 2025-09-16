@@ -13,6 +13,7 @@ import {
   PaymentMethod,
 } from "../../api/tickets/payment-methods/payment-methods";
 import { addLoader, removeLoader } from "../../global_components/loader";
+import "../htmlcolor.css";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
@@ -204,6 +205,11 @@ export default function GroupTickets() {
     });
 
     if (response.ok) {
+      if (formData.paymentMethod === "CARD") {
+        const { paymentUrl } = await response.json();
+        window.location.href = paymentUrl;
+        return;
+      }
       setFormData({
         emails: ["", "", "", ""],
         names: ["", "", "", ""],
@@ -519,6 +525,7 @@ export default function GroupTickets() {
                         formData.phone.length >= 11 &&
                         formData.paymentMethod &&
                         (formData.paymentMethod == "CASH" ||
+                          selectedPaymentFields[0] == null ||
                           (formData.additionalFields[
                             selectedPaymentFields[0].id
                           ] != "" &&

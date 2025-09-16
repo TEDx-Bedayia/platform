@@ -420,6 +420,11 @@ export default function SingleTickets() {
     });
 
     if (response.ok) {
+      if (formData.paymentMethod === "CARD") {
+        const { paymentUrl } = await response.json();
+        window.location.href = paymentUrl;
+        return;
+      }
       setFormData({
         email: "",
         name: "",

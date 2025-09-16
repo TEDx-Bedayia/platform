@@ -1,6 +1,7 @@
 import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { initiateCardPayment } from "../../utils/card-payment";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import {
   checkSafety,
@@ -9,6 +10,7 @@ import {
   verifyPaymentMethod,
 } from "../../utils/input-sanitization";
 import { TicketType } from "../../utils/ticket-types";
+import { price } from "../price/prices";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod
@@ -78,6 +80,28 @@ export async function POST(request: NextRequest) {
 
     let ids = (await resp.json()).ids;
 
+    let paymentUrl = "";
+    if (paymentMethod === "CARD") {
+      let amount = price.getPrice(TicketType.GROUP, "CARD") * 4;
+
+      const initiateCardPaymentResponse = await initiateCardPayment(
+        name1,
+        phone,
+        email1,
+        amount,
+        "group",
+        ids.join(",")
+      );
+
+      if (!initiateCardPaymentResponse.ok) {
+        // delete the attendee record since payment initiation failed.
+        await sql`DELETE FROM attendees WHERE id = ${ids[0]} OR id = ${ids[1]} OR id = ${ids[2]} OR id = ${ids[3]};`;
+        return initiateCardPaymentResponse;
+      }
+
+      paymentUrl = (await initiateCardPaymentResponse.json()).paymentUrl;
+    }
+
     try {
       await sql`INSERT INTO groups (id1, id2, id3, id4) VALUES (${ids[0]}, ${ids[1]}, ${ids[2]}, ${ids[3]});`;
     } catch (error) {
@@ -98,8 +122,19 @@ export async function POST(request: NextRequest) {
         name1,
         emails[0],
         ids[0],
-        TicketType.GROUP
+        TicketType.GROUP,
+        paymentUrl
       );
+
+      if (paymentMethod === "CARD") {
+        return Response.json(
+          {
+            paymentUrl,
+            success: true,
+          },
+          { status: 200 }
+        );
+      }
     } catch (e) {
       console.error(
         "[CRITICAL ERROR] CONFIRMATION EMAIL NOT SENT TO GROUP LEADER",

@@ -18,17 +18,20 @@ export async function GET(request: NextRequest) {
   return Response.json(
     query.rows.map((row) => ({
       stream:
-        row.stream.toString().split("@")[0] !== "CASH"
-          ? row.stream.toString().split("@")[0] !== "Marketing"
-            ? pM.find(
-                (method) =>
-                  method.identifier === row.stream.toString().split("@")[0]
-              )?.displayName +
-              " — " +
-              row.stream.toString().split("@")[1]
-            : "Marketing — " +
+        row.stream.toString().split("@")[0] !== "CARD"
+          ? row.stream.toString().split("@")[0] !== "CASH"
+            ? row.stream.toString().split("@")[0] !== "Marketing"
+              ? pM.find(
+                  (method) =>
+                    method.identifier === row.stream.toString().split("@")[0]
+                )?.displayName +
+                " — " +
+                row.stream.toString().split("@")[1]
+              : "Marketing — " +
+                row.stream.toString().split("@")[1].replaceAll(" ", "@")
+            : "Office — " +
               row.stream.toString().split("@")[1].replaceAll(" ", "@")
-          : "Office — " +
+          : "Card — " +
             row.stream.toString().split("@")[1].replaceAll(" ", "@"),
       incurred: row.incurred,
       recieved: row.recieved,
