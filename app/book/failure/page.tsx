@@ -3,7 +3,7 @@ import Link from "next/link";
 import styles from "../book.module.css";
 import "../htmlcolor.css";
 
-export function XCircle({ className = "" }) {
+function XCircle({ className = "" }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
