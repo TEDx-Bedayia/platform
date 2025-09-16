@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import styles from "../book.module.css";
 import "../htmlcolor.css";
 
@@ -37,9 +38,9 @@ export default function Failure() {
           your email.
         </p>
 
-        <a href="/" className={styles.successButton}>
+        <Link href="/" className={styles.successButton}>
           Back to Home
-        </a>
+        </Link>
       </div>
     </div>
   );

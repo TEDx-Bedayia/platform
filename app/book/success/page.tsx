@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import styles from "../book.module.css";
 import "../htmlcolor.css";
 
@@ -34,9 +35,9 @@ export default function Success() {
           Please keep it handy for event entry.
         </p>
 
-        <a href="/" className={styles.successButton}>
+        <Link href="/" className={styles.successButton}>
           Back to Home
-        </a>
+        </Link>
       </div>
     </div>
   );
