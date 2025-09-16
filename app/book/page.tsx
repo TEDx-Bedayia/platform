@@ -303,6 +303,7 @@ export default function SingleTickets() {
               identifier: method.identifier,
               to: method.to,
               fields: method.fields,
+              automatic: method.automatic || false,
             })
           );
 
@@ -326,23 +327,7 @@ export default function SingleTickets() {
       return;
     }
 
-    if (name == "vfcash")
-      value = value.replace(/[\u0660-\u0669]/g, (c) => {
-        return (c.charCodeAt(0) - 0x0660).toString();
-      });
-    if (name == "vfcash") value = value.replace(/[^+\d]/g, "");
-
     if ((name == "tlda" || name == "ipn") && value.includes("+")) return;
-    if (name == "vfcash" && (isNaN(Number(value)) || value.includes(" "))) {
-      if (value != "+") return;
-    }
-    if (name == "vfcash") {
-      if (value.includes("+")) {
-        if (value.length > 13) return;
-      } else if (value.length > 11) {
-        return;
-      }
-    }
     setFormData({
       ...formData,
       additionalFields: {
@@ -399,10 +384,6 @@ export default function SingleTickets() {
     document.body.focus();
     addLoader();
     if (
-      (formData.additionalFields.vfcash &&
-        (formData.additionalFields.vfcash.length < 11 ||
-          (formData.additionalFields.vfcash.includes("+") &&
-            formData.additionalFields.vfcash.length != 13))) ||
       formData.phone.length < 11 ||
       (formData.phone.includes("+") && formData.phone.length != 13)
     ) {
@@ -420,7 +401,12 @@ export default function SingleTickets() {
     });
 
     if (response.ok) {
-      if (formData.paymentMethod === "CARD") {
+      if (
+        paymentOptions
+          .filter((m) => m.automatic)
+          .map((m) => m.identifier.toUpperCase())
+          .includes(formData.paymentMethod.toUpperCase())
+      ) {
         const { paymentUrl } = await response.json();
         window.location.href = paymentUrl;
         return;

@@ -6,9 +6,13 @@ export async function initiateCardPayment(
   email: string,
   amount: number,
   ticketType: string,
-  attendeeId: string
+  attendeeId: string,
+  type: string
 ) {
   try {
+    var integrationId =
+      type === "VFCASH" ? process.env.VFCASH_INT_ID : process.env.INTEGRATION_ID;
+
     var myHeaders = new Headers();
     myHeaders.append("Authorization", "Token " + process.env.SECRET_KEY);
     myHeaders.append("Content-Type", "application/json");
@@ -16,7 +20,7 @@ export async function initiateCardPayment(
     var raw = JSON.stringify({
       amount: amount * 100,
       currency: "EGP",
-      payment_methods: [parseInt(process.env.INTEGRATION_ID?.toString() || "")],
+      payment_methods: [parseInt(integrationId?.toString() || "0")],
       items: [
         {
           name: `${

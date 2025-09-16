@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   let query =
     await sql`SELECT stream, incurred, recieved, created_at FROM pay_backup ORDER BY created_at DESC`;
 
-  let pM = await getPaymentMethods();
+  let pM = getPaymentMethods();
 
   return Response.json(
     query.rows.map((row) => ({

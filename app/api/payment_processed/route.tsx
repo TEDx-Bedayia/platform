@@ -99,7 +99,10 @@ export async function POST(request: NextRequest) {
 
     const orderId = transaction.order.id;
 
-    if (transaction.success) {
+    if (
+      transaction.success &&
+      !transaction.data.merchant.toString().startsWith("TEST")
+    ) {
       // update the payment status in the database using the orderId & check if user already paid then don't do anything
       let members;
       try {
