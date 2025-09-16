@@ -13,6 +13,7 @@ import {
   verifyPaymentMethod,
 } from "../utils/input-sanitization";
 import { TicketType } from "../utils/ticket-types";
+import { getPaymentMethods } from "./payment-methods/payment-methods";
 import { price } from "./price/prices";
 
 // email, name, phone, paymentMethod
@@ -167,7 +168,12 @@ async function submitOneTicket(
   }
 
   let paymentUrl = "";
-  if (paymentMethod === "CARD") {
+  if (
+    getPaymentMethods()
+      .filter((m) => m.automatic)
+      .map((m) => m.identifier.toUpperCase())
+      .includes(paymentMethod.split("@")[0].toUpperCase())
+  ) {
     let amount = price.getPrice(TicketType.INDIVIDUAL, "CARD");
 
     const initiateCardPaymentResponse = await initiateCardPayment(
@@ -176,7 +182,8 @@ async function submitOneTicket(
       email,
       amount,
       "individual",
-      id
+      id,
+      paymentMethod.startsWith("VFCASH") ? "VFCASH" : "CARD"
     );
 
     if (!initiateCardPaymentResponse.ok) {
@@ -200,7 +207,12 @@ async function submitOneTicket(
       paymentUrl
     );
 
-    if (paymentMethod === "CARD") {
+    if (
+      getPaymentMethods()
+        .filter((m) => m.automatic)
+        .map((m) => m.identifier.toUpperCase())
+        .includes(paymentMethod.split("@")[0].toUpperCase())
+    ) {
       return Response.json(
         {
           paymentUrl,

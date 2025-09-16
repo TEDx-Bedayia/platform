@@ -10,6 +10,7 @@ import {
   verifyPaymentMethod,
 } from "../../utils/input-sanitization";
 import { TicketType } from "../../utils/ticket-types";
+import { getPaymentMethods } from "../payment-methods/payment-methods";
 import { price } from "../price/prices";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
@@ -81,7 +82,12 @@ export async function POST(request: NextRequest) {
     let ids = (await resp.json()).ids;
 
     let paymentUrl = "";
-    if (paymentMethod === "CARD") {
+    if (
+      getPaymentMethods()
+        .filter((m) => m.automatic)
+        .map((m) => m.identifier.toUpperCase())
+        .includes(paymentMethod.split("@")[0].toUpperCase())
+    ) {
       let amount = price.getPrice(TicketType.GROUP, "CARD") * 4;
 
       const initiateCardPaymentResponse = await initiateCardPayment(
@@ -90,7 +96,8 @@ export async function POST(request: NextRequest) {
         email1,
         amount,
         "group",
-        ids.join(",")
+        ids.join(","),
+        paymentMethod.startsWith("VFCASH") ? "VFCASH" : "CARD"
       );
 
       if (!initiateCardPaymentResponse.ok) {
@@ -126,7 +133,12 @@ export async function POST(request: NextRequest) {
         paymentUrl
       );
 
-      if (paymentMethod === "CARD") {
+      if (
+        getPaymentMethods()
+          .filter((m) => m.automatic)
+          .map((m) => m.identifier.toUpperCase())
+          .includes(paymentMethod.split("@")[0].toUpperCase())
+      ) {
         return Response.json(
           {
             paymentUrl,

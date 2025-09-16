@@ -50,15 +50,8 @@ const VFCASH: PaymentMethod = {
   displayName: "E-Wallet (e.g. Vodafone Cash)",
   identifier: "VFCASH",
   to: PHONE,
-  fields: [
-    {
-      type: "string",
-      label: "Phone Number",
-      id: "vfcash",
-      placeholder: "E-Wallet Phone Number",
-      required: true,
-    },
-  ],
+  fields: [],
+  automatic: true,
 };
 
 const CASH: PaymentMethod = {
@@ -76,10 +69,10 @@ const CARD: PaymentMethod = {
   fields: [],
 };
 
-export async function getPaymentMethods() {
-  return [CARD, TLDA, INSTAPAY, VFCASH, CASH];
+export function getPaymentMethods() {
+  return [CARD, VFCASH, TLDA, INSTAPAY, CASH];
 }
 
-export async function getIdentifiersForPaymentMethods() {
-  return (await getPaymentMethods()).map((method) => method.identifier);
+export function getIdentifiersForPaymentMethods() {
+  return getPaymentMethods().map((method) => method.identifier);
 }
