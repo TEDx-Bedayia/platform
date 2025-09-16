@@ -101,7 +101,8 @@ export async function POST(request: NextRequest) {
 
     if (
       transaction.success &&
-      !transaction.data.merchant.toString().startsWith("TEST")
+      (!transaction.data.merchant.toString().startsWith("TEST") ||
+        process.env.PAYMOB_TEST_MODE === "true")
     ) {
       // update the payment status in the database using the orderId & check if user already paid then don't do anything
       let members;
