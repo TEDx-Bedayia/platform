@@ -61,16 +61,16 @@ const CASH: PaymentMethod = {
   fields: [],
 };
 
-// const CARD: PaymentMethod = {
-//   displayName: "Credit/Debit Card (or Telda Card)",
-//   identifier: "CARD",
-//   to: "Paymob",
-//   automatic: true,
-//   fields: [],
-// };
+const CARD: PaymentMethod = {
+  displayName: "Credit/Debit Card (or Telda Card)",
+  identifier: "CARD",
+  to: "Paymob",
+  automatic: true,
+  fields: [],
+};
 
 export function getPaymentMethods() {
-  return [CASH];
+  return [CARD, CASH];
 }
 
 export function getIdentifiersForPaymentMethods() {
