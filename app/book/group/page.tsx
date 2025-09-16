@@ -205,7 +205,12 @@ export default function GroupTickets() {
     });
 
     if (response.ok) {
-      if (formData.paymentMethod === "CARD") {
+      if (
+        paymentOptions
+          .filter((m) => m.automatic)
+          .map((m) => m.identifier.toUpperCase())
+          .includes(formData.paymentMethod.toUpperCase())
+      ) {
         const { paymentUrl } = await response.json();
         window.location.href = paymentUrl;
         return;
