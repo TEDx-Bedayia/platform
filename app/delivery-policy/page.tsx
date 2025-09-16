@@ -1,17 +1,7 @@
 import React from "react";
 import styles from "./DeliveryPolicy.module.css";
 
-type Props = {
-  city?: string;
-  effectiveDate?: string;
-  contactEmail?: string;
-};
-
-const DeliveryPolicy: React.FC<Props> = ({
-  city = "Youth Bedayia School",
-  effectiveDate = "September 16, 2025",
-  contactEmail = "tedxyouth@bedayia.com",
-}) => {
+export default function DeliveryPolicy() {
   return (
     <article
       className={styles.container}
@@ -22,14 +12,15 @@ const DeliveryPolicy: React.FC<Props> = ({
           Delivery &amp; Shipment Policy
         </h1>
         <p className={styles.effective}>
-          Effective Date: <time dateTime={effectiveDate}>{effectiveDate}</time>
+          Effective Date:{" "}
+          <time dateTime="September 16, 2025">September 16, 2025</time>
         </p>
       </header>
 
       <section className={styles.section}>
         <p>
-          At TEDx {city}, all tickets are delivered electronically as eTickets.
-          No physical tickets are issued or shipped.
+          At TEDx Youth Bedayia School, all tickets are delivered electronically
+          as eTickets. No physical tickets are issued or shipped.
         </p>
       </section>
 
@@ -71,8 +62,8 @@ const DeliveryPolicy: React.FC<Props> = ({
           <li>Ensure the email address provided during purchase was correct</li>
           <li>
             If the issue persists, contact us at{" "}
-            <a href={`mailto:${contactEmail}`} className={styles.link}>
-              {contactEmail}
+            <a href={`mailto:tedxyouth@bedayia.com`} className={styles.link}>
+              tedxyouth@bedayia.com
             </a>
           </li>
         </ul>
@@ -88,10 +79,10 @@ const DeliveryPolicy: React.FC<Props> = ({
       <section className={styles.section}>
         <h2 className={styles.h2}>5. Contact</h2>
         <address className={styles.address}>
-          <strong>TEDx {city} Team</strong>
+          <strong>TEDx Youth Bedayia School Team</strong>
           <br />
-          <a href={`mailto:${contactEmail}`} className={styles.link}>
-            {contactEmail}
+          <a href={`mailto:tedxyouth@bedayia.com`} className={styles.link}>
+            tedxyouth@bedayia.com
           </a>
         </address>
       </section>
@@ -99,11 +90,9 @@ const DeliveryPolicy: React.FC<Props> = ({
       <footer className={styles.footer}>
         <p className={styles.small}>
           This Delivery &amp; Shipment Policy applies only to eTickets purchased
-          for TEDx {city} events.
+          for TEDx Youth Bedayia School events.
         </p>
       </footer>
     </article>
   );
-};
-
-export default DeliveryPolicy;
+}

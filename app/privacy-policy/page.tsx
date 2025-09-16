@@ -1,17 +1,7 @@
 import React from "react";
 import styles from "./PrivacyPolicy.module.css";
 
-type Props = {
-  city?: string;
-  effectiveDate?: string;
-  contactEmail?: string;
-};
-
-const PrivacyPolicy: React.FC<Props> = ({
-  city = "Youth Bedayia School",
-  effectiveDate = "September 16, 2025",
-  contactEmail = "tedxyouth@bedayia.com",
-}) => {
+export default function PrivacyPolicy() {
   return (
     <article
       className={styles.container}
@@ -22,17 +12,18 @@ const PrivacyPolicy: React.FC<Props> = ({
           Privacy Policy
         </h1>
         <p className={styles.effective}>
-          Effective Date: <time dateTime={effectiveDate}>{effectiveDate}</time>
+          Effective Date:{" "}
+          <time dateTime="September 16, 2025">September 16, 2025</time>
         </p>
       </header>
 
       <section className={styles.section}>
         <p>
-          <strong>TEDx {city}</strong> (“we”, “our”, or “us”) respects your
-          privacy and is committed to protecting the personal information you
-          share with us. This Privacy Policy explains how we collect, use,
-          share, and retain the personal information necessary to issue and
-          admit attendees to our events.
+          <strong>TEDx Youth Bedayia School</strong> (“we”, “our”, or “us”)
+          respects your privacy and is committed to protecting the personal
+          information you share with us. This Privacy Policy explains how we
+          collect, use, share, and retain the personal information necessary to
+          issue and admit attendees to our events.
         </p>
       </section>
 
@@ -119,8 +110,8 @@ const PrivacyPolicy: React.FC<Props> = ({
           Depending on your jurisdiction, you may have rights to access,
           correct, or delete the personal information we hold about you. To
           exercise these rights, contact us at{" "}
-          <a href={`mailto:${contactEmail}`} className={styles.link}>
-            {contactEmail}
+          <a href={`mailto:tedxyouth@bedayia.com`} className={styles.link}>
+            tedxyouth@bedayia.com
           </a>
           .
         </p>
@@ -143,10 +134,10 @@ const PrivacyPolicy: React.FC<Props> = ({
           data practices, please contact:
         </p>
         <address className={styles.address}>
-          <strong>TEDx {city} Team</strong>
+          <strong>TEDx Youth Bedayia School Team</strong>
           <br />
-          <a href={`mailto:${contactEmail}`} className={styles.link}>
-            {contactEmail}
+          <a href={`mailto:tedxyouth@bedayia.com`} className={styles.link}>
+            tedxyouth@bedayia.com
           </a>
         </address>
       </section>
@@ -160,6 +151,4 @@ const PrivacyPolicy: React.FC<Props> = ({
       </footer>
     </article>
   );
-};
-
-export default PrivacyPolicy;
+}

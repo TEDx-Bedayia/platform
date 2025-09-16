@@ -1,17 +1,7 @@
 import React from "react";
 import styles from "./RefundPolicy.module.css";
 
-type Props = {
-  city?: string;
-  effectiveDate?: string;
-  contactEmail?: string;
-};
-
-const RefundPolicy: React.FC<Props> = ({
-  city = "Youth Bedayia School",
-  effectiveDate = "September 16, 2025",
-  contactEmail = "tedxyouth@bedayia.com",
-}) => {
+export default function RefundPolicy() {
   return (
     <article className={styles.container} aria-labelledby="refund-policy-title">
       <header className={styles.header}>
@@ -19,15 +9,16 @@ const RefundPolicy: React.FC<Props> = ({
           Refund &amp; Cancellation Policy
         </h1>
         <p className={styles.effective}>
-          Effective Date: <time dateTime={effectiveDate}>{effectiveDate}</time>
+          Effective Date:{" "}
+          <time dateTime="September 16, 2025">September 16, 2025</time>
         </p>
       </header>
 
       <section className={styles.section}>
         <p>
-          TEDx {city} eTickets are issued for admission to a one-time live
-          event. Please review this policy carefully before completing your
-          purchase.
+          TEDx Youth Bedayia School eTickets are issued for admission to a
+          one-time live event. Please review this policy carefully before
+          completing your purchase.
         </p>
       </section>
 
@@ -88,8 +79,8 @@ const RefundPolicy: React.FC<Props> = ({
         <p>
           To request a refund under the conditions outlined above, please
           contact us at{" "}
-          <a href={`mailto:${contactEmail}`} className={styles.link}>
-            {contactEmail}
+          <a href={`mailto:tedxyouth@bedayia.com`} className={styles.link}>
+            tedxyouth@bedayia.com
           </a>{" "}
           and provide:
         </p>
@@ -112,22 +103,20 @@ const RefundPolicy: React.FC<Props> = ({
       <section className={styles.section}>
         <h2 className={styles.h2}>7. Contact</h2>
         <address className={styles.address}>
-          <strong>TEDx {city} Team</strong>
+          <strong>TEDx Youth Bedayia School Team</strong>
           <br />
-          <a href={`mailto:${contactEmail}`} className={styles.link}>
-            {contactEmail}
+          <a href={`mailto:tedxyouth@bedayia.com`} className={styles.link}>
+            tedxyouth@bedayia.com
           </a>
         </address>
       </section>
 
       <footer className={styles.footer}>
         <p className={styles.small}>
-          This Refund &amp; Cancellation Policy applies only to TEDx {city}{" "}
-          events and may be updated at any time.
+          This Refund &amp; Cancellation Policy applies only to TEDx Youth
+          Bedayia School events and may be updated at any time.
         </p>
       </footer>
     </article>
   );
-};
-
-export default RefundPolicy;
+}
