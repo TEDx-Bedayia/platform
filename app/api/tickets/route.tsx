@@ -2,7 +2,7 @@ import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
-import { safeRandUUID } from "../admin/payment-reciever/main";
+import { pay, safeRandUUID } from "../admin/payment-reciever/main";
 import { initiateCardPayment } from "../utils/card-payment";
 import { sendBookingConfirmation } from "../utils/email-helper";
 import {
@@ -89,14 +89,6 @@ async function submitOneTicket(
     );
   }
 
-  paymentMethod = await verifyPaymentMethod(paymentMethod);
-  if (paymentMethod === undefined || paymentMethod.split("@").length > 2) {
-    return Response.json(
-      { message: "Please enter a valid payment method." },
-      { status: 400 }
-    );
-  }
-
   if (phone[0] == "+") {
     phone = phone.slice(1);
   }
@@ -168,22 +160,15 @@ async function submitOneTicket(
   }
 
   let paymentUrl = "";
-  if (
-    getPaymentMethods()
-      .filter((m) => m.automatic)
-      .map((m) => m.identifier.toUpperCase())
-      .includes(paymentMethod.split("@")[0].toUpperCase())
-  ) {
+  if (paymentMethod === "CARD") {
     let amount = price.getPrice(TicketType.INDIVIDUAL, "CARD");
-
     const initiateCardPaymentResponse = await initiateCardPayment(
       name,
       phone,
       email,
       amount,
       "individual",
-      id,
-      paymentMethod.startsWith("VFCASH") ? "VFCASH" : "CARD"
+      id
     );
 
     if (!initiateCardPaymentResponse.ok) {
@@ -207,20 +192,26 @@ async function submitOneTicket(
       paymentUrl
     );
 
-    if (
-      getPaymentMethods()
-        .filter((m) => m.automatic)
-        .map((m) => m.identifier.toUpperCase())
-        .includes(paymentMethod.split("@")[0].toUpperCase())
-    ) {
+    if (paymentMethod === "CARD") {
       return Response.json(
         {
-          paymentUrl,
+          paymentUrl: paymentUrl,
           success: true,
         },
         { status: 200 }
       );
     }
+    return Response.json(
+      {
+        message: `Ticket Booked Successfully! Please check your email to continue.${
+          paymentMethod === "CASH"
+            ? ` Your Attendee ID is ${id}. Use it to pay at the school office.`
+            : ""
+        }`,
+        success: true,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE id = ${id}`;
@@ -237,17 +228,6 @@ async function submitOneTicket(
       { status: 400 }
     );
   }
-  return Response.json(
-    {
-      message: `Ticket Booked Successfully! Please check your email to continue.${
-        paymentMethod === "CASH"
-          ? ` Your Attendee ID is ${id}. Use it to pay at the school office.`
-          : ""
-      }`,
-      success: true,
-    },
-    { status: 200 }
-  );
 }
 
 export async function GET() {

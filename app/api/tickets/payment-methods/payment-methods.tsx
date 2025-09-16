@@ -16,43 +16,43 @@ export interface Field {
   id: string;
 }
 
-const TLDA: PaymentMethod = {
-  displayName: "Telda",
-  identifier: "TLDA",
-  to: TELDA,
-  fields: [
-    {
-      type: "string",
-      id: "tlda",
-      label: "Telda Username",
-      placeholder: "Telda Username",
-      required: true,
-    },
-  ],
-};
+// const TLDA: PaymentMethod = {
+//   displayName: "Telda",
+//   identifier: "TLDA",
+//   to: TELDA,
+//   fields: [
+//     {
+//       type: "string",
+//       id: "tlda",
+//       label: "Telda Username",
+//       placeholder: "Telda Username",
+//       required: true,
+//     },
+//   ],
+// };
 
-const INSTAPAY: PaymentMethod = {
-  displayName: "Instapay",
-  identifier: "IPN",
-  to: IPN,
-  fields: [
-    {
-      type: "string",
-      id: "ipn",
-      label: "InstaPay Address (IPA)",
-      placeholder: "InstaPay Address (without @instapay)",
-      required: true,
-    },
-  ],
-};
+// const INSTAPAY: PaymentMethod = {
+//   displayName: "Instapay",
+//   identifier: "IPN",
+//   to: IPN,
+//   fields: [
+//     {
+//       type: "string",
+//       id: "ipn",
+//       label: "InstaPay Address (IPA)",
+//       placeholder: "InstaPay Address (without @instapay)",
+//       required: true,
+//     },
+//   ],
+// };
 
-const VFCASH: PaymentMethod = {
-  displayName: "E-Wallet (e.g. Vodafone Cash)",
-  identifier: "VFCASH",
-  to: PHONE,
-  fields: [],
-  automatic: true,
-};
+// const VFCASH: PaymentMethod = {
+//   displayName: "E-Wallet (e.g. Vodafone Cash)",
+//   identifier: "VFCASH",
+//   to: PHONE,
+//   fields: [],
+//   automatic: true,
+// };
 
 const CASH: PaymentMethod = {
   displayName: "Bedayia High School Office (Cash)",
@@ -70,7 +70,7 @@ const CARD: PaymentMethod = {
 };
 
 export function getPaymentMethods() {
-  return [CARD, VFCASH, TLDA, INSTAPAY, CASH];
+  return [CARD, CASH];
 }
 
 export function getIdentifiersForPaymentMethods() {

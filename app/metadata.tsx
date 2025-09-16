@@ -1,6 +1,6 @@
 import type { Author } from "next/dist/lib/metadata/types/metadata-types";
 
-export const PHONE = "+20 105 578 2533"; // Change to E-Wallet & WhatsApp Enabled phone number
+export const PHONE = "+20 105 578 2533"; // Change to WhatsApp Enabled phone number
 export const TELDA = "@alymob"; // Change to Telda username
 export const IPN = "omarelmandooh@instapay"; // Change to Instapay details
 
