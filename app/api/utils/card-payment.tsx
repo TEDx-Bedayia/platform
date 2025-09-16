@@ -11,7 +11,7 @@ export async function initiateCardPayment(
 ) {
   try {
     var integrationId =
-      type == "VFCASH" ? process.env.VFCASH_INT_ID : process.env.INTEGRATION_ID;
+      type === "VFCASH" ? process.env.VFCASH_INT_ID : process.env.INTEGRATION_ID;
 
     var myHeaders = new Headers();
     myHeaders.append("Authorization", "Token " + process.env.SECRET_KEY);
