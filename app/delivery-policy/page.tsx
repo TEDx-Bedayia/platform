@@ -20,7 +20,8 @@ export default function DeliveryPolicy() {
       <section className={styles.section}>
         <p>
           At TEDx Youth Bedayia School, all tickets are delivered electronically
-          as eTickets. No physical tickets are issued or shipped.
+          as eTickets, issued directly by us. No physical tickets are issued or
+          shipped.
         </p>
       </section>
 
@@ -28,9 +29,9 @@ export default function DeliveryPolicy() {
         <h2 className={styles.h2}>1. Delivery Method</h2>
         <ul className={styles.list}>
           <li>
-            <strong>Online Payments (via PayMob):</strong> eTickets are
-            delivered instantly by email to the address provided during
-            purchase, once payment is successfully processed.
+            <strong>Online Payments (via PayMob):</strong> we deliver the
+            eTickets instantly by email to the address provided during purchase,
+            once payment is successfully processed.
           </li>
           <li>
             <strong>Cash Payments (at the school office):</strong> eTickets are
