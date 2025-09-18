@@ -9,7 +9,7 @@ import {
   verifyPaymentMethod,
 } from "../../utils/input-sanitization";
 import { TicketType } from "../../utils/ticket-types";
-
+ 
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod
 export async function POST(request: NextRequest) {
@@ -93,13 +93,16 @@ export async function POST(request: NextRequest) {
 
     try {
       // Send email to group leader
-      await sendBookingConfirmation(
+      if (paymentMethod == "CASH") {
+        await sendBookingConfirmation(
         paymentMethod,
         name1,
         emails[0],
         ids[0],
         TicketType.GROUP
       );
+      }
+      
     } catch (e) {
       console.error(
         "[CRITICAL ERROR] CONFIRMATION EMAIL NOT SENT TO GROUP LEADER",

@@ -156,13 +156,16 @@ async function submitOneTicket(
 
   try {
     // send payment details and next steps.
-    await sendBookingConfirmation(
+    if (paymentMethod == "CASH") {
+      await sendBookingConfirmation(
       paymentMethod,
       name,
       email,
       id,
       TicketType.INDIVIDUAL
-    );
+      );
+    }
+    
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE id = ${id}`;

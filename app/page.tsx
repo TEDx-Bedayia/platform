@@ -214,8 +214,7 @@ export default function Home() {
 
             <div className="ml-2 mt-6 flex flex-row items-end justify-center gap-4 max-tablet:ml-0 max-phone:mt-[1.125rem] max-phone:flex-col max-phone:items-center max-phone:justify-center max-phone:gap-2">
               <motion.div
-                initial={{ rotate: 30 }}
-                animate={{ rotate: 0 }}
+                
                 transition={{ ease: "easeInOut", duration: 0.75 }}
               >
                 <button
@@ -228,8 +227,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div
-                initial={{ rotate: -30 }}
-                animate={{ rotate: 0 }}
+
                 transition={{ ease: "easeInOut", duration: 0.75 }}
               >
                 <div className="secondary-wrapper relative mt-4 hover:-translate-y-2">
@@ -244,10 +242,13 @@ export default function Home() {
                     Book a Group Ticket
                   </button>
                 </div>
-              </motion.div>
+            </motion.div>
             </div>
           </div>
         </section>
+        <section>
+        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">Countdown</div>
+      </section>
 
         {/* <section
           id="testimonials"
