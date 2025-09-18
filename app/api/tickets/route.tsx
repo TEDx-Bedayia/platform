@@ -185,13 +185,14 @@ async function submitOneTicket(
     // send payment details and next steps.
     if (paymentMethod == "CASH") {
       await sendBookingConfirmation(
-      paymentMethod,
-      name,
-      email,
-      id,
-      TicketType.INDIVIDUAL,
-      paymentUrl
-    );
+        paymentMethod,
+        name,
+        email,
+        id,
+        TicketType.INDIVIDUAL,
+        paymentUrl
+      );
+    }
 
     if (paymentMethod === "CARD") {
       return Response.json(
