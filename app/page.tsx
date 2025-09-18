@@ -34,7 +34,7 @@ function infoLink(text: string, svg: any, link: string) {
       <Link
         href={link}
         className="font-[Sansation] text-[2em]/[2rem] text-secondary-200 underline max-phone:text-[1.25em]/[1.25rem]"
-        style={{ fontWeight: 400 }}
+        style={{ fontWeight: 400, textDecorationColor: "#007BFF", color: "#333333" }}
       >
         {text}
       </Link>
@@ -214,7 +214,8 @@ export default function Home() {
 
             <div className="ml-2 mt-6 flex flex-row items-end justify-center gap-4 max-tablet:ml-0 max-phone:mt-[1.125rem] max-phone:flex-col max-phone:items-center max-phone:justify-center max-phone:gap-2">
               <motion.div
-                
+                initial={{ rotate: 0 }}
+                animate={{ rotate: 0 }}
                 transition={{ ease: "easeInOut", duration: 0.75 }}
               >
                 <button
@@ -227,7 +228,8 @@ export default function Home() {
               </motion.div>
 
               <motion.div
-
+                initial={{ rotate: 0 }}
+                animate={{ rotate: 0 }}
                 transition={{ ease: "easeInOut", duration: 0.75 }}
               >
                 <div className="secondary-wrapper relative mt-4 hover:-translate-y-2">
@@ -356,7 +358,7 @@ export default function Home() {
                 className="align-start m-0 inline-flex w-max justify-start rounded-[0.75rem] bg-accent py-1 pl-4 pr-2 font-bold"
                 style={{ lineHeight: "1rem" }}
               >
-                <span>Echoes of Time</span>
+                <span><a style={{color: "#F9F9F9"}}>Echoes of Time</a></span>
                 <Image
                   className="h-4 w-4"
                   src="/mini-stars-dreamscape.png"
@@ -374,9 +376,7 @@ export default function Home() {
           </center>
         </div>
       </section>
-      <section>
-        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">FAQS</div>
-      </section>
+      
 
       <section
         id="info"
@@ -511,6 +511,9 @@ export default function Home() {
           </div>
         </center>
       </section>
+      <section>
+        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">FAQS</div>
+      </section>
 
       <center>
         <div className="temp-note mt-20 w-[33.5rem] font-small text-text-gray-dark max-phone:w-[95vw]">
@@ -519,7 +522,7 @@ export default function Home() {
             className="font-body text-secondary-200"
             href="https://wa.me/201055782533"
           >
-            +201021991550
+            +201055782533
           </a>{" "}
           if you find any bugs.
         </div>
