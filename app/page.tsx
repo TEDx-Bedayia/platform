@@ -102,7 +102,7 @@ export default function Home() {
     <main className="wrapper" style={{ scrollBehavior: "smooth" }}>
       <center
         className="fixed top-0 z-[9999999] w-[100%] backdrop-blur-[5px]"
-        style={{ background: "rgba(249, 249, 249, 1)" }}
+        style={{ background: "rgba(249, 249, 249, 0.06)" }}
       >
         <section
           id="nav"
