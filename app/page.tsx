@@ -244,10 +244,13 @@ export default function Home() {
                     Book a Group Ticket
                   </button>
                 </div>
-              </motion.div>
+            </motion.div>
             </div>
           </div>
         </section>
+        <section>
+        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">Countdown</div>
+      </section>
 
         {/* <section
           id="testimonials"

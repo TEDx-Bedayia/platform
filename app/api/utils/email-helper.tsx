@@ -16,20 +16,8 @@ export async function sendBookingConfirmation(
   const htmlContent = await promises.readFile(filePath, "utf8");
 
   let paymentDetails = "";
-  if (paymentMethod.split("@")[0] === "VFCASH") {
-    paymentDetails = `Please proceed with your Mobile Wallet payment to <strong>${PHONE}</strong>. After your payment, send us a WhatsApp or SMS message from the phone you will pay with, <strong>${
-      paymentMethod.split("@")[1]
-    }</strong>, stating your Attendee ID: <strong>${ID}</strong> to confirm your payment.`;
-  } else if (paymentMethod.split("@")[0] === "CASH") {
+  if (paymentMethod.split("@")[0] === "CASH") {
     paymentDetails = `Please proceed with your cash payment to Bedayia's Office. Make sure you tell them your Attendee ID: <strong>${ID}</strong>.`;
-  } else if (paymentMethod.split("@")[0] === "TLDA") {
-    paymentDetails = `Please proceed with your Telda transfer to the following account: <strong>${TELDA}</strong>. Make sure to include a comment with your Attendee ID: <strong>${ID}</strong>. You're sending from @${
-      paymentMethod.split("@")[1]
-    }. If that's incorrect please reply to this message or contact us on WhatsApp as soon as possible.`;
-  } else if (paymentMethod.split("@")[0] === "IPN") {
-    paymentDetails = `Please proceed with your InstaPay Transfer to the following account: <strong>${IPN}</strong>. Then, please send us a screenshot of your payment with your username <strong>${
-      paymentMethod.split("@")[1]
-    }@instapay</strong> visible and send your Attendee ID, <strong>${ID}</strong>, on our WhatsApp at <strong>${PHONE}</strong> or simply send the screenshot as a reply to this message if you don't have WhatsApp.`;
   }
 
   let pricingDesc =
