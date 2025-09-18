@@ -214,7 +214,7 @@ export default function Home() {
 
             <div className="ml-2 mt-6 flex flex-row items-end justify-center gap-4 max-tablet:ml-0 max-phone:mt-[1.125rem] max-phone:flex-col max-phone:items-center max-phone:justify-center max-phone:gap-2">
               <motion.div
-                initial={{ rotate: 30 }}
+                initial={{ rotate: 0 }}
                 animate={{ rotate: 0 }}
                 transition={{ ease: "easeInOut", duration: 0.75 }}
               >
@@ -228,7 +228,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div
-                initial={{ rotate: -30 }}
+                initial={{ rotate: 0 }}
                 animate={{ rotate: 0 }}
                 transition={{ ease: "easeInOut", duration: 0.75 }}
               >

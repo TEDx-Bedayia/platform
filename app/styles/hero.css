@@ -41,8 +41,8 @@
 
 #hero .primary:hover {
   box-shadow:
-    0 19px 38px rgba(141, 37, 71, 0.25),
-    0 15px 12px rgba(141, 37, 71, 0.22);
+    0 19px 38px #3333333b,
+    0 15px 12px #3333333b;
 }
 
 #hero .secondary-wrapper {
