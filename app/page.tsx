@@ -315,7 +315,7 @@ export default function Home() {
         </section> */}
       </center>
       <section>
-        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">Total atendee count: 40000+</div>
+        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">Total attendee count: 40000+</div>
       </section>
       <section>
         <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">Improved Testimonials</div>
