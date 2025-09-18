@@ -69,24 +69,11 @@ export async function verifyPaymentMethod(
   if (metadata && metadata.includes("@")) {
     return;
   }
-  const options = await getIdentifiersForPaymentMethods();
+  const options = getIdentifiersForPaymentMethods();
   if (!paymentMethod || !options.includes(method)) {
     return;
   }
 
-  const vfcash = /^[0-9]{11}$/;
-
-  if (method === "VFCASH") {
-    // Replace ٠-٩ with 0-9
-    metadata = metadata.replace(/[\u0660-\u0669]/g, (c) =>
-      (c.charCodeAt(0) - 0x0660).toString()
-    );
-    if (metadata.length === 13 && metadata.startsWith("+")) {
-      metadata = metadata.slice(2);
-    }
-    if (vfcash.test(metadata)) return method + "@" + metadata;
-    else return;
-  }
   if (checkSafety(metadata)) return paymentMethod;
   return;
 }

@@ -10,7 +10,8 @@ export async function sendBookingConfirmation(
   name: string,
   email: string,
   ID: string,
-  ticketType: TicketType
+  ticketType: TicketType,
+  paymentUrl: string | undefined = undefined
 ) {
   const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
   const htmlContent = await promises.readFile(filePath, "utf8");

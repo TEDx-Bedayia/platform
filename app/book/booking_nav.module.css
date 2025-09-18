@@ -58,6 +58,9 @@
 .contact {
   bottom: 4rem;
 }
+.contact2 {
+  bottom: 3rem;
+}
 
 .navigation > a:hover::after {
   transform: scaleX(1);
@@ -92,6 +95,10 @@
 
   .navigation > a {
     font-size: 0.8rem;
+  }
+
+  .hideOnMobile {
+    display: none;
   }
 }
 

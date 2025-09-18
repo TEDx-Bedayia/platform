@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
+import { form } from "framer-motion/client";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
 import {
@@ -13,6 +14,7 @@ import {
   PaymentMethod,
 } from "../../api/tickets/payment-methods/payment-methods";
 import { addLoader, removeLoader } from "../../global_components/loader";
+import "../htmlcolor.css";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
@@ -25,42 +27,7 @@ export default function GroupTickets() {
     additionalFields: {} as { [key: string]: string },
   });
 
-  const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
-  const [selectedPaymentFields, setSelectedPaymentFields] = useState(
-    [] as Field[]
-  );
-
   const [useSameEmail, setUseSameEmail] = useState(false);
-
-  useEffect(() => {
-    const fetchPaymentMethods = async () => {
-      try {
-        const response = await fetch("/api/tickets/payment-methods");
-        if (response.ok) {
-          const data = (await response.json()) as {
-            paymentMethods: PaymentMethod[];
-          };
-
-          const methods: PaymentMethod[] = data.paymentMethods.map(
-            (method) => ({
-              displayName: method.displayName,
-              identifier: method.identifier,
-              to: method.to,
-              fields: method.fields,
-            })
-          );
-
-          setPaymentOptions(methods);
-        } else {
-          console.error("Failed to fetch payment methods");
-        }
-      } catch (error) {
-        console.error("Error fetching payment methods:", error);
-      }
-    };
-
-    fetchPaymentMethods();
-  }, []);
 
   const handleAdditionalFieldChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -68,22 +35,6 @@ export default function GroupTickets() {
     let { name, value } = e.target;
     if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
       return;
-    }
-    if (name == "vfcash")
-      value = value.replace(/[\u0660-\u0669]/g, (c) => {
-        return (c.charCodeAt(0) - 0x0660).toString();
-      });
-    if (name == "vfcash") value = value.replace(/[^+\d]/g, "");
-    if ((name == "tlda" || name == "ipn") && value.includes("+")) return;
-    if (name == "vfcash" && (isNaN(Number(value)) || value.includes(" "))) {
-      if (value != "+") return;
-    }
-    if (name == "vfcash") {
-      if (value.includes("+")) {
-        if (value.length > 13) return;
-      } else if (value.length > 11) {
-        return;
-      }
     }
     setFormData({
       ...formData,
@@ -140,21 +91,6 @@ export default function GroupTickets() {
         [name]: value,
       });
     }
-
-    // Set additional fields for the selected payment method
-    if (name === "paymentMethod") {
-      const selectedOption = paymentOptions.find(
-        (option) => option.identifier === value
-      );
-
-      setFormData({
-        ...formData,
-        paymentMethod: value,
-        additionalFields: {},
-      });
-
-      setSelectedPaymentFields(selectedOption?.fields || []);
-    }
   };
 
   async function handleSubmit(e: React.FormEvent) {
@@ -204,6 +140,11 @@ export default function GroupTickets() {
     });
 
     if (response.ok) {
+      if (formData.paymentMethod === "CARD") {
+        const { paymentUrl } = await response.json();
+        window.location.href = paymentUrl;
+        return;
+      }
       setFormData({
         emails: ["", "", "", ""],
         names: ["", "", "", ""],
@@ -212,7 +153,6 @@ export default function GroupTickets() {
         additionalFields: {} as { [key: string]: string },
       });
       setUseSameEmail(false);
-      setSelectedPaymentFields([]);
       customAlert((await response.json()).message ?? "Submitted.");
       setCurrentPerson(0);
     } else {
@@ -339,123 +279,6 @@ export default function GroupTickets() {
             </div>
           )}
 
-          {currentPerson == 0 && (
-            <div
-              id="paymentMethodContainer"
-              className={styles.paymentMethodContainer}
-            >
-              <div
-                className={styles.paymentMethodSelector}
-                id="payment-method"
-                onClick={() => {
-                  document
-                    .getElementById("paymentMethodOptions")
-                    ?.classList.toggle(styles.activeOption);
-
-                  document
-                    .getElementsByClassName(styles.selectArrow)[0]
-                    .classList.toggle(styles.activeSVG);
-                }}
-              >
-                {paymentOptions.find(
-                  (value) => value.identifier == formData.paymentMethod
-                )?.displayName == null ? (
-                  <span style={{ padding: "0", margin: "0" }}>
-                    Select Payment Method
-                  </span>
-                ) : (
-                  <span style={{ color: "white", padding: "0", margin: "0" }}>
-                    {
-                      paymentOptions.find(
-                        (value) => value.identifier == formData.paymentMethod
-                      )?.displayName
-                    }
-                  </span>
-                )}
-              </div>
-              <div
-                id="paymentMethodOptions"
-                className={styles.paymentMethodOptions}
-              >
-                {paymentOptions.map((option) => (
-                  <div
-                    className={styles.paymentMethod}
-                    key={option.identifier}
-                    onClick={() => {
-                      setFormData({
-                        ...formData,
-                        paymentMethod: option.identifier,
-                        additionalFields: {},
-                      });
-
-                      setSelectedPaymentFields(option.fields || []);
-
-                      document
-                        .getElementById("paymentMethodOptions")
-                        ?.classList.toggle(styles.activeOption);
-                      document
-                        .getElementsByClassName(styles.selectArrow)[0]
-                        .classList.toggle(styles.activeSVG);
-                    }}
-                  >
-                    {option.displayName}
-                  </div>
-                ))}
-              </div>
-
-              <svg
-                className={styles.selectArrow}
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{ zIndex: 101 }}
-              >
-                <path
-                  d="M6 8.825C5.8 8.825 5.6 8.725 5.5 8.625L2.2 5.325C1.9 5.025 1.9 4.525 2.2 4.225C2.5 3.925 3 3.925 3.3 4.225L6 6.925L8.7 4.225C9 3.925 9.5 3.925 9.8 4.225C10.1 4.525 10.1 5.025 9.8 5.325L6.6 8.525C6.4 8.725 6.2 8.825 6 8.825Z"
-                  fill="#fff"
-                />
-              </svg>
-            </div>
-          )}
-
-          {/* Dynamically render additional fields based on selected payment method */}
-          {selectedPaymentFields.length > 0 && currentPerson == 0 && (
-            <div className="additional-field-container">
-              {selectedPaymentFields.length > 0 &&
-                selectedPaymentFields.map((field, index) => (
-                  <motion.div
-                    initial={{ opacity: 0.3, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    key={index}
-                    transition={{
-                      type: "tween",
-                      ease: "easeIn",
-                      duration: 0.75,
-                    }}
-                  >
-                    <div className={styles.mainTextbox}>
-                      <div className={styles.inputWrapper}>
-                        <input
-                          type={field.type}
-                          name={field.id}
-                          id={`additional-field-${index}`}
-                          placeholder=" "
-                          required={field.required}
-                          value={formData.additionalFields[field.id] || ""}
-                          onChange={handleAdditionalFieldChange}
-                        />
-                        <label htmlFor={`additional-field-${index}`}>
-                          {field.placeholder}
-                        </label>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-            </div>
-          )}
-
           {currentPerson != 3 &&
             (formData.emails.includes("") || formData.names.includes("")) && (
               <h3
@@ -516,15 +339,7 @@ export default function GroupTickets() {
                       if (
                         formData.names[currentPerson] != "" &&
                         verifyEmail(formData.emails[currentPerson]) &&
-                        formData.phone.length >= 11 &&
-                        formData.paymentMethod &&
-                        (formData.paymentMethod == "CASH" ||
-                          (formData.additionalFields[
-                            selectedPaymentFields[0].id
-                          ] != "" &&
-                            formData.additionalFields[
-                              selectedPaymentFields[0].id
-                            ] != null))
+                        formData.phone.length >= 11
                       ) {
                         document.getElementsByTagName(
                           "form"
@@ -544,8 +359,6 @@ export default function GroupTickets() {
                           document.getElementById("email-input")!.focus();
                         else if (formData.phone.length < 11)
                           document.getElementById("phone-input")!.focus();
-                        else if (formData.paymentMethod == "")
-                          document.getElementById("payment-method")!.click();
                       }
                     }}
                   >
@@ -555,22 +368,47 @@ export default function GroupTickets() {
               )}
           </div>
 
-          <motion.div
-            initial={{ opacity: 0.2 }}
-            animate={{ opacity: 1 }}
-            transition={{ type: "tween", ease: "anticipate", duration: 2 }}
-          >
-            {(currentPerson == 3 ||
-              (!formData.emails.includes("") &&
-                !formData.names.includes(""))) && (
-              <button
-                type="submit"
-                style={{ ...title.style, width: "100%", marginTop: "2rem" }}
+          {(currentPerson == 3 ||
+            (!formData.emails.includes("") &&
+              !formData.names.includes(""))) && (
+            <>
+              <motion.div
+                initial={{ opacity: 0.2 }}
+                animate={{ opacity: 1 }}
+                transition={{ type: "tween", ease: "anticipate", duration: 2 }}
               >
-                Submit
-              </button>
-            )}
-          </motion.div>
+                <button
+                  type="submit"
+                  style={{ ...title.style, width: "100%", marginTop: "2rem" }}
+                  onClick={() => {
+                    formData.paymentMethod = "CARD";
+                  }}
+                >
+                  Pay Online
+                </button>
+              </motion.div>
+
+              <div className="flex items-center justify-center mt-4 mb-4 font-bold">
+                OR
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0.2 }}
+                animate={{ opacity: 1 }}
+                transition={{ type: "tween", ease: "anticipate", duration: 2 }}
+              >
+                <button
+                  className={`${styles.schoolOfficeButton} font-bold`}
+                  style={{ ...title.style, width: "100%" }}
+                  onClick={() => {
+                    formData.paymentMethod = "CASH";
+                  }}
+                >
+                  Pay at Bedayia High School Office
+                </button>
+              </motion.div>
+            </>
+          )}
         </form>
       </motion.div>
     </section>
