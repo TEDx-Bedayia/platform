@@ -52,6 +52,7 @@
   gap: 20px;
   justify-content: center;
   bottom: 1rem;
+  filter: invert(39%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%) contrast(100%);
 }
 
 .contact {

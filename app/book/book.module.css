@@ -103,9 +103,9 @@
 .container input,
 .container select,
 .paymentMethodSelector {
-  background: rgba(255, 255, 255, 0.15);
+  background: #E0E0E0;
 
-  color: #fff; /* White text inside inputs */
+  color: #666666; /* White text inside inputs */
   padding: 10px 16px;
   margin: 10px 0;
   border-radius: 100rem;
@@ -133,7 +133,7 @@
 
 .container input:focus {
   outline: none;
-  border: #b1aae4 2px solid;
+  border: #666666 2px solid;
 }
 
 .container select:focus {
@@ -150,7 +150,7 @@
   top: 12px;
   left: 0;
   padding: 10px 20px;
-  color: #ffffff;
+  color: #666666;
   opacity: 0.5;
   font-size: 1em;
   pointer-events: none;
@@ -161,7 +161,7 @@
 .inputWrapper input:not(:placeholder-shown) + label {
   font-size: 0.55em;
   top: 5px;
-  color: #ffccda;
+  color: #666666;
   opacity: 1;
   font-weight: 700;
 }
@@ -260,13 +260,13 @@
 /* Hover and focus states */
 .paymentMethodContainer select:hover,
 .paymentMethodContainer select:focus {
-  border: #b1aae4 2px solid;
-  color: #ffffffdd;
+  border: #666666 2px solid;
+  color: #666666;
 }
 
 .paymentMethodOptions {
   position: absolute;
-  background-color: #a07299;
+  background-color: #666666;
   top: 0;
   z-index: 100;
   border-radius: 1.5rem;
@@ -289,7 +289,7 @@
 }
 
 .paymentMethodOptions > div {
-  border-bottom: #ffffff40 1px solid;
+  border-bottom: #666666 1px solid;
 }
 
 .selectArrow {
@@ -309,7 +309,7 @@
 }
 
 .container select:valid {
-  color: #fff !important;
+  color: #666666 !important;
 }
 
 .buttonsContainer {
@@ -322,7 +322,7 @@
 }
 
 .buttonsContainer button {
-  background-color: #007bff;
+  background-color: #007BFF;
   /* background: linear-gradient(45deg, #007bff, #0056b3); */
   color: #fff;
   padding: 4px 4px;
@@ -341,7 +341,7 @@
 
 .container button[type="submit"],
 .codeInputDialog button {
-  background-color: #007bff;
+  background-color: #007BFF;
   /* background: linear-gradient(45deg, #007bff, #0056b3); */
   color: #fff;
   padding: 12px 0px;

@@ -26,6 +26,7 @@ export default function RootLayout({
           left: 0,
           right: 0,
           zIndex: 10000,
+          
         }}
       >
         <nav className={styles.navigation} style={ubuntu.style}>

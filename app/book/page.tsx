@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./book.module.css";
 
 import { motion } from "framer-motion";
-
+ 
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
 import {
@@ -445,7 +445,7 @@ export default function SingleTickets() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ ease: "easeOut", duration: 1.5 }}
       >
-        <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Ticket</h1>
+        <h1 style={{ ...title.style, fontWeight: 700, color: '#333333' }}>Book a Ticket</h1>
         <h2 style={{ ...title.style, fontWeight: 100 }}>
           {code ? "Paid Ticket!" : "400 EGP"}
         </h2>
