@@ -358,7 +358,7 @@ export default function Home() {
                 className="align-start m-0 inline-flex w-max justify-start rounded-[0.75rem] bg-accent py-1 pl-4 pr-2 font-bold"
                 style={{ lineHeight: "1rem" }}
               >
-                <span><a style={{color: "#F9F9F9"}}>Echoes of Time</a></span>
+                <span><span style={{color: "#F9F9F9"}}>Echoes of Time</span></span>
                 <Image
                   className="h-4 w-4"
                   src="/mini-stars-dreamscape.png"
