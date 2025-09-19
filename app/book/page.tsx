@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./book.module.css";
 
 import { motion } from "framer-motion";
- 
+
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
 import {
@@ -372,8 +372,10 @@ export default function SingleTickets() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ ease: "easeOut", duration: 1.5 }}
       >
-        <h1 style={{ ...title.style, fontWeight: 700, color: '#E0E0E0' }}>Book a Ticket</h1>
-        <h2 style={{ ...title.style, fontWeight: 900, color: '#F9F9F9' }}>
+        <h1 style={{ ...title.style, fontWeight: 700, color: "#E0E0E0" }}>
+          Book a Ticket
+        </h1>
+        <h2 style={{ ...title.style, fontWeight: 900, color: "#F9F9F9" }}>
           {code ? "Paid Ticket!" : "400 EGP"}
         </h2>
       </motion.div>
@@ -434,122 +436,6 @@ export default function SingleTickets() {
               <label htmlFor="phone">Phone Number</label>
             </div>
           </div>
-
-          {!code && (
-            <div
-              id="paymentMethodContainer"
-              className={styles.paymentMethodContainer}
-            >
-              <div
-                className={styles.paymentMethodSelector}
-                onClick={() => {
-                  document
-                    .getElementById("paymentMethodOptions")
-                    ?.classList.toggle(styles.activeOption);
-
-                  document
-                    .getElementsByClassName(styles.selectArrow)[0]
-                    .classList.toggle(styles.activeSVG);
-                }}
-              >
-                {paymentOptions.find(
-                  (value) => value.identifier == formData.paymentMethod
-                )?.displayName == null ? (
-                  <span style={{ padding: "0", margin: "0", color: '#666666' }}>
-                    Select Payment Method
-                  </span>
-                ) : (
-                  <span style={{ color: "white", padding: "0", margin: "0" }}>
-                    {
-                      paymentOptions.find(
-                        (value) => value.identifier == formData.paymentMethod
-                      )?.displayName
-                    }
-                  </span>
-                )}
-              </div>
-              <div
-                id="paymentMethodOptions"
-                className={styles.paymentMethodOptions}
-              >
-                {paymentOptions.map((option) => (
-                  <div
-                    className={styles.paymentMethod}
-                    key={option.identifier}
-                    onClick={() => {
-                      setFormData({
-                        ...formData,
-                        paymentMethod: option.identifier,
-                        additionalFields: {},
-                      });
-
-                      setSelectedPaymentFields(option.fields || []);
-
-                      document
-                        .getElementById("paymentMethodOptions")
-                        ?.classList.toggle(styles.activeOption);
-                      document
-                        .getElementsByClassName(styles.selectArrow)[0]
-                        .classList.toggle(styles.activeSVG);
-                    }}
-                  >
-                    {option.displayName}
-                  </div>
-                ))}
-              </div>
-
-              <svg
-                className={styles.selectArrow}
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{ zIndex: 101 }}
-              >
-                <path
-                  d="M6 8.825C5.8 8.825 5.6 8.725 5.5 8.625L2.2 5.325C1.9 5.025 1.9 4.525 2.2 4.225C2.5 3.925 3 3.925 3.3 4.225L6 6.925L8.7 4.225C9 3.925 9.5 3.925 9.8 4.225C10.1 4.525 10.1 5.025 9.8 5.325L6.6 8.525C6.4 8.725 6.2 8.825 6 8.825Z"
-                  fill="#fff"
-                />
-              </svg>
-            </div>
-          )}
-
-          {/* Dynamically render additional fields based on selected payment method */}
-          {selectedPaymentFields.length > 0 && (
-            <div className="additional-field-container">
-              {selectedPaymentFields.length > 0 &&
-                selectedPaymentFields.map((field, index) => (
-                  <motion.div
-                    initial={{ opacity: 0.3, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    key={index}
-                    transition={{
-                      type: "tween",
-                      ease: "easeIn",
-                      duration: 0.75,
-                    }}
-                  >
-                    <div className={styles.mainTextbox}>
-                      <div className={styles.inputWrapper}>
-                        <input
-                          type={field.type}
-                          name={field.id}
-                          id={`additional-field-${index}`}
-                          placeholder=" "
-                          required={field.required}
-                          value={formData.additionalFields[field.id] || ""}
-                          onChange={handleAdditionalFieldChange}
-                        />
-                        <label htmlFor={`additional-field-${index}`}>
-                          {field.placeholder}
-                        </label>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-            </div>
-          )}
 
           <motion.div
             initial={{ scale: 2, opacity: 0.2 }}

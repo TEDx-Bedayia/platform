@@ -26,7 +26,6 @@ export default function RootLayout({
           left: 0,
           right: 0,
           zIndex: 10000,
-          
         }}
       >
         <nav className={styles.navigation} style={ubuntu.style}>
@@ -85,9 +84,7 @@ export default function RootLayout({
         </p>
       </div>
 
-      <Link
-        href="https://wa.me/message/VNHEAKD7RJD5A1?src=qr"
-        passHref
+      <span
         style={{
           position: "absolute",
           // bottom: "-1.5rem",
@@ -98,13 +95,15 @@ export default function RootLayout({
         }}
         className={styles.contact}
       >
-        Contact us on <a
-            className="font-body"
-            href="https://wa.me/201055782533"
-          >
-            +201055782533
-          </a>{" "}
-      </Link>
+        Contact us on{" "}
+        <Link
+          className="font-body"
+          href="https://wa.me/message/VNHEAKD7RJD5A1?src=qr"
+          passHref
+        >
+          +201055782533
+        </Link>{" "}
+      </span>
 
       <Link
         href="mailto:tedxyouth@bedayia.com"
