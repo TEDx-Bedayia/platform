@@ -467,7 +467,7 @@ export default function MarketingMembers() {
           </h3>
           {Object.entries(memberActivity).length > 0 && (
             <p className={ubuntu.className}>
-              Click on a date to view pending rush hour tickets.
+              Click on a date to view pending rush hour/normal tickets.
             </p>
           )}
         </div>

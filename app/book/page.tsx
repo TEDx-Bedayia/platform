@@ -25,11 +25,6 @@ export default function SingleTickets() {
     additionalFields: {} as { [key: string]: string },
   });
 
-  const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
-  const [selectedPaymentFields, setSelectedPaymentFields] = useState(
-    [] as Field[]
-  );
-
   const [code, setCode] = useState("");
   const [askForCode, setAskForCode] = useState(false);
 
@@ -288,70 +283,6 @@ export default function SingleTickets() {
     }
   }, [askForCode]);
 
-  useEffect(() => {
-    const fetchPaymentMethods = async () => {
-      try {
-        const response = await fetch("/api/tickets/payment-methods");
-        if (response.ok) {
-          const data = (await response.json()) as {
-            paymentMethods: PaymentMethod[];
-          };
-
-          const methods: PaymentMethod[] = data.paymentMethods.map(
-            (method) => ({
-              displayName: method.displayName,
-              identifier: method.identifier,
-              to: method.to,
-              fields: method.fields,
-            })
-          );
-
-          setPaymentOptions(methods);
-        } else {
-          console.error("Failed to fetch payment methods");
-        }
-      } catch (error) {
-        console.error("Error fetching payment methods:", error);
-      }
-    };
-
-    fetchPaymentMethods();
-  }, []);
-
-  const handleAdditionalFieldChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    let { name, value } = e.target;
-    if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
-      return;
-    }
-
-    if (name == "vfcash")
-      value = value.replace(/[\u0660-\u0669]/g, (c) => {
-        return (c.charCodeAt(0) - 0x0660).toString();
-      });
-    if (name == "vfcash") value = value.replace(/[^+\d]/g, "");
-
-    if ((name == "tlda" || name == "ipn") && value.includes("+")) return;
-    if (name == "vfcash" && (isNaN(Number(value)) || value.includes(" "))) {
-      if (value != "+") return;
-    }
-    if (name == "vfcash") {
-      if (value.includes("+")) {
-        if (value.length > 13) return;
-      } else if (value.length > 11) {
-        return;
-      }
-    }
-    setFormData({
-      ...formData,
-      additionalFields: {
-        ...formData.additionalFields,
-        [name]: value.toLowerCase(),
-      },
-    });
-  };
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -377,32 +308,12 @@ export default function SingleTickets() {
       ...formData,
       [name]: value,
     });
-
-    // Set additional fields for the selected payment method
-    if (name === "paymentMethod") {
-      const selectedOption = paymentOptions.find(
-        (option) => option.identifier === value
-      );
-
-      setFormData({
-        ...formData,
-        paymentMethod: value,
-        additionalFields: {},
-      });
-
-      setSelectedPaymentFields(selectedOption?.fields || []);
-    }
   };
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    document.body.focus();
+  async function submitTicket(type: string) {
     addLoader();
+    formData.paymentMethod = type;
     if (
-      (formData.additionalFields.vfcash &&
-        (formData.additionalFields.vfcash.length < 11 ||
-          (formData.additionalFields.vfcash.includes("+") &&
-            formData.additionalFields.vfcash.length != 13))) ||
       formData.phone.length < 11 ||
       (formData.phone.includes("+") && formData.phone.length != 13)
     ) {
@@ -420,21 +331,37 @@ export default function SingleTickets() {
     });
 
     if (response.ok) {
-      setFormData({
-        email: "",
-        name: "",
-        phone: "",
-        paymentMethod: "",
-        additionalFields: {} as { [key: string]: string },
-      });
-      if (code) setAskForCode(true);
-      setCode("");
-      setSelectedPaymentFields([]);
-      customAlert((await response.json()).message ?? "Submitted.");
+      const jsonRes = await response.json();
+
+      if (type === "CASH") {
+        customAlert(jsonRes.message ?? "Ticket booked successfully!");
+        setFormData({
+          email: "",
+          name: "",
+          phone: "",
+          paymentMethod: "",
+          additionalFields: {},
+        });
+        setCode("");
+        removeLoader();
+        return;
+      }
+
+      window.location.href = jsonRes.paymentUrl;
+      return;
     } else {
       customAlert((await response.json()).message ?? "An Error Occurred.");
     }
     removeLoader();
+  }
+
+  // for PayMob & Cash
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    document.body.focus();
+
+    if (code !== "") await submitTicket("CASH");
+    else await submitTicket(formData.paymentMethod || "CARD");
   }
 
   return (
@@ -630,9 +557,32 @@ export default function SingleTickets() {
             transition={{ type: "tween", ease: "anticipate", duration: 2 }}
           >
             <button type="submit" style={{ ...title.style, width: "100%" }}>
-              Submit
+              {code !== "" ? <span>Submit</span> : <span>Pay Online</span>}
             </button>
           </motion.div>
+          {code === "" && (
+            <>
+              <div className="flex items-center justify-center mt-4 mb-4 font-bold">
+                OR
+              </div>
+
+              <motion.div
+                initial={{ scale: 2, opacity: 0.2 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "tween", ease: "anticipate", duration: 2 }}
+              >
+                <button
+                  className={`${styles.schoolOfficeButton} font-bold`}
+                  style={{ ...title.style, width: "100%" }}
+                  onClick={() => {
+                    formData.paymentMethod = "CASH";
+                  }}
+                >
+                  Pay at Bedayia High School Office
+                </button>
+              </motion.div>
+            </>
+          )}
         </form>
       </motion.div>
     </section>

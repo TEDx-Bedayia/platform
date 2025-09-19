@@ -3,6 +3,7 @@
 // DELETE = Delete a member by ID .. if ID is -1 then delete all members
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import crypto from "crypto";
 
 export const maxDuration = 15;
 
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
   }
 
   let username: string = name.split(" ")[0].toLowerCase().replace(/\s+/g, "-");
-  username += Math.floor(Math.random() * 1000).toString();
+  username += crypto.randomInt(0, 1000).toString();
 
   const newMember = await sql`
     INSERT INTO marketing_members (name, username)
