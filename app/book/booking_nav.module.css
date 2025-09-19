@@ -23,6 +23,15 @@
   text-decoration: none;
 }
 
+.font-body {
+  color: "#E0E0E0" ;
+}
+.font-body:hover {
+  color: "#E0E0E0";
+  text-decoration: underline;
+  text-decoration-color: #007BFF;
+}
+
 .navigation > a {
   position: relative;
 }

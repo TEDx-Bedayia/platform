@@ -7,6 +7,7 @@
   z-index: 10 !important;
 }
 
+
 .container {
   background-image: url("/asfalt-light.png");
 
@@ -50,7 +51,7 @@
   background-image: repeating-radial-gradient(
     circle at 50% 50%,
     transparent 0%,
-    rgba(0, 0, 0, 0.07) 1%,
+    rgba(255, 0, 0, 0.06) 1%,
     transparent 5%
   );
   filter: blur(3px);

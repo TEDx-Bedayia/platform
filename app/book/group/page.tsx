@@ -231,10 +231,10 @@ export default function GroupTickets() {
         transition={{ ease: "easeOut", duration: 1.5 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Group Ticket</h1>
-        <h2 style={{ ...title.style, fontWeight: 100, marginBottom: ".5rem" }}>
+        <h2 style={{ ...title.style, fontWeight: 900, color: '#F9F9F9', marginBottom: ".5rem" }}>
           1, 400 EGP
         </h2>
-        <h2 style={{ ...title.style, fontWeight: 400, fontSize: ".75em" }}>
+        <h2 style={{ ...title.style, fontWeight: 100, fontSize: ".75em" }}>
           350 EGP/Person
         </h2>
       </motion.div>
@@ -360,7 +360,7 @@ export default function GroupTickets() {
                 {paymentOptions.find(
                   (value) => value.identifier == formData.paymentMethod
                 )?.displayName == null ? (
-                  <span style={{ padding: "0", margin: "0" }}>
+                  <span style={{ padding: "0", margin: "0", color: '#666666'}}>
                     Select Payment Method
                   </span>
                 ) : (
