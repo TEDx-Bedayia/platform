@@ -51,13 +51,61 @@
     </script>
 
 
+<section id="faq" style="padding: 2rem; max-width: 800px; margin: auto;">
+  <h2 style="text-align:center; margin-bottom:2rem;">Frequently Asked Questions</h2>
 
-    <main>
-        <section>
-            <h2>Section Title</h2>
-            <p>This is some sample content.</p>
-        </section>
-    </main>
+  <div class="faq-item" style="border-bottom:1px solid #ddd; padding:1rem 0;">
+    <button class="faq-question" style="width:100%; text-align:left; font-size:1.1rem; background:none; border:none; cursor:pointer; outline:none; display:flex; justify-content:space-between; align-items:center;">
+      What is the date of the next event?
+      <span class="faq-icon" style="transition: transform 0.3s;">+</span>
+    </button>
+    <div class="faq-answer" style="display:none; padding-top:0.5rem; color:#555;">
+      The next event will be held on December 12, 2025.
+    </div>
+  </div>
+
+  <div class="faq-item" style="border-bottom:1px solid #ddd; padding:1rem 0;">
+    <button class="faq-question" style="width:100%; text-align:left; font-size:1.1rem; background:none; border:none; cursor:pointer; outline:none; display:flex; justify-content:space-between; align-items:center;">
+      How can I buy tickets?
+      <span class="faq-icon" style="transition: transform 0.3s;">+</span>
+    </button>
+    <div class="faq-answer" style="display:none; padding-top:0.5rem; color:#555;">
+      Tickets can be purchased online through our website or at the venue on the day of the event.
+    </div>
+  </div>
+
+  <div class="faq-item" style="border-bottom:1px solid #ddd; padding:1rem 0;">
+    <button class="faq-question" style="width:100%; text-align:left; font-size:1.1rem; background:none; border:none; cursor:pointer; outline:none; display:flex; justify-content:space-between; align-items:center;">
+      Are there group discounts?
+      <span class="faq-icon" style="transition: transform 0.3s;">+</span>
+    </button>
+    <div class="faq-answer" style="display:none; padding-top:0.5rem; color:#555;">
+      Yes! Groups of 10 or more get a 10% discount. Contact us for more details.
+    </div>
+  </div>
+</section>
+
+<script>
+const faqQuestions = document.querySelectorAll('.faq-question');
+faqQuestions.forEach(question => {
+  question.addEventListener('click', () => {
+    const answer = question.nextElementSibling;
+    const icon = question.querySelector('.faq-icon');
+    const isOpen = answer.style.display === 'block';
+
+    // Close all answers
+    document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
+    document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+
+    // Toggle current
+    if (!isOpen) {
+      answer.style.display = 'block';
+      icon.style.transform = 'rotate(45deg)'; // rotates + into an X
+    }
+  });
+});
+</script>
+
 
     <footer style="background:#666666; color:#fff; padding:2rem; text-align:center">
         <div style="margin-bottom:1rem;">
