@@ -23,6 +23,11 @@
   text-decoration: none;
 }
 
+.iconBook {
+  fill: white;
+  stroke: white;
+}
+
 .font-body {
   color: "#E0E0E0" ;
 }

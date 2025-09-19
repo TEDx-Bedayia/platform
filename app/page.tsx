@@ -521,11 +521,12 @@ export default function Home() {
           <a
             className="font-body text-secondary-200"
             href="https://wa.me/201055782533"
-          >
+          > 
             +201055782533
           </a>{" "}
           if you find any bugs.
         </div>
+        
 
         <div className="socials mt-12">
           <a
