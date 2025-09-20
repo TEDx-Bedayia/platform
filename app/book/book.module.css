@@ -17,25 +17,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw !important;
   display: flex;
   flex-direction: column;
   position: relative;
-  /* background-size: 150% 150%;
-  animation: backgroundAnimation 5s ease infinite; */
-  /* z-index: -2; */
 }
 
-@keyframes backgroundAnimation {
-  0% {
-    background-position: 0% 0%; /* Start at one position */
-  }
-  50% {
-    background-position: 50% 50%; /* Gradually shift across the gradient */
-  }
-  100% {
-    background-position: 0% 0%; /* Loop back to the start */
+@media (min-width: 600px) {
+  .group {
+    padding-top: 10rem;
+    min-height: min-content;
   }
 }
 
@@ -51,7 +43,7 @@
   background-image: repeating-radial-gradient(
     circle at 50% 50%,
     transparent 0%,
-    rgba(0, 0, 0, 0.07) 1%,
+    rgba(255, 0, 0, 0.06) 1%,
     transparent 5%
   );
   filter: blur(3px);
@@ -60,8 +52,6 @@
 
 .container h1 {
   font-size: 2em;
-  /* margin-bottom: 1.5rem; */
-  /* margin-top: 0.5rem; */
   width: auto;
   text-align: center;
   font-weight: 700;
@@ -104,7 +94,7 @@
 .container input,
 .container select,
 .paymentMethodSelector {
-  background: rgba(255, 255, 255, 0.15);
+  background: #e0e0e041;
 
   color: #fff; /* White text inside inputs */
   padding: 10px 16px;
@@ -113,7 +103,6 @@
   border: transparent 2px solid;
   font-size: 1em;
   height: 3rem;
-  /* box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); */
   width: 100%;
   box-sizing: border-box;
 }
@@ -134,7 +123,7 @@
 
 .container input:focus {
   outline: none;
-  border: #b1aae4 2px solid;
+  border: #e0e0e0 2px solid;
 }
 
 .container select:focus {
@@ -151,7 +140,7 @@
   top: 12px;
   left: 0;
   padding: 10px 20px;
-  color: #ffffff;
+  color: #e0e0e0;
   opacity: 0.5;
   font-size: 1em;
   pointer-events: none;
@@ -162,7 +151,7 @@
 .inputWrapper input:not(:placeholder-shown) + label {
   font-size: 0.55em;
   top: 5px;
-  color: #ffccda;
+  color: #e0e0e0;
   opacity: 1;
   font-weight: 700;
 }
@@ -174,6 +163,22 @@
   margin-left: 16px;
   margin-bottom: 8px;
   position: relative;
+}
+
+.mainTextbox {
+  transition: all ease 300ms;
+  transform: scaleY(1);
+  opacity: 1;
+  pointer-events: all;
+  transform-origin: top;
+  /* height: 1; */
+}
+
+.mainTextbox.disabledTextbox {
+  transform: scaleY(0.5);
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .checkboxContainer input {
@@ -261,13 +266,13 @@
 /* Hover and focus states */
 .paymentMethodContainer select:hover,
 .paymentMethodContainer select:focus {
-  border: #b1aae4 2px solid;
-  color: #ffffffdd;
+  border: #666666 2px solid;
+  color: #666666;
 }
 
 .paymentMethodOptions {
   position: absolute;
-  background-color: #a07299;
+  background-color: #666666;
   top: 0;
   z-index: 100;
   border-radius: 1.5rem;
@@ -290,7 +295,7 @@
 }
 
 .paymentMethodOptions > div {
-  border-bottom: #ffffff40 1px solid;
+  border-bottom: #666666 1px solid;
 }
 
 .selectArrow {
@@ -310,7 +315,7 @@
 }
 
 .container select:valid {
-  color: #fff !important;
+  color: #666666 !important;
 }
 
 .buttonsContainer {
@@ -474,7 +479,7 @@
 .successButton {
   display: inline-block;
   padding: 0.75rem 1.5rem;
-  background: #2563eb;
+  background: #007bff;
   color: white;
   font-weight: 600;
   text-decoration: none;

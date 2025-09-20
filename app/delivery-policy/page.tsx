@@ -1,14 +1,23 @@
 import React from "react";
-import styles from "./DeliveryPolicy.module.css";
+import styles from "../styles/Policy.module.css";
+
+import { Poppins, Ubuntu } from "next/font/google";
+const ubuntu = Ubuntu({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const poppins = Poppins({ subsets: ["latin"], weight: "700" });
 
 export default function DeliveryPolicy() {
   return (
     <article
       className={styles.container}
+      style={ubuntu.style}
       aria-labelledby="delivery-policy-title"
     >
       <header className={styles.header}>
-        <h1 id="delivery-policy-title" className={styles.title}>
+        <h1
+          id="delivery-policy-title"
+          className={styles.title}
+          style={poppins.style}
+        >
           Delivery &amp; Shipment Policy
         </h1>
         <p className={styles.effective}>
@@ -20,7 +29,8 @@ export default function DeliveryPolicy() {
       <section className={styles.section}>
         <p>
           At TEDx Youth Bedayia School, all tickets are delivered electronically
-          as eTickets. No physical tickets are issued or shipped.
+          as eTickets, issued directly by us. No physical tickets are issued or
+          shipped.
         </p>
       </section>
 
@@ -28,9 +38,9 @@ export default function DeliveryPolicy() {
         <h2 className={styles.h2}>1. Delivery Method</h2>
         <ul className={styles.list}>
           <li>
-            <strong>Online Payments (via PayMob):</strong> eTickets are
-            delivered instantly by email to the address provided during
-            purchase, once payment is successfully processed.
+            <strong>Online Payments (via PayMob):</strong> we deliver the
+            eTickets instantly by email to the address provided during purchase,
+            once payment is successfully processed.
           </li>
           <li>
             <strong>Cash Payments (at the school office):</strong> eTickets are

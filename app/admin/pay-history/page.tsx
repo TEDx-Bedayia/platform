@@ -170,25 +170,9 @@ export default function History() {
           (acc, curr) => acc + curr.recieved - curr.incurred,
           0
         )}{" "}
-        EGP. <br /> Telda:{" "}
-        {data
-          .filter((x) => x.stream.startsWith("Telda"))
-          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. Instapay:{" "}
-        {data
-          .filter((x) => x.stream.startsWith("Instapay"))
-          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. E-Wallet:{" "}
-        {data
-          .filter((x) => x.stream.startsWith("E-Wallet"))
-          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. Office:{" "}
+        EGP. <br /> Office:{" "}
         {data
           .filter((x) => x.stream.startsWith("Office"))
-          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. Marketing:{" "}
-        {data
-          .filter((x) => x.stream.startsWith("Marketing"))
           .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
         EGP. Cards:{" "}
         {data

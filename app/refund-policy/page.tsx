@@ -1,11 +1,23 @@
 import React from "react";
-import styles from "./RefundPolicy.module.css";
+import styles from "../styles/Policy.module.css";
+
+import { Poppins, Ubuntu } from "next/font/google";
+const ubuntu = Ubuntu({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const poppins = Poppins({ subsets: ["latin"], weight: "700" });
 
 export default function RefundPolicy() {
   return (
-    <article className={styles.container} aria-labelledby="refund-policy-title">
+    <article
+      className={styles.container}
+      aria-labelledby="refund-policy-title"
+      style={ubuntu.style}
+    >
       <header className={styles.header}>
-        <h1 id="refund-policy-title" className={styles.title}>
+        <h1
+          id="refund-policy-title"
+          className={styles.title}
+          style={poppins.style}
+        >
           Refund &amp; Cancellation Policy
         </h1>
         <p className={styles.effective}>

@@ -14,8 +14,8 @@ const config: Config = {
     extend: {
       colors: {
         transparent: "transparent",
-        background: "#100d26",
-        text: "#FFFFFF",
+        background: "#333333",
+        text: "#E0E0E0",
         "text-gray": {
           light: "#DFDFDF",
           dark: "#BABABA",

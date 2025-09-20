@@ -34,8 +34,8 @@ export default function Failure() {
           We&apos;re sorry, but your payment could not be processed.
         </p>
         <p className={styles.successSubMessage}>
-          Please check your payment details and try again using the link sent to
-          your email.
+          Please try booking another ticket or contact support if the issue
+          persists.
         </p>
 
         <Link href="/" className={styles.successButton}>

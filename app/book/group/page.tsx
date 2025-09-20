@@ -1,18 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "../book.module.css";
 
 import { motion } from "framer-motion";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
-import { form } from "framer-motion/client";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
-import {
-  Field,
-  PaymentMethod,
-} from "../../api/tickets/payment-methods/payment-methods";
 import { addLoader, removeLoader } from "../../global_components/loader";
 import "../htmlcolor.css";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
@@ -27,23 +22,7 @@ export default function GroupTickets() {
     additionalFields: {} as { [key: string]: string },
   });
 
-  const [useSameEmail, setUseSameEmail] = useState(false);
-
-  const handleAdditionalFieldChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    let { name, value } = e.target;
-    if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
-      return;
-    }
-    setFormData({
-      ...formData,
-      additionalFields: {
-        ...formData.additionalFields,
-        [name]: value.toLowerCase(),
-      },
-    });
-  };
+  const [useSameEmail, setUseSameEmail] = useState(true);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -97,17 +76,6 @@ export default function GroupTickets() {
     e.preventDefault();
     document.body.focus();
     addLoader();
-    if (
-      formData.additionalFields.vfcash &&
-      (formData.additionalFields.vfcash.length < 11 ||
-        (formData.additionalFields.vfcash.includes("+") &&
-          formData.additionalFields.vfcash.length != 13))
-    ) {
-      customAlert("Please enter a valid phone number for E-Wallet.");
-      setCurrentPerson(0);
-      removeLoader();
-      return;
-    }
 
     if (
       formData.phone.length < 11 ||
@@ -117,6 +85,26 @@ export default function GroupTickets() {
       setCurrentPerson(0);
       removeLoader();
       return;
+    }
+
+    if (
+      formData.names[1] == "" &&
+      formData.names[2] == "" &&
+      formData.names[3] == "" &&
+      formData.names[0] != ""
+    ) {
+      setFormData({
+        ...formData,
+        names: [
+          formData.names[0],
+          formData.names[0],
+          formData.names[0],
+          formData.names[0],
+        ],
+      });
+      formData.names[1] = formData.names[0];
+      formData.names[2] = formData.names[0];
+      formData.names[3] = formData.names[0];
     }
 
     const response = await fetch("/api/tickets/group", {
@@ -164,17 +152,27 @@ export default function GroupTickets() {
   const [currentPerson, setCurrentPerson] = useState(0);
 
   return (
-    <section id="book-group-ticket" className={styles.container}>
+    <section
+      id="book-group-ticket"
+      className={`${styles.container} ${styles.group}`}
+    >
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ ease: "easeOut", duration: 1.5 }}
       >
         <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Group Ticket</h1>
-        <h2 style={{ ...title.style, fontWeight: 100, marginBottom: ".5rem" }}>
+        <h2
+          style={{
+            ...title.style,
+            fontWeight: 900,
+            color: "#F9F9F9",
+            marginBottom: ".5rem",
+          }}
+        >
           1, 400 EGP
         </h2>
-        <h2 style={{ ...title.style, fontWeight: 400, fontSize: ".75em" }}>
+        <h2 style={{ ...title.style, fontWeight: 100, fontSize: ".75em" }}>
           350 EGP/Person
         </h2>
       </motion.div>
@@ -218,76 +216,66 @@ export default function GroupTickets() {
           </div>
 
           {currentPerson == 0 && (
-            <div className={styles.checkboxContainer}>
-              <input
-                type="checkbox"
-                id="same-email-checkbox"
-                checked={useSameEmail}
-                onChange={(e) => {
-                  setUseSameEmail(e.target.checked);
-                  if (e.target.checked) {
-                    setFormData({
-                      ...formData,
-                      emails: [
-                        formData.emails[0],
-                        formData.emails[0],
-                        formData.emails[0],
-                        formData.emails[0],
-                      ],
-                    });
-                  }
-                }}
-              />
-              <span
-                className={styles.checkMark}
-                onClick={() => {
-                  setUseSameEmail(!useSameEmail);
-                  if (!useSameEmail) {
-                    setFormData({
-                      ...formData,
-                      emails: [
-                        formData.emails[0],
-                        formData.emails[0],
-                        formData.emails[0],
-                        formData.emails[0],
-                      ],
-                    });
-                  }
-                }}
-              ></span>
-              <label htmlFor="same-email-checkbox">
-                Use the same email for all members
-              </label>
-            </div>
-          )}
-
-          {currentPerson == 0 && (
-            <div className={styles.mainTextbox}>
-              <div className={styles.inputWrapper}>
+            <>
+              <div className={styles.checkboxContainer}>
                 <input
-                  type="text"
-                  name="phone"
-                  id="phone-input"
-                  placeholder=" "
-                  minLength={11}
-                  required={true}
-                  value={formData.phone}
-                  onChange={handleChange}
+                  type="checkbox"
+                  id="same-email-checkbox"
+                  checked={!useSameEmail}
+                  onChange={(e) => {
+                    setUseSameEmail(!e.target.checked);
+                    if (!e.target.checked) {
+                      setFormData({
+                        ...formData,
+                        emails: [
+                          formData.emails[0],
+                          formData.emails[0],
+                          formData.emails[0],
+                          formData.emails[0],
+                        ],
+                      });
+                    }
+                  }}
                 />
-                <label htmlFor="phone">Phone Number</label>
+                <span
+                  className={styles.checkMark}
+                  onClick={() => {
+                    setUseSameEmail(!useSameEmail);
+                    if (!useSameEmail) {
+                      setFormData({
+                        ...formData,
+                        emails: [
+                          formData.emails[0],
+                          formData.emails[0],
+                          formData.emails[0],
+                          formData.emails[0],
+                        ],
+                      });
+                    }
+                  }}
+                ></span>
+                <label htmlFor="same-email-checkbox">
+                  Use different emails for members
+                </label>
               </div>
-            </div>
-          )}
 
-          {currentPerson != 3 &&
-            (formData.emails.includes("") || formData.names.includes("")) && (
-              <h3
-                style={{ margin: "0.5rem 0", color: "white", opacity: 0.6 }}
-                className="max-phone:text-sm"
-              >
-                Please fill out the fields above to continue
-              </h3>
-            )}
+              <div className={styles.mainTextbox}>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    name="phone"
+                    id="phone-input"
+                    placeholder=" "
+                    minLength={11}
+                    required={true}
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="phone">Phone Number</label>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className={styles.buttonsContainer}>
             {currentPerson != 0 && (
@@ -320,7 +308,8 @@ export default function GroupTickets() {
             {((formData.names[currentPerson] &&
               formData.emails[currentPerson]) ||
               currentPerson == 0) &&
-              currentPerson != 3 && (
+              currentPerson != 3 &&
+              !useSameEmail && (
                 <motion.div
                   initial={{ opacity: 0.2 }}
                   animate={{ opacity: 1 }}
@@ -369,9 +358,11 @@ export default function GroupTickets() {
           </div>
 
           {(currentPerson == 3 ||
+            useSameEmail ||
             (!formData.emails.includes("") &&
               !formData.names.includes(""))) && (
             <>
+              {!useSameEmail && <br />}
               <motion.div
                 initial={{ opacity: 0.2 }}
                 animate={{ opacity: 1 }}
@@ -379,7 +370,7 @@ export default function GroupTickets() {
               >
                 <button
                   type="submit"
-                  style={{ ...title.style, width: "100%", marginTop: "2rem" }}
+                  style={{ ...title.style, width: "100%", marginTop: "12px" }}
                   onClick={() => {
                     formData.paymentMethod = "CARD";
                   }}
