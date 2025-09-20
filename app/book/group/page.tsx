@@ -4,7 +4,8 @@ import styles from "../book.module.css";
 
 import { motion } from "framer-motion";
 
-import { form } from "framer-motion/client";
+import { verifyEmail } from "@/app/api/utils/input-sanitization";
+import { backArrow, forwardArrow } from "@/app/icons";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
 import { addLoader, removeLoader } from "../../global_components/loader";
@@ -22,22 +23,6 @@ export default function GroupTickets() {
   });
 
   const [useSameEmail, setUseSameEmail] = useState(true);
-
-  const handleAdditionalFieldChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    let { name, value } = e.target;
-    if (value != "" && !RegExp(/^[a-zA-Z0-9-.+\s]+$/g).test(value)) {
-      return;
-    }
-    setFormData({
-      ...formData,
-      additionalFields: {
-        ...formData.additionalFields,
-        [name]: value.toLowerCase(),
-      },
-    });
-  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -197,7 +182,8 @@ export default function GroupTickets() {
         transition={{ ease: "anticipate", duration: 2 }}
       >
         <form onSubmit={handleSubmit} style={ubuntu.style}>
-          <h3>Group Leader</h3>
+          {currentPerson == 0 && <h3>Group Leader</h3>}
+          {currentPerson != 0 && <h3>Person {currentPerson + 1}</h3>}
           <div className={styles.mainTextbox}>
             <div className={styles.inputWrapper}>
               <input
@@ -229,99 +215,191 @@ export default function GroupTickets() {
             </div>
           </div>
 
-          <div className={styles.checkboxContainer}>
-            <input
-              type="checkbox"
-              id="same-email-checkbox"
-              checked={!useSameEmail}
-              onChange={(e) => {
-                setUseSameEmail(!e.target.checked);
-                if (!e.target.checked) {
-                  setFormData({
-                    ...formData,
-                    emails: [
-                      formData.emails[0],
-                      formData.emails[0],
-                      formData.emails[0],
-                      formData.emails[0],
-                    ],
-                  });
-                }
-              }}
-            />
-            <span
-              className={styles.checkMark}
-              onClick={() => {
-                setUseSameEmail(!useSameEmail);
-                if (!useSameEmail) {
-                  setFormData({
-                    ...formData,
-                    emails: [
-                      formData.emails[0],
-                      formData.emails[0],
-                      formData.emails[0],
-                      formData.emails[0],
-                    ],
-                  });
-                }
-              }}
-            ></span>
-            <label htmlFor="same-email-checkbox">
-              Use different emails for members
-            </label>
+          {currentPerson == 0 && (
+            <>
+              <div className={styles.checkboxContainer}>
+                <input
+                  type="checkbox"
+                  id="same-email-checkbox"
+                  checked={!useSameEmail}
+                  onChange={(e) => {
+                    setUseSameEmail(!e.target.checked);
+                    if (!e.target.checked) {
+                      setFormData({
+                        ...formData,
+                        emails: [
+                          formData.emails[0],
+                          formData.emails[0],
+                          formData.emails[0],
+                          formData.emails[0],
+                        ],
+                      });
+                    }
+                  }}
+                />
+                <span
+                  className={styles.checkMark}
+                  onClick={() => {
+                    setUseSameEmail(!useSameEmail);
+                    if (!useSameEmail) {
+                      setFormData({
+                        ...formData,
+                        emails: [
+                          formData.emails[0],
+                          formData.emails[0],
+                          formData.emails[0],
+                          formData.emails[0],
+                        ],
+                      });
+                    }
+                  }}
+                ></span>
+                <label htmlFor="same-email-checkbox">
+                  Use different emails for members
+                </label>
+              </div>
+
+              <div className={styles.mainTextbox}>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    name="phone"
+                    id="phone-input"
+                    placeholder=" "
+                    minLength={11}
+                    required={true}
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="phone">Phone Number</label>
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className={styles.buttonsContainer}>
+            {currentPerson != 0 && (
+              <motion.div
+                initial={{ opacity: 0.2 }}
+                animate={{ opacity: 1 }}
+                transition={{ type: "tween", ease: "anticipate", duration: 2 }}
+              >
+                <button
+                  style={{ ...title.style }}
+                  className={styles.backButton}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementsByTagName("form")[0].style.transition =
+                      "opacity 300ms ease";
+                    document.getElementsByTagName("form")[0].style.opacity =
+                      "0";
+                    setTimeout(() => {
+                      document.getElementsByTagName("form")[0].style.opacity =
+                        "1";
+                      setCurrentPerson(currentPerson - 1);
+                    }, 350);
+                  }}
+                >
+                  {backArrow}
+                </button>
+              </motion.div>
+            )}
+
+            {((formData.names[currentPerson] &&
+              formData.emails[currentPerson]) ||
+              currentPerson == 0) &&
+              currentPerson != 3 &&
+              !useSameEmail && (
+                <motion.div
+                  initial={{ opacity: 0.2 }}
+                  animate={{ opacity: 1 }}
+                  transition={{
+                    type: "tween",
+                    ease: "anticipate",
+                    duration: 2,
+                  }}
+                >
+                  <button
+                    style={{ ...title.style }}
+                    className={styles.nextButton}
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      if (
+                        formData.names[currentPerson] != "" &&
+                        verifyEmail(formData.emails[currentPerson]) &&
+                        formData.phone.length >= 11
+                      ) {
+                        document.getElementsByTagName(
+                          "form"
+                        )[0].style.transition = "opacity 300ms ease";
+                        document.getElementsByTagName("form")[0].style.opacity =
+                          "0";
+                        setTimeout(() => {
+                          document.getElementsByTagName(
+                            "form"
+                          )[0].style.opacity = "1";
+                          setCurrentPerson(currentPerson + 1);
+                        }, 350);
+                      } else {
+                        if (formData.names[currentPerson] == "")
+                          document.getElementById("name-input")!.focus();
+                        else if (!verifyEmail(formData.emails[currentPerson]))
+                          document.getElementById("email-input")!.focus();
+                        else if (formData.phone.length < 11)
+                          document.getElementById("phone-input")!.focus();
+                      }
+                    }}
+                  >
+                    {forwardArrow}
+                  </button>
+                </motion.div>
+              )}
           </div>
 
-          <div className={styles.mainTextbox}>
-            <div className={styles.inputWrapper}>
-              <input
-                type="text"
-                name="phone"
-                id="phone-input"
-                placeholder=" "
-                minLength={11}
-                required={true}
-                value={formData.phone}
-                onChange={handleChange}
-              />
-              <label htmlFor="phone">Phone Number</label>
-            </div>
-          </div>
+          {(currentPerson == 3 ||
+            useSameEmail ||
+            (!formData.emails.includes("") &&
+              !formData.names.includes(""))) && (
+            <>
+              {!useSameEmail && <br />}
+              <motion.div
+                initial={{ opacity: 0.2 }}
+                animate={{ opacity: 1 }}
+                transition={{ type: "tween", ease: "anticipate", duration: 2 }}
+              >
+                <button
+                  type="submit"
+                  style={{ ...title.style, width: "100%", marginTop: "12px" }}
+                  onClick={() => {
+                    formData.paymentMethod = "CARD";
+                  }}
+                >
+                  Pay Online
+                </button>
+              </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0.2 }}
-            animate={{ opacity: 1 }}
-            transition={{ type: "tween", ease: "anticipate", duration: 2 }}
-          >
-            <button
-              type="submit"
-              style={{ ...title.style, width: "100%", marginTop: "2rem" }}
-              onClick={() => {
-                formData.paymentMethod = "CARD";
-              }}
-            >
-              Pay Online
-            </button>
-          </motion.div>
+              <div className="flex items-center justify-center mt-4 mb-4 font-bold">
+                OR
+              </div>
 
-          <div className="flex items-center justify-center mt-4 mb-4 font-bold">
-            OR
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0.2 }}
-            animate={{ opacity: 1 }}
-            transition={{ type: "tween", ease: "anticipate", duration: 2 }}
-          >
-            <button
-              className={`${styles.schoolOfficeButton} font-bold`}
-              style={{ ...title.style, width: "100%" }}
-              onClick={() => {
-                formData.paymentMethod = "CASH";
-              }}
-            >
-              Pay at Bedayia High School Office
-            </button>
-          </motion.div>
+              <motion.div
+                initial={{ opacity: 0.2 }}
+                animate={{ opacity: 1 }}
+                transition={{ type: "tween", ease: "anticipate", duration: 2 }}
+              >
+                <button
+                  className={`${styles.schoolOfficeButton} font-bold`}
+                  style={{ ...title.style, width: "100%" }}
+                  onClick={() => {
+                    formData.paymentMethod = "CASH";
+                  }}
+                >
+                  Pay at Bedayia High School Office
+                </button>
+              </motion.div>
+            </>
+          )}
         </form>
       </motion.div>
     </section>
