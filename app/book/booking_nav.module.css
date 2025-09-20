@@ -29,12 +29,12 @@
 }
 
 .font-body {
-  color: "#E0E0E0" ;
+  color: "#E0E0E0";
 }
 .font-body:hover {
   color: "#E0E0E0";
   text-decoration: underline;
-  text-decoration-color: #007BFF;
+  text-decoration-color: #007bff;
 }
 
 .navigation > a {
@@ -54,6 +54,24 @@
   transition: transform 0.25s ease-out;
 }
 
+.mainBookingContainer {
+  background-image: url("/asfalt-light.png");
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 100vh;
+  width: 100vw !important;
+  position: relative;
+}
+
+@media (min-width: 601px) {
+  .footerContainer {
+    position: absolute;
+    bottom: 0;
+  }
+}
+
 .icon {
   transition: all 0.2s;
 }
@@ -66,7 +84,8 @@
   gap: 20px;
   justify-content: center;
   bottom: 1rem;
-  filter: invert(39%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%) contrast(100%);
+  filter: invert(39%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%)
+    contrast(100%);
 }
 
 .contact {

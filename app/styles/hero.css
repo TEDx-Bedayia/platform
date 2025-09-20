@@ -33,24 +33,17 @@
 }
 
 #hero button {
-  transition:
-    transform ease-in 300ms,
-    box-shadow ease-in 300ms,
-    border ease-in 300ms;
+  transition: transform ease-in 300ms, box-shadow ease-in 300ms,
+    background-color ease-in 300ms, border ease-in 300ms;
 }
 
 #hero .primary:hover {
-  box-shadow:
-    0 19px 38px #3333333b,
-    0 15px 12px #3333333b;
+  box-shadow: 0 19px 38px #3333333b, 0 15px 12px #3333333b;
 }
 
 #hero .secondary-wrapper {
-  transition:
-    transform ease-in 300ms,
-    box-shadow ease-in 300ms,
-    background-color ease-in 300ms,
-    border ease-in 300ms;
+  transition: transform ease-in 300ms, box-shadow ease-in 300ms,
+    background-color ease-in 300ms, border ease-in 300ms;
 
   width: 17.25rem;
   height: 5.5rem;
@@ -64,9 +57,6 @@
 }
 
 #hero .secondary-wrapper > div {
-  transition:
-    transform ease-in 300ms,
-    box-shadow ease-in 300ms,
-    background-color ease-in 300ms,
-    border ease-in 300ms;
+  transition: transform ease-in 300ms, box-shadow ease-in 300ms,
+    background-color ease-in 300ms, border ease-in 300ms;
 }

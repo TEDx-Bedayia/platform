@@ -7,7 +7,6 @@
   z-index: 10 !important;
 }
 
-
 .container,
 .successContainer {
   background-image: url("/asfalt-light.png");
@@ -18,25 +17,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw !important;
   display: flex;
   flex-direction: column;
   position: relative;
-  /* background-size: 150% 150%;
-  animation: backgroundAnimation 5s ease infinite; */
-  /* z-index: -2; */
 }
 
-@keyframes backgroundAnimation {
-  0% {
-    background-position: 0% 0%; /* Start at one position */
-  }
-  50% {
-    background-position: 50% 50%; /* Gradually shift across the gradient */
-  }
-  100% {
-    background-position: 0% 0%; /* Loop back to the start */
+@media (min-width: 600px) {
+  .group {
+    padding-top: 10rem;
+    min-height: min-content;
   }
 }
 
@@ -61,8 +52,6 @@
 
 .container h1 {
   font-size: 2em;
-  /* margin-bottom: 1.5rem; */
-  /* margin-top: 0.5rem; */
   width: auto;
   text-align: center;
   font-weight: 700;
@@ -105,16 +94,15 @@
 .container input,
 .container select,
 .paymentMethodSelector {
-  background: #E0E0E0;
+  background: #e0e0e041;
 
-  color: #666666; /* White text inside inputs */
+  color: #fff; /* White text inside inputs */
   padding: 10px 16px;
   margin: 10px 0;
   border-radius: 100rem;
   border: transparent 2px solid;
   font-size: 1em;
   height: 3rem;
-  /* box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); */
   width: 100%;
   box-sizing: border-box;
 }
@@ -135,7 +123,7 @@
 
 .container input:focus {
   outline: none;
-  border: #666666 2px solid;
+  border: #e0e0e0 2px solid;
 }
 
 .container select:focus {
@@ -152,7 +140,7 @@
   top: 12px;
   left: 0;
   padding: 10px 20px;
-  color: #666666;
+  color: #e0e0e0;
   opacity: 0.5;
   font-size: 1em;
   pointer-events: none;
@@ -163,7 +151,7 @@
 .inputWrapper input:not(:placeholder-shown) + label {
   font-size: 0.55em;
   top: 5px;
-  color: #666666;
+  color: #e0e0e0;
   opacity: 1;
   font-weight: 700;
 }
@@ -175,6 +163,22 @@
   margin-left: 16px;
   margin-bottom: 8px;
   position: relative;
+}
+
+.mainTextbox {
+  transition: all ease 300ms;
+  transform: scaleY(1);
+  opacity: 1;
+  pointer-events: all;
+  transform-origin: top;
+  /* height: 1; */
+}
+
+.mainTextbox.disabledTextbox {
+  transform: scaleY(0.5);
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .checkboxContainer input {
@@ -324,7 +328,7 @@
 }
 
 .buttonsContainer button {
-  background-color: #007BFF;
+  background-color: #007bff;
   /* background: linear-gradient(45deg, #007bff, #0056b3); */
   color: #fff;
   padding: 4px 4px;
@@ -343,7 +347,7 @@
 
 .container button[type="submit"],
 .codeInputDialog button {
-  background-color: #007BFF;
+  background-color: #007bff;
   /* background: linear-gradient(45deg, #007bff, #0056b3); */
   color: #fff;
   padding: 12px 0px;

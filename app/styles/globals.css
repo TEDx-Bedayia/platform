@@ -47,7 +47,7 @@
   height: 2px;
   bottom: 0;
   left: 0;
-  background-color: #007BFF;
+  background-color: #007bff;
   transform-origin: bottom right;
   transition: transform 0.25s ease-out;
 }
@@ -62,7 +62,7 @@
 }
 
 .font-body {
-  color: #E0E0E0;
+  color: #e0e0e0;
   font-size: 1em;
   line-height: calc(1.5 * 1rem);
   letter-spacing: 0px;
@@ -79,7 +79,7 @@
 }
 
 .font-navButton {
-  color: #F9F9F9;
+  color: #f9f9f9;
   font-size: 1.25em;
   line-height: calc(1.2 * 1.25rem);
   letter-spacing: 0px;
@@ -112,7 +112,11 @@
 }
 
 .btnColor {
-  background-color: #007BFF;
+  background-color: #007bff;
+}
+
+.btnColor:hover {
+  background-color: #0066cc;
 }
 
 @font-face {
@@ -246,11 +250,10 @@ html {
 
 body {
   background-color: var(--background) !important;
-  color: #E0E0E0 !important;
+  color: #e0e0e0 !important;
   text-align: center;
   max-width: 100vw;
   overflow-x: hidden;
-  padding-bottom: 6rem !important;
 }
 
 .wrapper {
@@ -332,11 +335,11 @@ td {
   outline: 0;
 }
 body {
-  background-image: url("/asfalt-light.png");/* Background image isnt even here */
-  background-repeat: repeat; 
-  background-size: auto; 
-  background-attachment: scroll; 
-  margin: 0; 
+  background-image: url("/asfalt-light.png"); /* Background image isnt even here */
+  background-repeat: repeat;
+  background-size: auto;
+  background-attachment: scroll;
+  margin: 0;
   line-height: 1;
   color: black;
 }
