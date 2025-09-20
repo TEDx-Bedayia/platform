@@ -10,7 +10,6 @@ import {
   verifyPaymentMethod,
 } from "../../utils/input-sanitization";
 import { TicketType } from "../../utils/ticket-types";
-import { getPaymentMethods } from "../payment-methods/payment-methods";
 import { price } from "../price/prices";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
@@ -118,14 +117,16 @@ export async function POST(request: NextRequest) {
 
     try {
       // Send email to group leader
-      await sendBookingConfirmation(
-        paymentMethod,
-        name1,
-        emails[0],
-        ids[0],
-        TicketType.GROUP,
-        paymentUrl
-      );
+      if (paymentMethod == "CASH") {
+        await sendBookingConfirmation(
+          paymentMethod,
+          name1,
+          emails[0],
+          ids[0],
+          TicketType.GROUP,
+          paymentUrl
+        );
+      }
 
       if (paymentMethod === "CARD") {
         return Response.json(

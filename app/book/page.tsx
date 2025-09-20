@@ -372,8 +372,10 @@ export default function SingleTickets() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ ease: "easeOut", duration: 1.5 }}
       >
-        <h1 style={{ ...title.style, fontWeight: 700 }}>Book a Ticket</h1>
-        <h2 style={{ ...title.style, fontWeight: 100 }}>
+        <h1 style={{ ...title.style, fontWeight: 700, color: "#E0E0E0" }}>
+          Book a Ticket
+        </h1>
+        <h2 style={{ ...title.style, fontWeight: 900, color: "#F9F9F9" }}>
           {code ? "Paid Ticket!" : "400 EGP"}
         </h2>
       </motion.div>

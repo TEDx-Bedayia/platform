@@ -23,6 +23,20 @@
   text-decoration: none;
 }
 
+.iconBook {
+  fill: white;
+  stroke: white;
+}
+
+.font-body {
+  color: "#E0E0E0" ;
+}
+.font-body:hover {
+  color: "#E0E0E0";
+  text-decoration: underline;
+  text-decoration-color: #007BFF;
+}
+
 .navigation > a {
   position: relative;
 }
@@ -52,6 +66,7 @@
   gap: 20px;
   justify-content: center;
   bottom: 1rem;
+  filter: invert(39%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%) contrast(100%);
 }
 
 .contact {
