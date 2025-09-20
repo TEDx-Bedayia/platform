@@ -1,14 +1,23 @@
 import React from "react";
-import styles from "./DeliveryPolicy.module.css";
+import styles from "../styles/Policy.module.css";
+
+import { Poppins, Ubuntu } from "next/font/google";
+const ubuntu = Ubuntu({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const poppins = Poppins({ subsets: ["latin"], weight: "700" });
 
 export default function DeliveryPolicy() {
   return (
     <article
       className={styles.container}
+      style={ubuntu.style}
       aria-labelledby="delivery-policy-title"
     >
       <header className={styles.header}>
-        <h1 id="delivery-policy-title" className={styles.title}>
+        <h1
+          id="delivery-policy-title"
+          className={styles.title}
+          style={poppins.style}
+        >
           Delivery &amp; Shipment Policy
         </h1>
         <p className={styles.effective}>

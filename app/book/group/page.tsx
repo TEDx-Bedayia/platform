@@ -4,6 +4,7 @@ import styles from "../book.module.css";
 
 import { motion } from "framer-motion";
 
+import { form } from "framer-motion/client";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
 import { addLoader, removeLoader } from "../../global_components/loader";
@@ -99,6 +100,26 @@ export default function GroupTickets() {
       setCurrentPerson(0);
       removeLoader();
       return;
+    }
+
+    if (
+      formData.names[1] == "" &&
+      formData.names[2] == "" &&
+      formData.names[3] == "" &&
+      formData.names[0] != ""
+    ) {
+      setFormData({
+        ...formData,
+        names: [
+          formData.names[0],
+          formData.names[0],
+          formData.names[0],
+          formData.names[0],
+        ],
+      });
+      formData.names[1] = formData.names[0];
+      formData.names[2] = formData.names[0];
+      formData.names[3] = formData.names[0];
     }
 
     const response = await fetch("/api/tickets/group", {

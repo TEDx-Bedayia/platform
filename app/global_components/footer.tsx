@@ -65,6 +65,14 @@ export default function Footer() {
         <p>Bedayia International School, New Cairo</p>
         <p style={{ marginTop: "0.25rem" }} className={styles.policiesLinks}>
           <Link
+            href="/terms-and-conditions"
+            target="_blank"
+            className="text-secondary-200"
+          >
+            Terms &amp; Conditions
+          </Link>
+          {" - "}
+          <Link
             href="/privacy-policy"
             target="_blank"
             className="text-secondary-200"
