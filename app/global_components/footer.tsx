@@ -13,54 +13,82 @@ export default function Footer() {
         textAlign: "center",
         fontFamily: poppins.style.fontFamily,
       }}
+      className="flex flex-col items-center justify-center gap-2"
     >
-      <div style={{ marginBottom: "1rem" }} className={styles.footerLinks}>
-        <Link
-          href="/privacy-policy"
-          style={{ color: "#fff", margin: "0 1rem", textDecoration: "none" }}
-        >
-          Privacy Policy
-        </Link>
-        <Link
-          href="/delivery-policy"
-          style={{ color: "#fff", margin: "0 1rem", textDecoration: "none" }}
-        >
-          Delivery Policy
-        </Link>
-        <Link
-          href="/refund-policy"
-          style={{ color: "#fff", margin: "0 1rem", textDecoration: "none" }}
-        >
-          Refund Policy
-        </Link>
-      </div>
       <div className={styles.footerLinksSecondary}>
         <Link
+          href="https://tiktok.com/@tedxyouthbedayiaschool"
+          style={{ color: "#25D366", margin: "", textDecoration: "none" }}
+        >
+          TikTok
+        </Link>
+        <Link
+          href="https://www.instagram.com/tedxyouthbedayiaschool/"
+          target="_blank"
+          style={{ color: "#25D366", margin: "", textDecoration: "none" }}
+        >
+          Instagram
+        </Link>
+        <Link
+          href="https://www.facebook.com/TEDxYouthBedayiaSchool"
+          target="_blank"
+          style={{ color: "#25D366", margin: "", textDecoration: "none" }}
+        >
+          Facebook
+        </Link>
+      </div>
+      <div className={styles.footerLinks}>
+        <Link
           href="mailto:tedxyouth@bedayia.com"
-          style={{ color: "#25D366", margin: "0 1rem", textDecoration: "none" }}
+          style={{ color: "#F9F9F9", margin: "", textDecoration: "none" }}
         >
           Email Us
         </Link>
         <Link
           href="https://wa.me/message/VNHEAKD7RJD5A1"
           target="_blank"
-          style={{ color: "#25D366", margin: "0 1rem", textDecoration: "none" }}
+          style={{ color: "#F9F9F9", margin: "", textDecoration: "none" }}
         >
           WhatsApp
         </Link>
       </div>
 
-      {/* Socials */}
-
-      <p
+      <div
         style={{
-          marginTop: "2rem",
-          fontSize: "0.9rem",
-          color: "#e0e0e0",
+          textAlign: "center",
+          marginTop: "1rem",
+          color: "lightgray",
+          fontSize: ".75rem",
+          marginBottom: "1rem",
         }}
       >
-        Bedayia International School, New Cairo
-      </p>
+        <p>Bedayia International School, New Cairo</p>
+        <p style={{ marginTop: "0.25rem" }} className={styles.policiesLinks}>
+          <Link
+            href="/privacy-policy"
+            target="_blank"
+            className="text-secondary-200"
+          >
+            Privacy Policy
+          </Link>
+          {" - "}
+          <Link
+            href="/delivery-policy"
+            target="_blank"
+            className="text-secondary-200"
+          >
+            Delivery Policy
+          </Link>
+          {" - "}
+          <Link
+            href="/refund-policy"
+            target="_blank"
+            className="text-secondary-200"
+          >
+            Refund Policy
+          </Link>
+        </p>
+      </div>
       <p
         style={{
           marginTop: "0.75rem",

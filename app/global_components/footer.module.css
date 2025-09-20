@@ -1,10 +1,20 @@
 .footerLinks > a,
-.footerLinksSecondary > a {
+.footerLinksSecondary > a,
+.policiesLinks > a {
   position: relative;
 }
 
+.footerLinks,
+.footerLinksSecondary {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+}
+
 .footerLinks > a::after,
-.footerLinksSecondary > a::after {
+.footerLinksSecondary > a::after,
+.policiesLinks > a::after {
   content: "";
   position: absolute;
   width: 100%;
@@ -24,8 +34,13 @@
   background-color: #fff;
 }
 
+.policiesLinks > a::after {
+  background-color: #b9b3e5;
+}
+
 .footerLinks > a:hover::after,
-.footerLinksSecondary > a:hover::after {
+.footerLinksSecondary > a:hover::after,
+.policiesLinks > a:hover::after {
   transform: scaleX(1);
   transform-origin: bottom left;
 }
