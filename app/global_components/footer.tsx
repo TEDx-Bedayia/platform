@@ -62,6 +62,7 @@ export default function Footer() {
           marginBottom: "1rem",
         }}
       >
+        <p>+20 105 578 2533</p>
         <p>Bedayia International School, New Cairo</p>
         <p style={{ marginTop: "0.25rem" }} className={styles.policiesLinks}>
           <Link
