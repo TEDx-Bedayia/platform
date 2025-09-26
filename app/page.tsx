@@ -29,6 +29,8 @@ function infoItem(text: string, svg: any) {
   );
 }
 
+
+
 function infoLink(text: string, svg: any, link: string) {
   return (
     <div className="flex flex-row items-center justify-center gap-2">
