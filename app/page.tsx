@@ -7,6 +7,7 @@ import "./styles/hero.css";
 import "./styles/info.css";
 import "./styles/navigation.css";
 import "./styles/theme.css";
+import "../mohamed/style.css";
 
 import { Bungee, Ubuntu } from "next/font/google";
 import Footer from "./global_components/footer";
@@ -325,9 +326,32 @@ export default function Home() {
           Total attendee count: 40000+
         </div>
       </section>
-      <section>
-        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">
-          Improved Testimonials
+      <section className="testimonials">
+        <div className="testimonial-slider">
+          <div className="testimonial">
+            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p>- Ahmed mohsen</p>
+          </div>
+          <div className="testimonial">
+            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p>- Ahmed mohsen</p>
+          </div>
+          <div className="testimonial">
+            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p>- Ahmed mohsen</p>
+          </div>
+          <div className="testimonial">
+            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p>- Ahmed mohsen</p>
+          </div>
+          <div className="testimonial">
+            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p>- Ahmed mohsen</p>
+          </div>
+          <div className="testimonial">
+            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p>- Ahmed mohsen</p>
+          </div>
         </div>
       </section>
       <section
