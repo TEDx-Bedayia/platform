@@ -464,7 +464,7 @@ export default function SingleTickets() {
                     formData.paymentMethod = "CASH";
                   }}
                 >
-                  Pay at Bedayia High School Office
+                  Pay at Bedayia
                 </button>
               </motion.div>
             </>
