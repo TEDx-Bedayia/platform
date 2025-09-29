@@ -50,60 +50,6 @@ function infoLink(text: string, svg: any, link: string) {
   );
 }
 
-// function testimonial(
-//   avatar_url: string,
-//   role: string,
-//   name: string,
-//   quote: string,
-//   alt: boolean
-// ) {
-//   if (alt)
-//     return (
-//       <div
-//         className="flex h-[6.75rem] w-[38.5rem] flex-row items-center justify-start gap-4 rounded-[1rem] bg-secondary-400 px-10 py-4 max-phone:h-[5.0625rem] max-phone:min-w-[28.875rem] max-phone:gap-3 max-phone:rounded-[0.75rem] max-phone:px-[1.875rem] max-phone:py-3"
-//         style={{
-//           backgroundImage: 'url("/Hero Section/Vector Art Testimonial.png")',
-//           backgroundSize: "100% 100%",
-//           backgroundRepeat: "no-repeat",
-//         }}
-//       >
-//         <div className="flex h-full w-[37.75rem] flex-col items-start justify-start gap-0 py-1 text-start max-phone:w-[20rem]">
-//           <span className="mb-1 font-small max-phone:text-[0.75em]/[1.125rem]">
-//             {name}
-//           </span>
-//           <p
-//             className="font-body max-phone:text-[2em]/[3rem]"
-//             style={ubuntu.style}
-//           >
-//             {quote}
-//           </p>
-//         </div>
-//       </div>
-//     );
-
-//   return (
-//     <div
-//       className="flex h-[6.75rem] w-[38.5rem] flex-row items-center justify-start gap-4 rounded-[1rem] bg-primary-400 px-10 py-4 max-phone:h-[5.0625rem] max-phone:min-w-[28.875rem] max-phone:gap-3 max-phone:rounded-[0.75rem] max-phone:px-[1.875rem] max-phone:py-3"
-//       style={{
-//         backgroundImage: 'url("/Hero Section/Vector Art Testimonial alt.png")',
-//         backgroundSize: "100% 100%",
-//         backgroundRepeat: "no-repeat",
-//       }}
-//     >
-//       <div className="flex h-full w-[37.75rem] flex-col items-start justify-start gap-0 py-1 text-start max-phone:w-[20rem]">
-//         <span className="mb-1 font-small max-phone:text-[0.75em]/[1.125rem]">
-//           {name}
-//         </span>
-//         <p
-//           className="font-body max-phone:text-[2em]/[3rem]"
-//           style={ubuntu.style}
-//         >
-//           {quote}
-//         </p>
-//       </div>
-//     </div>
-//   );
-//}
 
 export default function Home() {
   return (
@@ -260,98 +206,38 @@ export default function Home() {
             Countdown
           </div>
         </section>
-
-        {/* <section
-          id="testimonials"
-          className="flex max-w-[100vw] flex-row justify-start gap-4 overflow-hidden scroll-smooth max-phone:gap-3"
-        >
-          {testimonial(
-            "/Avatars/kareem.png",
-            "Graduate",
-            "Kareem",
-            "TEDx hosts a beautiful culmination of knowledge and entertainment, curated to ensure you have the best of times.",
-            true
-          )}
-          {testimonial(
-            "/Avatars/ahmed.png",
-            "Student",
-            "Abdelrahman El-Kalla",
-            "I liked how TEDx had a diverse genre of topics that the speakers spoke about.",
-            false
-          )}
-          {testimonial(
-            "/Avatars/girl.png",
-            "Student",
-            "Ibrahim Dawood",
-            "The food tasted well and the speakers were fun!",
-            true
-          )}
-          {testimonial(
-            "/Avatars/girl.png",
-            "Team Member",
-            "Omar Emara",
-            "The speaker lounge was perfect.",
-            false
-          )}
-          {testimonial(
-            "/Avatars/mom.png",
-            "Student",
-            "Jude Ahmed",
-            "Very interactive audience, making the talks relatable.",
-            true
-          )}
-          {testimonial(
-            "/Avatars/mom.png",
-            "Student",
-            "Moaz Moatasem",
-            "All team members worked well to produce such an event.",
-            false
-          )}
-          {testimonial(
-            "/Avatars/mom.png",
-            "Student",
-            "Omar Farghaly",
-            "The speakers were fun to listen to.",
-            true
-          )}
-          {testimonial(
-            "/Avatars/dad.png",
-            "Parent",
-            "Omar Mohamed El-Mandooh",
-            "Best event you'll ever go to!",
-            false
-          )}
-        </section> */}
       </center>
+
       <section>
         <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">
           Total attendee count: 40000+
         </div>
       </section>
+
       <section className="testimonials">
         <div className="testimonial-slider">
           <div className="testimonial">
-            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
             <p>- Ahmed mohsen</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
             <p>- Ahmed mohsen</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
             <p>- Ahmed mohsen</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
             <p>- Ahmed mohsen</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
             <p>- Ahmed mohsen</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">"This was such a fascinating event that i loved"</p>
+            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
             <p>- Ahmed mohsen</p>
           </div>
         </div>
