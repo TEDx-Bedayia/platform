@@ -13,7 +13,7 @@
     "@vercel/postgres": "^0.10.0",
     "framer-motion": "^12.23.12",
     "next": "^15.5.3",
-    "nodemailer": "^6.9.16",
+    "nodemailer": "^7.0.7",
     "qrcode": "^1.5.4",
     "react": "^18",
     "react-dom": "^18"
