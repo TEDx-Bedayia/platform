@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  return (
+  return ( 
     <div className={styles.mainBookingContainer}>
       <motion.div
         initial={{ opacity: 0 }}
