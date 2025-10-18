@@ -6,13 +6,10 @@ import { motion } from "framer-motion";
 
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
-import {
-  Field,
-  PaymentMethod,
-} from "../api/tickets/payment-methods/payment-methods";
 import "./htmlcolor.css";
 
 import { addLoader, removeLoader } from "../global_components/loader";
+import { redirect } from "next/navigation";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
@@ -358,10 +355,21 @@ export default function SingleTickets() {
   // for PayMob & Cash
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const { name, email, phone } = formData;
+    if (!name || !email || !phone) {
+      customAlert("Please fill all the required fields");
+      removeLoader();
+      return;
+    }
     document.body.focus();
 
     if (code !== "") await submitTicket("CASH");
-    else await submitTicket(formData.paymentMethod || "CARD");
+    else {
+      const encodedName = encodeURIComponent(name);
+      const encodedEmail = encodeURIComponent(email);
+      const encodedPhone = encodeURIComponent(phone);
+      window.location.href = `/pay-online?name=${encodedName}&mail=${encodedEmail}&phone=${encodedPhone}`
+    }
   }
 
   return (
@@ -448,25 +456,16 @@ export default function SingleTickets() {
           </motion.div>
           {code === "" && (
             <>
-              <div className="flex items-center justify-center mt-4 mb-4 font-bold">
-                OR
-              </div>
-
-              <motion.div
-                initial={{ scale: 2, opacity: 0.2 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "tween", ease: "anticipate", duration: 2 }}
-              >
+              <div className="flex flex-col gap-3 mt-6">
                 <button
+                  type="button"
                   className={`${styles.schoolOfficeButton} font-bold`}
-                  style={{ ...title.style, width: "100%" }}
-                  onClick={() => {
-                    formData.paymentMethod = "CASH";
-                  }}
+                  style={{ ...title.style }}
+                  onClick={() => submitTicket("CASH")}
                 >
                   Pay at Bedayia
                 </button>
-              </motion.div>
+              </div>
             </>
           )}
         </form>

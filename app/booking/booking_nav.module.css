@@ -1,0 +1,141 @@
+.navigation {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 10rem;
+  padding-right: 15rem;
+  /* border-bottom: 1px solid #e0e0e0; */
+  z-index: 10000;
+  width: 100vw;
+  height: 4rem;
+  backdrop-filter: blur(5px);
+  background: rgba(16, 13, 38, 0.1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navigation * {
+  color: white;
+  font-size: 1rem;
+  font-weight: 300;
+  text-decoration: none;
+}
+
+.iconBook {
+  fill: white;
+  stroke: white;
+}
+
+.font-body {
+  color: "#E0E0E0";
+}
+.font-body:hover {
+  color: "#E0E0E0";
+  text-decoration: underline;
+  text-decoration-color: #007bff;
+}
+
+.navigation > a {
+  position: relative;
+}
+
+.navigation > a::after {
+  content: "";
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #fff;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.mainBookingContainer {
+  background-image: url("/asfalt-light.png");
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 100vh;
+  width: 100vw !important;
+  position: relative;
+}
+
+@media (min-width: 601px) {
+  .footerContainer {
+    padding-top: 1rem;
+    bottom: 0;
+  }
+}
+
+.icon {
+  transition: all 0.2s;
+}
+.icon:hover {
+  transform: scale(1.5) translate(0px, -10px) !important;
+}
+
+.socials {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  bottom: 1rem;
+  filter: invert(39%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%)
+    contrast(100%);
+}
+
+.contact {
+  bottom: 4rem;
+}
+.contact2 {
+  bottom: 3rem;
+}
+
+.navigation > a:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+@media (max-width: 600px) {
+  .navigation {
+    padding: 1rem 2rem;
+    flex-direction: column;
+    height: fit-content;
+    gap: 1rem;
+  }
+
+  .socials {
+    bottom: -10%; /* 4 rem */
+  }
+
+  .contact {
+    bottom: -5%;
+  }
+
+  .navigation * {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .navigation > img {
+    aspect-ratio: calc(448 / 36);
+    width: 80%;
+  }
+
+  .navigation > a {
+    font-size: 0.8rem;
+  }
+
+  .hideOnMobile {
+    display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .icon:hover {
+    transform: scale(1) translate(0px, 0px) !important;
+  }
+}

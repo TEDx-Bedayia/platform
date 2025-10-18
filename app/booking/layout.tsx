@@ -21,13 +21,6 @@ export default function RootLayout({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ ease: "easeInOut", duration: 2.5 }}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 10000,
-        }}
       >
         <nav className={styles.navigation} style={ubuntu.style}>
           <Image

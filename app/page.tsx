@@ -79,7 +79,7 @@ export default function Home() {
           <button
             className={`flex flex-row items-center gap-2 btnColor px-6 py-2 transition-all max-phone:mt-4`}
             style={{ ...button.style, borderRadius: "0.5rem" }}
-            onClick={() => (window.location.href = "/book")}
+            onClick={() => (window.location.href = "/booking")}
           >
             <div className="h-6 w-6">
               <svg
@@ -174,7 +174,7 @@ export default function Home() {
                 <button
                   className="primary hover:-translate-y-2 w-[16.25rem] shrink-0 items-center justify-center rounded-2xl btnColor py-6 text-center font-navButton max-phone:w-[16rem] max-phone:py-[1.125rem]"
                   style={{ ...button.style }}
-                  onClick={() => (window.location.href = "/book")}
+                  onClick={() => (window.location.href = "/booking")}
                 >
                   Book a Ticket
                 </button>

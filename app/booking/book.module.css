@@ -1,0 +1,514 @@
+.container label,
+.container input,
+.container textarea,
+.container select,
+.paymentMethodSelector {
+  transition: all ease 300ms;
+  z-index: 10 !important;
+}
+
+.container,
+.successContainer {
+  background-image: url("/asfalt-light.png");
+
+  color: #fff; /* White text for readability */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  width: 100vw !important;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+}
+
+@media (min-width: 600px) {
+  .group {
+    padding-top: 10rem;
+    min-height: min-content;
+  }
+}
+
+.container::after {
+  content: "";
+  opacity: 0.3;
+  pointer-events: none;
+  background-image: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0%,
+    rgba(255, 0, 0, 0.06) 1%,
+    transparent 5%
+  );
+  filter: blur(3px);
+  z-index: 1;
+}
+
+.container h1 {
+  font-size: 2em;
+  width: auto;
+  text-align: center;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.container h2 {
+  font-size: 1em;
+  margin-bottom: 1.5rem;
+  width: auto;
+  text-align: center;
+  font-weight: 100;
+  z-index: 2;
+}
+
+.container form h3 {
+  text-align: center;
+}
+
+.container form,
+.codeInputDialog {
+  width: 400px;
+  border-radius: 1rem;
+  background: rgb(255, 255, 255, 0.2);
+  padding: 1.5rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  padding-bottom: 30px;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: #ffffff20 1px solid;
+  z-index: 3 !important;
+}
+
+.container input,
+.container select,
+.paymentMethodSelector {
+  background: #e0e0e041;
+
+  color: #fff; /* White text inside inputs */
+  padding: 10px 16px;
+  margin: 10px 0;
+  border-radius: 100rem;
+  border: transparent 2px solid;
+  font-size: 1em;
+  height: 3rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.paymentMethodSelector {
+  margin: 0 !important;
+}
+
+.container input {
+  padding-bottom: 0px !important;
+}
+
+.container input:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff80; /* Lighter text for disabled inputs */
+  cursor: not-allowed; /* Change cursor to indicate disabled state */
+}
+
+.container input:focus {
+  outline: none;
+  border: #e0e0e0 2px solid;
+}
+
+.container select:focus {
+  outline: none;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.inputWrapper label {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  padding: 10px 20px;
+  color: #e0e0e0;
+  opacity: 0.5;
+  font-size: 1em;
+  pointer-events: none;
+  transition: all ease 300ms;
+}
+
+.inputWrapper input:focus + label,
+.inputWrapper input:not(:placeholder-shown) + label {
+  font-size: 0.55em;
+  top: 5px;
+  color: #e0e0e0;
+  opacity: 1;
+  font-weight: 700;
+}
+
+.checkboxContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: start;
+  margin-left: 16px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.mainTextbox {
+  transition: all ease 300ms;
+  transform: scaleY(1);
+  opacity: 1;
+  pointer-events: all;
+  transform-origin: top;
+  /* height: 1; */
+}
+
+.mainTextbox.disabledTextbox {
+  transform: scaleY(0.5);
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkboxContainer input {
+  display: none; /* Hide the default checkbox */
+}
+
+.checkboxContainer .checkMark {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  background-color: #ffffff20; /* Semi-transparent background */
+  border: 2px solid #ffffff40; /* Light border */
+  border-radius: 4px; /* Rounded corners */
+}
+
+/* Checkmark tick (appears only when checked) */
+.checkboxContainer input:checked + .checkMark::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 2px;
+  width: 7px;
+  height: 12.5px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkboxContainer input:checked + .checkMark {
+  background-color: #ffffff40;
+  border-color: #ffffff80; /* Lighter border when checked */
+}
+
+.checkboxContainer:hover .checkMark {
+  border-color: #ffffff80;
+}
+
+.checkboxContainer label {
+  color: #ffffff80;
+  font-size: 0.9em;
+  margin: 0;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.paymentMethodContainer {
+  position: relative;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.paymentMethodContainer select,
+.paymentMethodSelector {
+  appearance: none; /* Remove default browser styles */
+  -webkit-appearance: none; /* For Safari */
+  -moz-appearance: none; /* For Firefox */
+  width: 100%;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  border: 2px solid transparent;
+  color: #ffffff80;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 101 !important;
+}
+
+.paymentMethodSelector > * {
+  margin: 10px 16px;
+}
+
+.paymentMethodContainer .selectArrow {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  pointer-events: none; /* Make sure the arrow doesn't block clicks */
+  color: white;
+  font-size: 12px;
+}
+
+/* Hover and focus states */
+.paymentMethodContainer select:hover,
+.paymentMethodContainer select:focus {
+  border: #666666 2px solid;
+  color: #666666;
+}
+ 
+.paymentMethodOptions {
+  position: absolute;
+  background-color: #666666;
+  top: 0;
+  z-index: 100;
+  border-radius: 1.5rem;
+  padding: 10px 16px;
+  width: 100%;
+  padding-top: 3.5rem;
+  /* display: none; */
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paymentMethodOptions > div:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.paymentMethodOptions > div {
+  border-bottom: #666666 1px solid;
+}
+
+.selectArrow {
+  transition: all 0.5s ease;
+  transform: rotate(0deg);
+}
+
+.selectArrow.activeSVG {
+  transform: rotate(180deg);
+  top: 40%;
+}
+
+.activeOption {
+  opacity: 1;
+  transform: translateY(0px);
+  pointer-events: all;
+}
+
+.container select:valid {
+  color: #666666 !important;
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 32px;
+  margin-top: 20px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.buttonsContainer button {
+  background-color: #007bff;
+  /* background: linear-gradient(45deg, #007bff, #0056b3); */
+  color: #fff;
+  padding: 4px 4px;
+  text-align: center;
+  border: none;
+  border-radius: 100rem;
+  aspect-ratio: 1;
+  scale: 1.5;
+  /* add letter spacing */
+  cursor: pointer;
+  transition: background 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container button[type="submit"],
+.codeInputDialog button {
+  background-color: #007bff;
+  /* background: linear-gradient(45deg, #007bff, #0056b3); */
+  color: #fff;
+  padding: 12px 0px;
+  text-align: center;
+  margin-top: 12px;
+  border: none;
+  border-radius: 100rem;
+  font-weight: 700;
+  /* add letter spacing */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.container button[type="submit"]:hover {
+  /* background: linear-gradient(-45deg, #007bff, #0056b3); */
+  background-color: #0056b3;
+}
+
+.schoolOfficeButton {
+  background-color: transparent;
+  border: #007bff 4px solid;
+  color: #fff;
+  padding: 12px 0px;
+  text-align: center;
+  border-radius: 100rem;
+  font-weight: 400;
+  /* add letter spacing */
+  letter-spacing: 1px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.container input:-webkit-autofill,
+.container input:-webkit-autofill:hover,
+.container input:-webkit-autofill:focus,
+.container input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #ffffff;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px #23232329;
+}
+
+@media (max-width: 600px) {
+  .container form,
+  .codeInputDialog {
+    padding: 15px;
+    width: 80vw;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+
+  .container {
+    padding-top: 2rem;
+    height: calc(100vh + 5rem);
+    margin-top: 0.5rem;
+  }
+
+  .container::after {
+    opacity: 0.4;
+    background-image: repeating-radial-gradient(
+      circle at 50% 50%,
+      transparent 0%,
+      rgba(0, 0, 0, 0.07) 1%,
+      transparent 5%
+    );
+    filter: blur(4px);
+  }
+}
+
+.codeInputDialog h2 {
+  margin-bottom: 0;
+  font-size: 1.2em;
+}
+
+.successCard {
+  padding: 2.5rem;
+  border-radius: 1rem;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  animation: fadeInUp 0.6s ease;
+  background: rgb(255, 255, 255, 0.2);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: #ffffff20 1px solid;
+}
+
+.successIcon {
+  color: #22c55e;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+  animation: scalePop 0.5s ease;
+}
+
+.failureIcon {
+  color: #d00036;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+  animation: scalePop 0.5s ease;
+}
+
+.successTitle {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.successMessage {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #ececec;
+  margin-bottom: 0.25rem;
+}
+
+.successSubMessage {
+  font-size: 1rem;
+  color: #d1d5db;
+  margin-bottom: 2rem;
+}
+
+.successButton {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: #007bff;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.75rem;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.successButton:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scalePop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
