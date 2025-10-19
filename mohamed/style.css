@@ -1,39 +1,13 @@
-html {
-    background-color: #666666;
-}
-body {
-  margin: 0;
-  font-family: 'Helvetica Neue', sans-serif;
-  background: #f9f9f9;
-  color: #333;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: 'Helvetica Neue', sans-serif;
-  background: #f9f9f9;
-  color: #333;
-}
 
 .testimonials {
   text-align: center;
-  padding: 20px 20px;
-  background: #fff;
+  padding: 30px 20px;
+  background: #3333330b;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   max-width: 900px;
   margin: 50px auto;
   border-radius: 8px;
   overflow: hidden;
-}
-
-.testimonials h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #222;
 }
 
 /* Slider container */
@@ -44,6 +18,7 @@ body {
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 10px;
+  padding-top: 10px;
   scrollbar-width: none; 
 }
 
@@ -72,7 +47,7 @@ body {
   line-height: 1.6;
 }
 
-.testimonial h4 {
+.testimonialText {
   margin-top: 15px;
   font-size: 14px;
   color: #000;

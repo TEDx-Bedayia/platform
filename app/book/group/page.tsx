@@ -395,7 +395,7 @@ export default function GroupTickets() {
                     formData.paymentMethod = "CASH";
                   }}
                 >
-                  Pay at Bedayia High School Office
+                  Pay at Bedayia
                 </button>
               </motion.div>
             </>
