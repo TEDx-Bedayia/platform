@@ -16,7 +16,7 @@
     "nodemailer": "^7.0.9",
     "qrcode": "^1.5.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^19"
   },
   "devDependencies": {
     "@types/node": "^24",
@@ -24,7 +24,7 @@
     "@types/pg-format": "^1.0.5",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
     "eslint": "^8",
     "eslint-config-next": "15.5.3",
