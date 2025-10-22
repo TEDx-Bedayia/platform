@@ -16,8 +16,7 @@ export const TICKET_WINDOW = [
 export const EVENT_DATE = new Date("2020-01-01T23:59:59Z"); // Change to event date
 export const HOST = "https://tedxbedayia.com"; // Change to your domain
 
-export const EVENT_DESC =
-  "TESTING PHASE";
+export const EVENT_DESC = "TESTING PHASE";
 
 export const YEAR = 26;
 
@@ -27,3 +26,5 @@ export const support: Author = {
   name: "Aly Mobarak",
   url: "mailto:alymmobarak@hotmail.com",
 };
+
+export const paymentProcessor = "NULL";

@@ -2,6 +2,7 @@ import React from "react";
 import styles from "../styles/Policy.module.css";
 
 import { Poppins, Ubuntu } from "next/font/google";
+import { paymentProcessor } from "../metadata";
 const ubuntu = Ubuntu({ subsets: ["latin"], weight: ["400", "500", "700"] });
 const poppins = Poppins({ subsets: ["latin"], weight: "700" });
 
@@ -56,7 +57,7 @@ export default function PrivacyPolicy() {
         <ul className={styles.list}>
           <li>
             Credit card or payment information (payments are processed by
-            PayMob)
+            {paymentProcessor})
           </li>
           <li>Device metadata, IP addresses, or geolocation identifiers</li>
         </ul>
@@ -87,7 +88,7 @@ export default function PrivacyPolicy() {
         <ul className={styles.list}>
           <li>
             With service providers that perform services on our behalf (for
-            example, PayMob for payment processing)
+            example, {paymentProcessor})
           </li>
           <li>When required by law or in response to valid legal requests</li>
         </ul>
@@ -129,10 +130,10 @@ export default function PrivacyPolicy() {
       <section className={styles.section}>
         <h2 className={styles.h2}>7. Third-Party Payment Processor</h2>
         <p>
-          All payments are processed through <strong>PayMob</strong>. We do not
-          have access to or store credit card or financial details. Please
-          review PayMob&apos;s privacy policy for details on how they handle
-          payment data.
+          All payments are processed through <strong>{paymentProcessor}</strong>
+          . We do not have access to or store credit card or financial details.
+          Please review {paymentProcessor}&apos;s privacy policy for details on
+          how they handle payment data.
         </p>
       </section>
 
