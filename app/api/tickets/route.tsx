@@ -179,6 +179,14 @@ async function submitOneTicket(
     }
 
     paymentUrl = (await initiateCardPaymentResponse.json()).paymentUrl;
+
+    return Response.json(
+      {
+        paymentUrl: paymentUrl,
+        success: true,
+      },
+      { status: 200 }
+    );
   }
 
   try {
@@ -194,15 +202,6 @@ async function submitOneTicket(
       );
     }
 
-    if (paymentMethod === "CARD") {
-      return Response.json(
-        {
-          paymentUrl: paymentUrl,
-          success: true,
-        },
-        { status: 200 }
-      );
-    }
     return Response.json(
       {
         message: `Ticket Booked Successfully! Please check your email to continue.${

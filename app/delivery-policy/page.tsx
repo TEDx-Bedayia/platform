@@ -2,6 +2,7 @@ import React from "react";
 import styles from "../styles/Policy.module.css";
 
 import { Poppins, Ubuntu } from "next/font/google";
+import { paymentProcessor } from "../metadata";
 const ubuntu = Ubuntu({ subsets: ["latin"], weight: ["400", "500", "700"] });
 const poppins = Poppins({ subsets: ["latin"], weight: "700" });
 
@@ -38,9 +39,9 @@ export default function DeliveryPolicy() {
         <h2 className={styles.h2}>1. Delivery Method</h2>
         <ul className={styles.list}>
           <li>
-            <strong>Online Payments (via PayMob):</strong> we deliver the
-            eTickets instantly by email to the address provided during purchase,
-            once payment is successfully processed.
+            <strong>Online Payments (via {paymentProcessor}):</strong> we
+            deliver the eTickets instantly by email to the address provided
+            during purchase, once payment is successfully processed.
           </li>
           <li>
             <strong>Cash Payments (at the school office):</strong> eTickets are
@@ -54,11 +55,11 @@ export default function DeliveryPolicy() {
         <h2 className={styles.h2}>2. Delivery Timeframe</h2>
         <ul className={styles.list}>
           <li>
-            <strong>Instant Delivery:</strong> For PayMob payments, delivery
-            occurs immediately after confirmation.
+            <strong>Instant Delivery:</strong> For {paymentProcessor} payments,
+            delivery occurs immediately after confirmation.
           </li>
           <li>
-            <strong>Cash Payments:</strong> Delivery occurs within 24 hours of
+            <strong>Cash Payments:</strong> Delivery occurs within 48 hours of
             payment confirmation at the school office.
           </li>
         </ul>
