@@ -8,6 +8,10 @@ export async function initiateCardPayment(
   ticketType: string,
   attendeeId: string
 ) {
+  if (process.env.anyrandomthing !== "enablepaymob") {
+    return Response.json({ message: "Work in Progress." }, { status: 503 });
+  }
+
   try {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", "Token " + process.env.SECRET_KEY);
