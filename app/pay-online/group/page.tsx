@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./page.module.css"
-import image from "../../public/Item-Icon.png"
+import image from "../../../public/Item-Icon.png"
 import { useState, FC, CSSProperties } from "react";
 import { paymentOptions, PaymentMethodKey, PaymentOptionProps } from "./methods";
 
@@ -60,6 +60,7 @@ const CustomerDetails: FC<CustomerDetailsProps> = ({name, setName, phone, setPho
   );
 };
 
+
 export default function Page() {
   const [activeMethod, setActiveMethod] = useState<PaymentMethodKey>('telda');
   const [hidden, setHidden] = useState<boolean>(true)
@@ -113,8 +114,8 @@ export default function Page() {
         <hr className={styles.product_area_hr} />
         <div className={styles.purchase_details}>
           <h2 className={styles.purchase_details_h2}>Order Cost</h2>
-          <h1 className={styles.purchase_details_h1}>EGP 400.00</h1>
-          <p>Ticket For 1 Person</p>
+          <h1 className={styles.purchase_details_h1}>EGP 1,400.00</h1>
+          <p>Ticket For 4 People</p>
         </div>
       </div>
 
@@ -145,7 +146,7 @@ export default function Page() {
           <div className={styles.instruction_block} hidden={hidden}>
             <h3 className={styles.instruction_title}>How to Pay with {currentOption.name}</h3>
 
-            <ol className={styles.instruction_list}><currentOption.instructions/></ol>
+            <ol className={styles.instruction_list} ><currentOption.instructions/></ol>
 
             <div>
               <input
