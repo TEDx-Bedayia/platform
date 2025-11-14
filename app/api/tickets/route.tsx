@@ -2,7 +2,7 @@ import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
-import { pay, safeRandUUID } from "../admin/payment-reciever/main";
+import { safeRandUUID } from "../admin/payment-reciever/main";
 import { initiateCardPayment } from "../utils/card-payment";
 import { sendBookingConfirmation } from "../utils/email-helper";
 import {
@@ -10,10 +10,8 @@ import {
   checkSafety,
   handleMisspelling,
   verifyEmail,
-  verifyPaymentMethod,
 } from "../utils/input-sanitization";
 import { TicketType } from "../utils/ticket-types";
-import { getPaymentMethods } from "./payment-methods/payment-methods";
 import { price } from "./price/prices";
 
 // email, name, phone, paymentMethod

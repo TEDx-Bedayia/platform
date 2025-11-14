@@ -67,6 +67,8 @@ export async function POST(request: NextRequest) {
 
     // step 1: Sort the parameters received in the callback in lexicographical order based on their keys.
     const payload = await request.json();
+    if (payload.type.toString().toLowerCase() !== "transaction")
+      return new Response("Ignored non-transaction callback.", { status: 200 });
     const transaction = payload.obj;
 
     // step 2: Depending on the type of callback received, concatenate the values of the keys/parameters into a single string. This string will be used to calculate the HMAC in the next step.
@@ -74,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // step 3: Compute the HMAC using the SHA-512 hashing algorithm and the secret key provided by Paymob. The computed HMAC should be in hexadecimal format.
     const encoder = new TextEncoder();
-    const keyData = encoder.encode(process.env.HMAC_SECRET || "");
+    const keyData = encoder.encode(process.env.PAYMOB_HMAC_SECRET || "");
     const hmacKey = await crypto.subtle.importKey(
       "raw",
       keyData,
@@ -174,6 +176,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   // request is coming from client... check the payment status and respond accordingly
+  // no need to check HMAC here since this is just a redirect.
   const searchParams = request.nextUrl.searchParams;
   if (searchParams.get("success") === "true") {
     return NextResponse.redirect("https://tedxbedayia.com/book/success");
