@@ -140,7 +140,7 @@ export default function GroupTickets() {
         paymentMethod: "",
         additionalFields: {} as { [key: string]: string },
       });
-      setUseSameEmail(false);
+      setUseSameEmail(true);
       customAlert((await response.json()).message ?? "Submitted.");
       setCurrentPerson(0);
     } else {
@@ -224,7 +224,13 @@ export default function GroupTickets() {
                   checked={!useSameEmail}
                   onChange={(e) => {
                     setUseSameEmail(!e.target.checked);
-                    if (!e.target.checked) {
+                    if (useSameEmail) {
+                      setFormData({
+                        ...formData,
+                        emails: [formData.emails[0], "", "", ""],
+                        names: [formData.names[0], "", "", ""],
+                      });
+                    } else {
                       setFormData({
                         ...formData,
                         emails: [
@@ -232,6 +238,12 @@ export default function GroupTickets() {
                           formData.emails[0],
                           formData.emails[0],
                           formData.emails[0],
+                        ],
+                        names: [
+                          formData.names[0],
+                          formData.names[0],
+                          formData.names[0],
+                          formData.names[0],
                         ],
                       });
                     }
@@ -241,7 +253,13 @@ export default function GroupTickets() {
                   className={styles.checkMark}
                   onClick={() => {
                     setUseSameEmail(!useSameEmail);
-                    if (!useSameEmail) {
+                    if (useSameEmail) {
+                      setFormData({
+                        ...formData,
+                        emails: [formData.emails[0], "", "", ""],
+                        names: [formData.names[0], "", "", ""],
+                      });
+                    } else {
                       setFormData({
                         ...formData,
                         emails: [
@@ -249,6 +267,12 @@ export default function GroupTickets() {
                           formData.emails[0],
                           formData.emails[0],
                           formData.emails[0],
+                        ],
+                        names: [
+                          formData.names[0],
+                          formData.names[0],
+                          formData.names[0],
+                          formData.names[0],
                         ],
                       });
                     }
