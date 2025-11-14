@@ -379,9 +379,7 @@ export default function GroupTickets() {
                 </button>
               </motion.div>
 
-              <div className="flex items-center justify-center mt-4 mb-4 font-bold">
-                OR
-              </div>
+              <div className="flex items-center justify-center mt-2 mb-2 font-bold"></div>
 
               <motion.div
                 initial={{ opacity: 0.2 }}
