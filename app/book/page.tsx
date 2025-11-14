@@ -6,10 +6,6 @@ import { motion } from "framer-motion";
 
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
-import {
-  Field,
-  PaymentMethod,
-} from "../api/tickets/payment-methods/payment-methods";
 import "./htmlcolor.css";
 
 import { addLoader, removeLoader } from "../global_components/loader";

@@ -67,8 +67,7 @@
 
 @media (min-width: 601px) {
   .footerContainer {
-    position: absolute;
-    bottom: 0;
+    flex: 0 0 auto;
   }
 }
 
