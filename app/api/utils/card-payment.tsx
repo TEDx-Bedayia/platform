@@ -8,21 +8,17 @@ export async function initiateCardPayment(
   ticketType: string,
   attendeeId: string
 ) {
-  if (process.env.anyrandomthing !== "enablepaymob") {
-    return Response.json({ message: "Work in Progress." }, { status: 503 });
-  }
-
   try {
     var myHeaders = new Headers();
-    myHeaders.append("Authorization", "Token " + process.env.SECRET_KEY);
+    myHeaders.append("Authorization", "Token " + process.env.PAYMOB_SECRET_KEY);
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify({
       amount: amount * 100,
       currency: "EGP",
       payment_methods: [
-        parseInt(process.env.VFCASH_INT_ID?.toString() || "0"),
-        parseInt(process.env.INTEGRATION_ID?.toString() || "0"),
+        parseInt(process.env.PAYMOB_VFCASH_INT_ID?.toString() || "0"),
+        parseInt(process.env.PAYMOB_CARD_INT_ID?.toString() || "0"),
       ],
       items: [
         {
@@ -55,7 +51,8 @@ export async function initiateCardPayment(
     };
 
     const response = await fetch(
-      "https://accept.paymob.com/v1/intention/",
+      process.env.PAYMOB_BASE_API_URL ||
+        "https://accept.paymob.com/v1/intention/",
       requestOptions
     );
     const result = await response.json();
@@ -95,7 +92,7 @@ export async function initiateCardPayment(
       );
     }
 
-    const paymentUrl = `${process.env.BASE_URL}/unifiedcheckout/?publicKey=${process.env.PUBLIC_KEY}&clientSecret=${result.client_secret}`;
+    const paymentUrl = `${process.env.PAYMOB_BASE_URL}/unifiedcheckout/?publicKey=${process.env.PAYMOB_PUBLIC_KEY}&clientSecret=${result.client_secret}`;
 
     return Response.json(
       {
