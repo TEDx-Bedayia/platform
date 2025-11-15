@@ -249,7 +249,7 @@ export default function MarketingRushHourDashboard() {
                   onClick={async () => {
                     if (type === "individual") {
                       customAlert(
-                        "You cannot submit a ticket without an email for individual tickets. They can go to the school office and pay there."
+                        "You cannot submit a ticket without an email for individual tickets. They can book a ticket themselves then go to the school office and pay there."
                       );
                       return;
                     }
@@ -309,11 +309,10 @@ export default function MarketingRushHourDashboard() {
             </div>
             <p className="text-xs text-gray-200 mt-3 text-center">
               Don&apos;t submit a ticket for someone who will not give you cash
-              in your hand. This is for your own safety. For telda and instapay
-              rush hour tickets, tell them to book a normal ticket from the
-              website and follow the instructions but transfer the discounted
-              amount, and include the word <strong>RUSH</strong> in their note.
-              Finance/Logistics will process those tickets.
+              in your hand. This is for your own safety. At this moment, we
+              won&apos;t formally accept telda and instapay rush hour tickets.
+              If you are able to receive the transfer to your own account then
+              hand cash to your marketing head that would be fine.
             </p>
           </div>
         </section>
