@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const [mode, setMode] = useState<"school" | "admin">("school");
+  const [mode, setMode] = useState<"other" | "admin">("other");
   useEffect(() => {
     if (localStorage.getItem("admin-token")) {
       setMode("admin");
