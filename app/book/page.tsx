@@ -6,10 +6,6 @@ import { motion } from "framer-motion";
 
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
-import {
-  Field,
-  PaymentMethod,
-} from "../api/tickets/payment-methods/payment-methods";
 import "./htmlcolor.css";
 
 import { addLoader, removeLoader } from "../global_components/loader";
@@ -193,7 +189,7 @@ export default function SingleTickets() {
                   ref={(el) => {
                     inputRefs.current[adjustedIndex] = el;
                   }}
-                  className="border-b border-white w-8 text-center outline-none"
+                  className="border-b rounded-sm border-white w-8 text-center outline-none"
                   contentEditable
                   suppressContentEditableWarning
                   onInput={(e) => handleInput(e, adjustedIndex)}
