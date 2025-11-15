@@ -66,6 +66,12 @@
   z-index: 3 !important;
 }
 
+.codeInputDialog {
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px);
+  position: relative;
+}
+
 .container input,
 .container select,
 .paymentMethodSelector {

@@ -189,7 +189,7 @@ export default function SingleTickets() {
                   ref={(el) => {
                     inputRefs.current[adjustedIndex] = el;
                   }}
-                  className="border-b border-white w-8 text-center outline-none"
+                  className="border-b rounded-sm border-white w-8 text-center outline-none"
                   contentEditable
                   suppressContentEditableWarning
                   onInput={(e) => handleInput(e, adjustedIndex)}
