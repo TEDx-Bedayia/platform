@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     if (
       result.rows[0].paid === false &&
-      result.rows[0].payment_method.toString().split("@")[0] !== "CARD"
+      result.rows[0].payment_method.toString().split("@")[0] === "CASH"
     ) {
       await sendBookingConfirmation(
         result.rows[0].payment_method,
