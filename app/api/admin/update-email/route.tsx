@@ -20,10 +20,6 @@ export async function POST(request: NextRequest) {
   const { id, email } = await request.json();
 
   try {
-    // Update the admitted status for the specified applicant
-    const applicant = await sql`SELECT * FROM attendees WHERE id = ${id}`;
-    const oldEmail = applicant.rows[0].email;
-
     const result = await sql.query(
       "UPDATE attendees SET email = $1 WHERE id = $2 RETURNING *",
       [email, id]
@@ -36,23 +32,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (result.rows[0].type === "group") {
-      await sql`
-        UPDATE groups
-        SET 
-          email1 = CASE WHEN email1 = ${oldEmail} THEN ${email} ELSE email1 END,
-          email2 = CASE WHEN email2 = ${oldEmail} THEN ${email} ELSE email2 END,
-          email3 = CASE WHEN email3 = ${oldEmail} THEN ${email} ELSE email3 END,
-          email4 = CASE WHEN email4 = ${oldEmail} THEN ${email} ELSE email4 END
-        WHERE 
-          email1 = ${oldEmail} OR 
-          email2 = ${oldEmail} OR 
-          email3 = ${oldEmail} OR 
-          email4 = ${oldEmail}
-      `;
-    }
-
-    if (result.rows[0].paid === false) {
+    if (
+      result.rows[0].paid === false &&
+      result.rows[0].payment_method.toString().split("@")[0] !== "CARD"
+    ) {
       await sendBookingConfirmation(
         result.rows[0].payment_method,
         result.rows[0].full_name,
