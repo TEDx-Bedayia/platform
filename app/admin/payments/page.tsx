@@ -49,7 +49,10 @@ function IDCheckPopup(
       <p>
         <span style={{ fontWeight: "bold" }}>{name}</span> (ID: {id})
       </p>
-      <p>{toTitleCase(getTicketTypeFromName(type) ?? "individual")} Ticket</p>
+      <p>
+        {toTitleCase(getTicketTypeFromName(type) ?? TicketType.INDIVIDUAL)}{" "}
+        Ticket
+      </p>
       <p>{email}</p>
       <p>{amount} EGP</p>
       <p style={{ marginTop: "0.5rem", fontWeight: "bold" }}>
