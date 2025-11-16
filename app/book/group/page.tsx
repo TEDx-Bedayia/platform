@@ -1,8 +1,8 @@
 "use client";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styles from "../book.module.css";
-
-import { motion } from "framer-motion";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
@@ -14,12 +14,12 @@ const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function GroupTickets() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     emails: ["", "", "", ""],
     names: ["", "", "", ""],
     phone: "",
     paymentMethod: "",
-    additionalFields: {} as { [key: string]: string },
   });
 
   const [useSameEmail, setUseSameEmail] = useState(true);
@@ -123,14 +123,20 @@ export default function GroupTickets() {
         email4: formData.emails[3],
         phone: formData.phone,
         paymentMethod: formData.paymentMethod,
-        additionalFields: formData.additionalFields,
       }),
     });
 
     if (response.ok) {
       if (formData.paymentMethod === "CARD") {
         const { paymentUrl } = await response.json();
-        window.location.href = paymentUrl;
+        if (paymentUrl) {
+          router.push(paymentUrl);
+        } else {
+          customAlert(
+            "Payment URL is missing. Please try again or contact support."
+          );
+        }
+        removeLoader();
         return;
       }
       setFormData({
@@ -138,7 +144,6 @@ export default function GroupTickets() {
         names: ["", "", "", ""],
         phone: "",
         paymentMethod: "",
-        additionalFields: {} as { [key: string]: string },
       });
       setUseSameEmail(true);
       customAlert((await response.json()).message ?? "Submitted.");

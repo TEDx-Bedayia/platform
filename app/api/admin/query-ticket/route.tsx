@@ -1,7 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest } from "next/server";
+import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
-import { TicketType } from "../../utils/ticket-types";
 
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
@@ -49,11 +49,14 @@ export async function GET(request: NextRequest) {
     let amount = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
     if (res.rows[0].type == TicketType.GROUP) amount = amount * 4;
 
+    let type = res.rows[0].type;
+
     return Response.json(
       {
         email,
         name,
         amount,
+        type,
       },
       { status: 200 }
     );

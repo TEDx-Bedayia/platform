@@ -1,4 +1,4 @@
-import { TicketType } from "@/app/api/utils/ticket-types";
+import { TicketType } from "@/app/ticket-types";
 import { sql } from "@vercel/postgres";
 import { NextRequest } from "next/server";
 

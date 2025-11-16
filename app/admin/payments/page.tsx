@@ -4,6 +4,7 @@ import { hidePopup, showPopup } from "@/app/api/utils/generic-popup";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
+import { getTicketTypeFromName, TicketType } from "@/app/ticket-types";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
@@ -12,10 +13,19 @@ import AmbiguityResolver from "./ambiguous-popup";
 import styles from "./payments.module.css";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
+function toTitleCase(str: string): string {
+  return str
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 function IDCheckPopup(
   name: string,
   email: string,
   amount: number,
+  type: string,
   id: string,
   handed_amount: number
 ) {
@@ -34,6 +44,10 @@ function IDCheckPopup(
       </div>
       <p>
         <span style={{ fontWeight: "bold" }}>{name}</span> (ID: {id})
+      </p>
+      <p>
+        {toTitleCase(getTicketTypeFromName(type) ?? TicketType.INDIVIDUAL)}{" "}
+        Ticket
       </p>
       <p>{email}</p>
       <p>{amount} EGP</p>
@@ -285,6 +299,7 @@ export default function Payments() {
               ticketData.name,
               ticketData.email,
               ticketData.amount,
+              ticketData.type,
               from,
               Number(amount)
             ),

@@ -61,21 +61,23 @@ export function handleMisspelling(email: string): string {
   return email;
 }
 
-export async function verifyPaymentMethod(
-  paymentMethod: string
-): Promise<string | undefined> {
+export function verifyPaymentMethod(paymentMethod: string): string | undefined {
   const method = paymentMethod.split("@")[0];
   let metadata = paymentMethod.split("@")[1];
   if (metadata && metadata.includes("@")) {
     return;
   }
-  const options = getIdentifiersForPaymentMethods();
+  const options = getIdentifiersForPaymentMethods().map((id) => id.toString());
   if (!paymentMethod || !options.includes(method)) {
     return;
   }
 
-  if (checkSafety(metadata)) return paymentMethod;
-  return;
+  if (metadata && !checkSafety(metadata)) return;
+  if (method === "VFCASH") {
+    paymentMethod = "VFCASH@0" + metadata;
+  }
+
+  return paymentMethod;
 }
 
 export function checkSafety(str: string): boolean {
@@ -89,13 +91,4 @@ export function checkPhone(str: string): boolean {
   const alphaNumericAndSymbols = /^[0-9+]*$/;
   if (alphaNumericAndSymbols.test(str)) return true;
   return false;
-}
-
-export function generateRandomString(length: number) {
-  const characters = "abcdefghijklmnopqrstuvwxyz";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
 }

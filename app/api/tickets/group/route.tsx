@@ -1,6 +1,7 @@
 import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { TicketType } from "../../../ticket-types";
 import { initiateCardPayment } from "../../utils/card-payment";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import {
@@ -9,7 +10,6 @@ import {
   verifyEmail,
   verifyPaymentMethod,
 } from "../../utils/input-sanitization";
-import { TicketType } from "../../utils/ticket-types";
 import { price } from "../price/prices";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
@@ -51,9 +51,6 @@ export async function POST(request: NextRequest) {
 
     phone = body.phone?.toString().trim();
     paymentMethod = body.paymentMethod?.toString().trim();
-    let add = body.additionalFields;
-    if (add != undefined && add[paymentMethod.toLowerCase()] != undefined)
-      paymentMethod += "@" + add[paymentMethod.toLowerCase()].trim();
   } catch (error) {
     return Response.json(
       { message: "Please fill out all required fields." },
@@ -188,7 +185,7 @@ async function submitTickets(
     );
   }
 
-  paymentMethod = await verifyPaymentMethod(paymentMethod);
+  paymentMethod = verifyPaymentMethod(paymentMethod);
   if (paymentMethod === undefined || paymentMethod.split("@").length > 2) {
     return Response.json(
       { message: "Please enter a valid payment method." },

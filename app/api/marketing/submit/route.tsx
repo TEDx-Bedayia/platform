@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { price } from "../../tickets/price/prices";
 import { verifyEmail } from "../../utils/input-sanitization";
 import { SQLSettings } from "../../utils/sql-settings";
-import { TicketType } from "../../utils/ticket-types";
+import { TicketType } from "../../../ticket-types";
 
 export async function POST(request: NextRequest) {
   let body: any;

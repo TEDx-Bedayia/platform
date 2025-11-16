@@ -1,6 +1,7 @@
 import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { TicketType } from "../../ticket-types";
 import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../admin/payment-reciever/main";
 import { initiateCardPayment } from "../utils/card-payment";
@@ -10,8 +11,8 @@ import {
   checkSafety,
   handleMisspelling,
   verifyEmail,
+  verifyPaymentMethod,
 } from "../utils/input-sanitization";
-import { TicketType } from "../utils/ticket-types";
 import { price } from "./price/prices";
 
 // email, name, phone, paymentMethod
@@ -33,13 +34,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let paymentMethod: string, name, email, phone, add, code;
+  let paymentMethod, name, email, phone, code;
   try {
     name = body.name?.toString().trim();
     email = body.email?.toString().trim().toLowerCase();
     phone = body.phone?.toString().trim();
-    paymentMethod = body.paymentMethod?.toString().trim()!;
-    add = body.additionalFields;
+    paymentMethod = body.paymentMethod?.toString().trim();
     if (body.code) code = body.code?.toString().trim();
   } catch (error) {
     return Response.json(
@@ -48,8 +48,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (add != undefined && add[paymentMethod.toLowerCase()] != undefined)
-    paymentMethod += "@" + add[paymentMethod.toLowerCase()].trim();
+  paymentMethod = verifyPaymentMethod(paymentMethod);
+  if (paymentMethod === undefined || paymentMethod.split("@").length > 2) {
+    return Response.json(
+      { message: "Please enter a valid payment method." },
+      { status: 400 }
+    );
+  }
 
   try {
     return await submitOneTicket(email!, name!, phone!, paymentMethod, code);
