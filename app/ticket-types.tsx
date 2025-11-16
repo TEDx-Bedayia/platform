@@ -15,3 +15,23 @@ export function getTicketTypeName(type: TicketType): string {
       return type.toString();
   }
 }
+
+export function getTicketTypeFromName(name: string): TicketType | null {
+  switch (name.toLowerCase()) {
+    case "individual":
+      return TicketType.INDIVIDUAL;
+    case "group":
+      return TicketType.GROUP;
+    case "speaker":
+      return TicketType.SPEAKER;
+    case "giveaway":
+      return TicketType.GIVEAWAY;
+    case "discounted":
+    case "rush hour":
+      return TicketType.DISCOUNTED;
+    case "teacher":
+      return TicketType.TEACHER;
+    default:
+      return null;
+  }
+}
