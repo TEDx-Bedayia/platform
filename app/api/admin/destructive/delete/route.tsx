@@ -5,13 +5,6 @@ import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  if (process.env.ADMIN_KEY === undefined || !process.env.ADMIN_KEY) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
   if (!canUserAccess(req, ProtectedResource.SUPER_ADMIN)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

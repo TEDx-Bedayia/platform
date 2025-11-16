@@ -18,7 +18,7 @@ import { price } from "./price/prices";
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {
   if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
-    if (process.env.ADMIN_KEY !== "dev")
+    if (process.env.PAYMOB_TEST_MODE !== "true")
       return Response.json(
         { message: "Ticket sales are currently closed." },
         { status: 400 }
