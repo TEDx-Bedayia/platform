@@ -3,7 +3,45 @@ import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
 
 const secret = process.env.JWT_SECRET;
-const expiresIn = "7d";
+
+type Unit =
+  | "Years"
+  | "Year"
+  | "Yrs"
+  | "Yr"
+  | "Y"
+  | "Weeks"
+  | "Week"
+  | "W"
+  | "Days"
+  | "Day"
+  | "D"
+  | "Hours"
+  | "Hour"
+  | "Hrs"
+  | "Hr"
+  | "H"
+  | "Minutes"
+  | "Minute"
+  | "Mins"
+  | "Min"
+  | "M"
+  | "Seconds"
+  | "Second"
+  | "Secs"
+  | "Sec"
+  | "s"
+  | "Milliseconds"
+  | "Millisecond"
+  | "Msecs"
+  | "Msec"
+  | "Ms";
+
+type UnitAnyCase = Unit | Uppercase<Unit> | Lowercase<Unit>;
+type StringValue =
+  | `${number}`
+  | `${number}${UnitAnyCase}`
+  | `${number} ${UnitAnyCase}`;
 
 export enum UserRole {
   ADMIN = "admin",
@@ -22,7 +60,10 @@ export enum ProtectedResource {
   INVITATIONS = "invitations",
 }
 
-export function signToken(payload: object): string {
+export function signToken(
+  payload: object,
+  expiresIn: StringValue = "7d"
+): string {
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }

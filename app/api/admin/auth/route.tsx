@@ -20,16 +20,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (
+      process.env.SKLOFFICE &&
+      process.env.SKLOFFICEPASS &&
       params.get("name")?.toString().toLowerCase().trim() === "school office" &&
       username === process.env.SKLOFFICE &&
-      password === process.env.SKLOFFICEPASS &&
-      process.env.SKLOFFICE &&
-      process.env.SKLOFFICEPASS
+      password === process.env.SKLOFFICEPASS
     ) {
-      const token = signToken({
-        role: UserRole.SCHOOL_OFFICE,
-        methods: ["CASH"],
-      });
+      const token = signToken(
+        {
+          role: UserRole.SCHOOL_OFFICE,
+          methods: ["CASH"],
+        },
+        "28d"
+      );
       const response = NextResponse.json({ role: UserRole.SCHOOL_OFFICE });
       response.headers.set(
         "Set-Cookie",
@@ -46,11 +49,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (
+      process.env.ADMIN_USERNAME &&
+      process.env.ADMIN_PASSWORD &&
+      process.env.MAINTAINER &&
       username === process.env.ADMIN_USERNAME &&
       password === process.env.ADMIN_PASSWORD &&
-      params.get("name")?.toString().trim() === process.env.MAINTAINER &&
-      process.env.ADMIN_USERNAME &&
-      process.env.ADMIN_PASSWORD
+      params.get("name")?.toString().trim() === process.env.MAINTAINER
     ) {
       const token = signToken({ role: UserRole.ADMIN });
       const response = NextResponse.json({ role: UserRole.ADMIN });
@@ -61,7 +65,7 @@ export async function POST(request: NextRequest) {
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 3, // 3 days
+          maxAge: 60 * 60 * 24 * 7, // 7 days
         })
       );
 
@@ -69,13 +73,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (
+      process.env.MARKETING_USERNAME &&
+      process.env.MARKETING_PASSWORD &&
       username === process.env.MARKETING_USERNAME &&
       password === process.env.MARKETING_PASSWORD &&
-      params.get("name")?.toString().toLowerCase().trim() === "marketing" &&
-      process.env.MARKETING_USERNAME &&
-      process.env.MARKETING_PASSWORD
+      params.get("name")?.toString().toLowerCase().trim() === "marketing"
     ) {
-      const token = signToken({ role: UserRole.MARKETING_HEAD });
+      const token = signToken({ role: UserRole.MARKETING_HEAD }, "14d");
       const response = NextResponse.json({ role: UserRole.MARKETING_HEAD });
       response.headers.set(
         "Set-Cookie",
