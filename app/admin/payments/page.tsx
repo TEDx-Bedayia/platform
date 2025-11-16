@@ -151,7 +151,7 @@ export default function Payments() {
       try {
         const res = await fetch("/api/admin/auth").then((res) => res.json());
         const allowedMethods = (res.methods as string[]) ?? [];
-        setType(res.role === "SCHOOL_OFFICE" ? "school" : "admin");
+        setType(res.role === "school_office" ? "school" : "admin");
 
         const response = await fetch("/api/tickets/payment-methods");
         if (response.ok) {
