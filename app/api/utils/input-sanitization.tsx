@@ -72,7 +72,7 @@ export function verifyPaymentMethod(paymentMethod: string): string | undefined {
     return;
   }
 
-  if (!checkSafety(metadata)) return;
+  if (metadata && !checkSafety(metadata)) return;
   if (method === "VFCASH") {
     paymentMethod = "VFCASH@0" + metadata;
   }
