@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
-import { getTicketTypeName, TicketType } from "../api/utils/ticket-types";
+import { getTicketTypeName, TicketType } from "../ticket-types";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
   check,

@@ -3,7 +3,7 @@ import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { price } from "../../tickets/price/prices";
 import { ResponseCode } from "../../utils/response-codes";
-import { TicketType } from "../../utils/ticket-types";
+import { TicketType } from "../../../ticket-types";
 import { sendEmail } from "./eTicketEmail";
 
 export async function safeRandUUID() {
