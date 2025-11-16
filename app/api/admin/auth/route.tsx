@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
           secure: true,
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 60 * 60 * 24 * 28, // 28 days
         })
       );
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
           secure: true,
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 60 * 60 * 24 * 3, // 3 days
         })
       );
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
           secure: true,
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 60 * 60 * 24 * 14, // 14 days
         })
       );
 
