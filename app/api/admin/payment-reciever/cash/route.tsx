@@ -1,5 +1,5 @@
 import { price } from "@/app/api/tickets/price/prices";
-import { TicketType } from "@/app/api/utils/ticket-types";
+import { TicketType } from "@/app/ticket-types";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { sendEmail } from "../eTicketEmail";
