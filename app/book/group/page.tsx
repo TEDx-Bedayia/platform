@@ -1,8 +1,8 @@
 "use client";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styles from "../book.module.css";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
@@ -129,7 +129,14 @@ export default function GroupTickets() {
     if (response.ok) {
       if (formData.paymentMethod === "CARD") {
         const { paymentUrl } = await response.json();
-        router.push(paymentUrl);
+        if (paymentUrl) {
+          router.push(paymentUrl);
+        } else {
+          customAlert(
+            "Payment URL is missing. Please try again or contact support."
+          );
+        }
+        removeLoader();
         return;
       }
       setFormData({
