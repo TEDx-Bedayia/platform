@@ -22,12 +22,7 @@ export async function pay(
   date: string,
   id_if_needed: string
 ) {
-  if (
-    process.env.ADMIN_KEY === undefined ||
-    !process.env.ADMIN_KEY ||
-    !process.env.SKL_OFFICE ||
-    process.env.SKL_OFFICE === undefined
-  ) {
+  if (process.env.JWT_SECRET === undefined) {
     return Response.json(
       { message: "Key is not set. Contact the maintainer." },
       { status: 500 }

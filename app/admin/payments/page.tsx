@@ -6,6 +6,7 @@ import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
 import { getTicketTypeFromName, TicketType } from "@/app/ticket-types";
 import { Poppins } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
 import { Applicant } from "../types/Applicant";
@@ -81,11 +82,6 @@ function IDCheckPopup(
                 )}`,
                 {
                   method: "GET",
-                  headers: {
-                    key: localStorage.getItem("school-token")
-                      ? (localStorage.getItem("school-token") as string)
-                      : (localStorage.getItem("admin-token") as string),
-                  },
                 }
               );
 
@@ -129,6 +125,7 @@ function IDCheckPopup(
 }
 
 export default function Payments() {
+  const router = useRouter();
   const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -144,18 +141,18 @@ export default function Payments() {
     date: getCurrentDate(),
   });
   const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
-  const [type, setType] = useState<"admin" | "school">("school");
+  const [type, setType] = useState("school" as "admin" | "school");
   const [changingFieldTitle, setChangingFieldTitle] = useState(
     "Email Address Or ID"
   );
 
   useEffect(() => {
-    if (localStorage.getItem("admin-token")) {
-      setType("admin");
-    }
-
     const fetchPaymentMethods = async () => {
       try {
+        const res = await fetch("/api/admin/auth").then((res) => res.json());
+        const allowedMethods = (res.methods as string[]) ?? [];
+        setType(res.role === "SCHOOL_OFFICE" ? "school" : "admin");
+
         const response = await fetch("/api/tickets/payment-methods");
         if (response.ok) {
           const data = (await response.json()) as {
@@ -163,7 +160,7 @@ export default function Payments() {
           };
 
           const methods: PaymentMethod[] = data.paymentMethods
-            .filter((method) => method.identifier != "CARD")
+            .filter((method) => !method.automatic)
             .map((method) => ({
               displayName: method.displayName,
               identifier: method.identifier,
@@ -171,13 +168,16 @@ export default function Payments() {
               fields: method.fields,
             }));
 
-          if (!localStorage.getItem("admin-token")) {
-            setPaymentOptions(methods.filter((m) => m.identifier == "CASH"));
+          setPaymentOptions(
+            methods.filter((m) => allowedMethods.includes(m.identifier))
+          );
+          if (allowedMethods.length === 0) setPaymentOptions(methods);
+          if (allowedMethods.length === 1) {
             setFormData((prev) => ({
               ...prev,
-              method: "CASH",
+              method: allowedMethods[0],
             }));
-          } else setPaymentOptions(methods);
+          }
         } else {
           console.error("Failed to fetch payment methods");
         }
@@ -199,16 +199,6 @@ export default function Payments() {
       value.includes("@")
     ) {
       return;
-    }
-    if (name == "method" && type == "school") {
-      setFormData({
-        ...formData,
-        method: "CASH",
-      });
-      return;
-    }
-    if (type == "school" && formData.method != "CASH") {
-      formData.method = "CASH";
     }
 
     if (name == "method") {
@@ -242,22 +232,20 @@ export default function Payments() {
   };
 
   useEffect(() => {
-    if (
-      !localStorage.getItem("admin-token") &&
-      !localStorage.getItem("school-token")
-    ) {
-      window.location.href = "/admin/login";
-    }
-  });
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.role) router.push("/admin/login");
+      });
+  }, []);
 
   const resetForm = () => {
-    formData.method = type == "admin" ? formData.method : "CASH";
     formData.from = "";
     formData.amount = "";
     formData.date = getCurrentDate();
 
     setFormData({
-      method: type == "admin" ? formData.method : "CASH",
+      method: formData.method,
       from: "",
       amount: "",
       date: getCurrentDate(),
@@ -284,11 +272,6 @@ export default function Payments() {
           `/api/admin/query-ticket?id=${encodeURIComponent(from)}`,
           {
             method: "GET",
-            headers: {
-              key: localStorage.getItem("school-token")
-                ? (localStorage.getItem("school-token") as string)
-                : (localStorage.getItem("admin-token") as string),
-            },
           }
         );
 
@@ -321,11 +304,6 @@ export default function Payments() {
         )}`,
         {
           method: "GET",
-          headers: {
-            key: localStorage.getItem("school-token")
-              ? (localStorage.getItem("school-token") as string)
-              : (localStorage.getItem("admin-token") as string),
-          },
         }
       );
 
@@ -365,11 +343,6 @@ export default function Payments() {
                   )}&identification=${encodeURIComponent(idList.join(","))}`,
                   {
                     method: "GET",
-                    headers: {
-                      key: localStorage.getItem("school-token")
-                        ? (localStorage.getItem("school-token") as string)
-                        : (localStorage.getItem("admin-token") as string),
-                    },
                   }
                 );
 
@@ -388,8 +361,6 @@ export default function Payments() {
                   if (parseInt(amount) - paid > 0) {
                     formData.amount = (paid - parseInt(amount)).toString();
                   } else {
-                    formData.method =
-                      type == "admin" ? formData.method : "CASH";
                     formData.from = "";
                     formData.amount = "";
                     formData.date = getCurrentDate();

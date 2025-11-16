@@ -1,3 +1,4 @@
+import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
 import { SQLSettings } from "@/app/api/utils/sql-settings";
 import { EVENT_DATE } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
@@ -11,12 +12,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (
-    req.headers.get("key") !== process.env.ADMIN_KEY ||
-    !process.env.ADMIN_KEY ||
-    !process.env.DESTRUCTIVE_KEY ||
-    req.nextUrl.searchParams.get("verification") === null
-  ) {
+  if (!canUserAccess(req, ProtectedResource.SUPER_ADMIN)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -32,7 +28,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (new Date() <= EVENT_DATE && process.env.ADMIN_KEY !== "dev") {
+  if (new Date() <= EVENT_DATE && process.env.MAINTAINER !== "dev") {
     return NextResponse.json(
       { message: "Event has not concluded yet." },
       { status: 400 }

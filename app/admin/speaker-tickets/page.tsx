@@ -1,20 +1,24 @@
 "use client";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { Poppins } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
 import styles from "../payments/payments.module.css";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
 export default function SpeakerTickets() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [speakerName, setSpeakerName] = useState("");
 
   // Redirect if no token is found
   useEffect(() => {
-    if (!localStorage.getItem("admin-token")) {
-      window.location.href = "/admin/login";
-    }
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.role) router.push("/admin/login");
+      });
   }, []);
 
   const handleChange = (
@@ -27,9 +31,11 @@ export default function SpeakerTickets() {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("admin-token")) {
-      window.location.href = "/admin/login";
-    }
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.role) router.push("/admin/login");
+      });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,9 +51,6 @@ export default function SpeakerTickets() {
         )}`,
         {
           method: "GET",
-          headers: {
-            key: localStorage.getItem("admin-token") as string,
-          },
         }
       );
 

@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
-import { getTicketTypeName, TicketType } from "../ticket-types";
+import { useRouter } from "next/navigation";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
   check,
@@ -16,6 +16,7 @@ import {
   speakerTicketIcon,
 } from "../icons";
 import { EVENT_DATE } from "../metadata";
+import { getTicketTypeName, TicketType } from "../ticket-types";
 import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
 import { Applicant } from "./types/Applicant";
@@ -32,9 +33,6 @@ const sendTicket = async (
     `/api/admin/send-ticket/?id=${encodeURIComponent(id)}`,
     {
       method: "GET",
-      headers: {
-        key: `${localStorage.getItem("admin-token")}`,
-      },
     }
   );
 
@@ -71,6 +69,7 @@ const formatDate = (date: Date) => {
 };
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [pageIndex, setPageIndex] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -94,7 +93,7 @@ export default function AdminDashboard() {
     "Hello {name}! Your ticket for the event has been sent to your email. Please check your inbox and spam folder. If you have any questions or concerns, feel free to contact us. Enjoy!";
 
   const grpMsg =
-    "Hello {name}! The tickets for the event have been sent to each member individually on their email. Please check your inbox and spam folder. If you have any questions or concerns, feel free to contact us. Enjoy!";
+    "Hello {name}! The tickets for the event have been sent to each member individually or the group leader. Please check your inbox and spam folder. If you have any questions or concerns, feel free to contact us. Enjoy!";
 
   function TicketCard(applicant: Applicant, admitApplicant: any) {
     return (
@@ -234,7 +233,6 @@ export default function AdminDashboard() {
                           method: "POST",
                           headers: {
                             "Content-Type": "application/json",
-                            key: `${localStorage.getItem("admin-token")}`,
                           },
                           body: JSON.stringify({
                             email: editorEmail,
@@ -331,7 +329,6 @@ export default function AdminDashboard() {
                               method: "POST",
                               headers: {
                                 "Content-Type": "application/json",
-                                key: `${localStorage.getItem("admin-token")}`,
                               },
                               body: JSON.stringify({
                                 id: applicant.id,
@@ -456,9 +453,11 @@ export default function AdminDashboard() {
 
   // Redirect if no token is found
   useEffect(() => {
-    if (!localStorage.getItem("admin-token")) {
-      window.location.href = "/admin/login";
-    }
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.role) router.push("/admin/login");
+      });
   }, []);
 
   // Fetch applicants from API
@@ -486,9 +485,7 @@ export default function AdminDashboard() {
       setLoading(true);
       const response = await fetch(`/api/admin/tickets/${index}${filter}`, {
         method: "GET",
-        headers: {
-          key: `${localStorage.getItem("admin-token")}`,
-        },
+        headers: {},
       });
 
       if (response.ok) {
@@ -499,14 +496,7 @@ export default function AdminDashboard() {
         setApplicants((prevApplicants) => [...prevApplicants, ...data]);
       } else {
         if (response.status === 401) {
-          localStorage.removeItem("admin-token");
-          if (localStorage.getItem("school-token")) {
-            window.location.href = "/admin/payments";
-            return;
-          } else {
-            window.location.href = "/admin/login";
-            return;
-          }
+          router.push("/admin/login");
         } else {
           setHasMore(false);
           customAlert("Failed to fetch applicants.");
@@ -527,7 +517,6 @@ export default function AdminDashboard() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        key: `${localStorage.getItem("admin-token")}`,
       },
       body: JSON.stringify({ admitted }),
     });
@@ -563,9 +552,6 @@ export default function AdminDashboard() {
                 )}`,
                 {
                   method: "GET",
-                  headers: {
-                    key: `${localStorage.getItem("admin-token")}`,
-                  },
                 }
               );
               removeLoader();
@@ -589,7 +575,7 @@ export default function AdminDashboard() {
       <div
         className="absolute left-24 top-24 flex flex-row items-center gap-2 bg-green-200 transition-all cursor-pointer hover:bg-green-300 active:bg-green-400 rounded-lg p-2 pr-4"
         onClick={() => {
-          window.location.href = "/admin/speaker-tickets";
+          router.push("/admin/speaker-tickets");
         }}
         title="Add Speaker Tickets"
       >

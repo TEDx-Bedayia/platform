@@ -11,7 +11,9 @@
   "dependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "@vercel/postgres": "^0.10.0",
+    "cookie": "^1.0.2",
     "framer-motion": "^12.23.24",
+    "jsonwebtoken": "^9.0.2",
     "next": "^15.5.3",
     "nodemailer": "^7.0.9",
     "qrcode": "^1.5.4",
@@ -19,6 +21,7 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24",
     "@types/nodemailer": "^7.0.2",
     "@types/pg-format": "^1.0.5",

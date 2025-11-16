@@ -1,19 +1,12 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
+import { canUserAccess, ProtectedResource } from "../../utils/auth";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import { sendEmail } from "../payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../payment-reciever/main";
 
-// Handler for POST requests
 export async function POST(request: NextRequest) {
-  if (process.env.ADMIN_KEY === undefined || !process.env.ADMIN_KEY) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (request.headers.get("key") !== process.env.ADMIN_KEY) {
+  if (!canUserAccess(request, ProtectedResource.TICKET_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

@@ -12,6 +12,7 @@ import {
 } from "@/app/icons";
 import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { customAlert } from "../custom-alert";
 import { MarketingMember } from "../types/MarketingMember";
 import styles from "./marketing-members.module.css"; // Import CSS styles
@@ -21,17 +22,16 @@ const title = Poppins({ weight: "700", subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function MarketingMembers() {
+  const router = useRouter();
   useEffect(() => {
-    if (
-      !localStorage.getItem("admin-token") &&
-      !localStorage.getItem("marketing-token")
-    ) {
-      window.location.href = "/admin/login";
-    }
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.role) router.push("/admin/login");
+      });
   }, []);
 
   const [members, setMembers] = useState<MarketingMember[]>([]);
-  const [password, setPassword] = useState<string>("Loading...");
   const [rushHourDate, setRushHourDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -45,23 +45,9 @@ export default function MarketingMembers() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   async function fetchMembers() {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     try {
       const response = await fetch(
-        "/api/admin/manage-marketing-members/members",
-        {
-          headers: {
-            key: token,
-          },
-        }
+        "/api/admin/manage-marketing-members/members"
       );
       const data = await response.json();
       if (data.members) {
@@ -70,29 +56,19 @@ export default function MarketingMembers() {
         customAlert(data.message || "Failed to fetch members");
       }
       setIsLoading(false);
+      if (response.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
     } catch (error) {
       customAlert("Failed to fetch members.");
     }
   }
 
   async function fetchMemberActivity() {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     try {
       const response = await fetch(
-        "/api/admin/manage-marketing-members/member-activity",
-        {
-          headers: {
-            key: token,
-          },
-        }
+        "/api/admin/manage-marketing-members/member-activity"
       );
       const data = await response.json();
       if (data.activity) {
@@ -122,58 +98,24 @@ export default function MarketingMembers() {
       } else {
         customAlert(data.message || "Failed to fetch member activity");
       }
+      if (response.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
     } catch (error) {
       customAlert("Error fetching member activity.");
     }
   }
 
   useEffect(() => {
-    if (
-      !localStorage.getItem("admin-token") &&
-      !localStorage.getItem("marketing-token")
-    ) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     async function runEffect() {
       addLoader();
-
-      try {
-        const response = await fetch(
-          "/api/admin/manage-marketing-members/get-pass",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              key:
-                (localStorage.getItem("admin-token") ||
-                  localStorage.getItem("marketing-token")) ??
-                "",
-            },
-          }
-        );
-        const data = await response.json();
-        if (data.pass) {
-          setPassword(data.pass);
-        } else {
-          customAlert(data.message || "Failed to fetch password");
-        }
-      } catch (error) {
-        customAlert("Error fetching password.");
-      }
 
       try {
         const response = await fetch(
           "/api/admin/manage-marketing-members/rush-hour-date",
           {
             method: "GET",
-            headers: {
-              key:
-                (localStorage.getItem("admin-token") ||
-                  localStorage.getItem("marketing-token")) ??
-                "",
-            },
           }
         );
         const data = await response.json();
@@ -197,15 +139,6 @@ export default function MarketingMembers() {
   }, []);
 
   function createMember(name: string) {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     if (!name) {
       customAlert("Name is required.");
       return;
@@ -217,7 +150,6 @@ export default function MarketingMembers() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        key: token,
       },
       body: JSON.stringify({ name }),
     })
@@ -237,15 +169,6 @@ export default function MarketingMembers() {
   }
 
   function deleteMember(id: number) {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     addLoader();
 
     fetch(
@@ -254,9 +177,6 @@ export default function MarketingMembers() {
       )}`,
       {
         method: "DELETE",
-        headers: {
-          key: token,
-        },
       }
     )
       .then((res) => {
@@ -271,33 +191,6 @@ export default function MarketingMembers() {
         }
       })
       .catch((error) => customAlert("Error deleting member."));
-  }
-
-  function deleteAllMembers() {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
-    fetch("/api/admin/manage-marketing-members/members?id=-1", {
-      method: "DELETE",
-      headers: {
-        key: token,
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          setMembers([]);
-          customAlert("All members deleted successfully.");
-        } else {
-          customAlert("Failed to delete all members");
-        }
-      })
-      .catch((error) => customAlert("Error deleting all members."));
   }
 
   return (
@@ -329,10 +222,6 @@ export default function MarketingMembers() {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
-                    key:
-                      (localStorage.getItem("admin-token") ||
-                        localStorage.getItem("marketing-token")) ??
-                      "",
                   },
                   body: JSON.stringify({ date: rushHourDate.toISOString() }),
                 }
@@ -410,10 +299,6 @@ export default function MarketingMembers() {
                           method: "POST",
                           headers: {
                             "Content-Type": "application/json",
-                            key:
-                              (localStorage.getItem("admin-token") ||
-                                localStorage.getItem("marketing-token")) ??
-                              "",
                           },
                           body: JSON.stringify({
                             memberId: Number(memberId),
@@ -498,7 +383,7 @@ export default function MarketingMembers() {
 
               <div className={styles.detailContainer}>
                 <span>{shieldLock}</span>
-                <span>{password}</span>
+                <span>{member.password}</span>
               </div>
             </div>
 

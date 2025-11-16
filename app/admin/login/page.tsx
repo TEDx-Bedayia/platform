@@ -1,6 +1,7 @@
 "use client";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { Poppins } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
 import styles from "./login.module.css"; // Importing the CSS module
@@ -8,6 +9,7 @@ import styles from "./login.module.css"; // Importing the CSS module
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
 export default function AdminLogin() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -25,13 +27,24 @@ export default function AdminLogin() {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("school-token")) {
-      window.location.href = "/admin/payments";
-    }
-    if (localStorage.getItem("admin-token")) {
-      window.location.href = "/admin";
-    }
-  });
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        switch (data.role) {
+          case "admin":
+            router.push("/admin");
+            break;
+          case "marketing_head":
+            router.push("/admin/manage-marketing-members");
+            break;
+          case "school_office":
+            router.push("/admin/payments");
+            break;
+          default:
+            break;
+        }
+      });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     addLoader();
@@ -39,6 +52,7 @@ export default function AdminLogin() {
     if (formData.username && formData.password && formData.name) {
       const { username, password, name } = formData;
       // Show Loader
+      addLoader();
 
       const response = await fetch("/api/admin/auth", {
         method: "POST",
@@ -53,15 +67,22 @@ export default function AdminLogin() {
       });
 
       // Hide Loader
+      removeLoader();
 
       if (response.ok) {
-        const { token, type } = await response.json();
-        if (token) {
-          localStorage.setItem(type + "-token", token);
-          if (type == "admin") window.location.href = "/admin";
-          else if (type == "marketing")
-            window.location.href = "/admin/manage-marketing-members";
-          else window.location.href = "/admin/payments";
+        const { role } = await response.json();
+        switch (role) {
+          case "admin":
+            router.push("/admin");
+            break;
+          case "marketing_head":
+            router.push("/admin/manage-marketing-members");
+            break;
+          case "school_office":
+            router.push("/admin/payments");
+            break;
+          default:
+            break;
         }
       } else {
         const { message } = await response.json();

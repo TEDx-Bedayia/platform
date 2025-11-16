@@ -1,25 +1,11 @@
+import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { NextRequest } from "next/server";
 import { sendEmail } from "../../payment-reciever/eTicketEmail";
 
 export async function POST(request: NextRequest) {
-  if (
-    process.env.ADMIN_KEY === undefined ||
-    !process.env.ADMIN_KEY ||
-    !process.env.MARKETING_KEY ||
-    process.env.MARKETING_KEY === undefined
-  ) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY &&
-    request.headers.get("key") !== process.env.MARKETING_KEY
-  ) {
+  if (!canUserAccess(request, ProtectedResource.MARKETING_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

@@ -1,4 +1,6 @@
-import { NextRequest } from "next/server";
+import cookie from "cookie";
+import { NextRequest, NextResponse } from "next/server";
+import { signToken, UserRole, verifyToken } from "../../utils/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,38 +26,69 @@ export async function POST(request: NextRequest) {
       process.env.SKLOFFICE &&
       process.env.SKLOFFICEPASS
     ) {
-      return Response.json(
-        { token: process.env.SKL_OFFICE, type: "school" },
-        { status: 200 }
+      const token = signToken({
+        role: UserRole.SCHOOL_OFFICE,
+        methods: ["CASH"],
+      });
+      const response = NextResponse.json({ role: UserRole.SCHOOL_OFFICE });
+      response.headers.set(
+        "Set-Cookie",
+        cookie.serialize("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+        })
       );
+
+      return response;
     }
 
     if (
       username === process.env.ADMIN_USERNAME &&
       password === process.env.ADMIN_PASSWORD &&
       params.get("name")?.toString().trim() === process.env.MAINTAINER &&
-      process.env.ADMIN_KEY &&
       process.env.ADMIN_USERNAME &&
       process.env.ADMIN_PASSWORD
     ) {
-      return Response.json(
-        { token: process.env.ADMIN_KEY, type: "admin" },
-        { status: 200 }
+      const token = signToken({ role: UserRole.ADMIN });
+      const response = NextResponse.json({ role: UserRole.ADMIN });
+      response.headers.set(
+        "Set-Cookie",
+        cookie.serialize("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+        })
       );
+
+      return response;
     }
 
     if (
       username === process.env.MARKETING_USERNAME &&
       password === process.env.MARKETING_PASSWORD &&
       params.get("name")?.toString().toLowerCase().trim() === "marketing" &&
-      process.env.MARKETING_KEY &&
       process.env.MARKETING_USERNAME &&
       process.env.MARKETING_PASSWORD
     ) {
-      return Response.json(
-        { token: process.env.MARKETING_KEY, type: "marketing" },
-        { status: 200 }
+      const token = signToken({ role: UserRole.MARKETING_HEAD });
+      const response = NextResponse.json({ role: UserRole.MARKETING_HEAD });
+      response.headers.set(
+        "Set-Cookie",
+        cookie.serialize("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+        })
       );
+
+      return response;
     }
 
     return Response.json({ message: "Invalid Credentials." }, { status: 403 });
@@ -63,9 +96,30 @@ export async function POST(request: NextRequest) {
     return Response.json(
       {
         message:
-          "Trying to get into the admin dashboard without permission is haram. I'm not joking. Etaky Rabena. You have great skills to be able to reach this point; great job bgd! Bs don't take saye2at on something tafha zy de :).",
+          "An error occurred during authentication. Please try again later.",
       },
       { status: 500 }
     );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const token = request.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json({}, { status: 401 });
+    }
+
+    const decoded = verifyToken(token) as {
+      role: UserRole;
+      methods?: string[];
+    };
+
+    return NextResponse.json(
+      { role: decoded.role, methods: decoded.methods },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json({}, { status: 401 });
   }
 }
