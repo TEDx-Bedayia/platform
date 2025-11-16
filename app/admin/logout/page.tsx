@@ -13,7 +13,7 @@ export default function Logout() {
         console.error("Error during logout:", error);
         router.push("/admin/login");
       });
-  }, []);
+  }, [router]);
 
   return <></>;
 }

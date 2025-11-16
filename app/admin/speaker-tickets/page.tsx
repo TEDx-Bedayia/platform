@@ -19,7 +19,7 @@ export default function SpeakerTickets() {
       .then((data) => {
         if (!data.role) router.push("/admin/login");
       });
-  }, []);
+  }, [router]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -29,14 +29,6 @@ export default function SpeakerTickets() {
     if (name == "email") setEmail(value);
     else setSpeakerName(value);
   };
-
-  useEffect(() => {
-    fetch("/api/admin/auth")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.role) router.push("/admin/login");
-      });
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     addLoader();

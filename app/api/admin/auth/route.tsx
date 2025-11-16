@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         "Set-Cookie",
         cookie.serialize("token", token, {
           httpOnly: true,
-          secure: true,
+          secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
           maxAge: 60 * 60 * 24 * 28, // 28 days
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         "Set-Cookie",
         cookie.serialize("token", token, {
           httpOnly: true,
-          secure: true,
+          secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
           maxAge: 60 * 60 * 24 * 3, // 3 days
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         "Set-Cookie",
         cookie.serialize("token", token, {
           httpOnly: true,
-          secure: true,
+          secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
           maxAge: 60 * 60 * 24 * 14, // 14 days

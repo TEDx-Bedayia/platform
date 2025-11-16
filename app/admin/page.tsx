@@ -458,7 +458,7 @@ export default function AdminDashboard() {
       .then((data) => {
         if (!data.role) router.push("/admin/login");
       });
-  }, []);
+  }, [router]);
 
   // Fetch applicants from API
 

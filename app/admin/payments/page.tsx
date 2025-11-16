@@ -237,7 +237,7 @@ export default function Payments() {
       .then((data) => {
         if (!data.role) router.push("/admin/login");
       });
-  }, []);
+  }, [router]);
 
   const resetForm = () => {
     formData.from = "";

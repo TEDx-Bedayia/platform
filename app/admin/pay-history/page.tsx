@@ -105,7 +105,7 @@ export default function History() {
       .then((data) => {
         if (!data.role) router.push("/admin/login");
       });
-  }, []);
+  }, [router]);
 
   // Fetch applicants from API
   const fetchData = async () => {

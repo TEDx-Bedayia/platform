@@ -44,15 +44,13 @@ export default function AdminLogin() {
             break;
         }
       });
-  }, []);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     addLoader();
     e.preventDefault();
     if (formData.username && formData.password && formData.name) {
       const { username, password, name } = formData;
-      // Show Loader
-      addLoader();
 
       const response = await fetch("/api/admin/auth", {
         method: "POST",
@@ -65,9 +63,6 @@ export default function AdminLogin() {
           name: name,
         }),
       });
-
-      // Hide Loader
-      removeLoader();
 
       if (response.ok) {
         const { role } = await response.json();

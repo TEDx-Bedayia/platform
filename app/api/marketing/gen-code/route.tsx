@@ -1,5 +1,4 @@
 import { sql } from "@vercel/postgres";
-import { get } from "http";
 import { NextRequest } from "next/server";
 import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
@@ -41,7 +40,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (
-    request.headers.get("username") &&
+    !request.headers.get("username") ||
     request.headers.get("password") !==
       getMarketingMemberPass(request.headers.get("username")!)
   ) {

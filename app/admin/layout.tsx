@@ -18,7 +18,6 @@ export default function RootLayout({
     fetch("/api/admin/auth")
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.role);
         if (data.role == "admin") setMode("admin");
       });
   }, []);
