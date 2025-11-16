@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import styles from "./book.module.css";
-
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 import { Poppins, Ubuntu } from "next/font/google";
@@ -13,12 +13,12 @@ const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function SingleTickets() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     name: "",
     phone: "",
     paymentMethod: "",
-    additionalFields: {} as { [key: string]: string },
   });
 
   const [code, setCode] = useState("");
@@ -336,14 +336,13 @@ export default function SingleTickets() {
           name: "",
           phone: "",
           paymentMethod: "",
-          additionalFields: {},
         });
         setCode("");
         removeLoader();
         return;
       }
 
-      window.location.href = jsonRes.paymentUrl;
+      if (jsonRes.paymentUrl) router.push(jsonRes.paymentUrl);
       return;
     } else {
       customAlert((await response.json()).message ?? "An Error Occurred.");

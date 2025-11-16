@@ -11,7 +11,7 @@ import {
   handleMisspelling,
   verifyEmail,
 } from "../utils/input-sanitization";
-import { TicketType } from "../utils/ticket-types";
+import { TicketType } from "../../ticket-types";
 import { price } from "./price/prices";
 
 // email, name, phone, paymentMethod
@@ -39,7 +39,6 @@ export async function POST(request: NextRequest) {
     email = body.email?.toString().trim().toLowerCase();
     phone = body.phone?.toString().trim();
     paymentMethod = body.paymentMethod?.toString().trim()!;
-    add = body.additionalFields;
     if (body.code) code = body.code?.toString().trim();
   } catch (error) {
     return Response.json(
@@ -47,10 +46,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-
-  if (add != undefined && add[paymentMethod.toLowerCase()] != undefined)
-    paymentMethod += "@" + add[paymentMethod.toLowerCase()].trim();
-
+  
   try {
     return await submitOneTicket(email!, name!, phone!, paymentMethod, code);
   } catch (error) {

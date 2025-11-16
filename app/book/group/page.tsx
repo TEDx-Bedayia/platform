@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import styles from "../book.module.css";
-
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
@@ -14,12 +14,12 @@ const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function GroupTickets() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     emails: ["", "", "", ""],
     names: ["", "", "", ""],
     phone: "",
     paymentMethod: "",
-    additionalFields: {} as { [key: string]: string },
   });
 
   const [useSameEmail, setUseSameEmail] = useState(true);
@@ -123,14 +123,13 @@ export default function GroupTickets() {
         email4: formData.emails[3],
         phone: formData.phone,
         paymentMethod: formData.paymentMethod,
-        additionalFields: formData.additionalFields,
       }),
     });
 
     if (response.ok) {
       if (formData.paymentMethod === "CARD") {
         const { paymentUrl } = await response.json();
-        window.location.href = paymentUrl;
+        router.push(paymentUrl);
         return;
       }
       setFormData({
@@ -138,7 +137,6 @@ export default function GroupTickets() {
         names: ["", "", "", ""],
         phone: "",
         paymentMethod: "",
-        additionalFields: {} as { [key: string]: string },
       });
       setUseSameEmail(true);
       customAlert((await response.json()).message ?? "Submitted.");
