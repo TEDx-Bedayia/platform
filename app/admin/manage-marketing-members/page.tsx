@@ -29,7 +29,7 @@ export default function MarketingMembers() {
       .then((data) => {
         if (!data.role) router.push("/admin/login");
       });
-  }, []);
+  }, [router]);
 
   const [members, setMembers] = useState<MarketingMember[]>([]);
   const [rushHourDate, setRushHourDate] = useState<Date | null>(null);

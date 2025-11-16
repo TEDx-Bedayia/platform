@@ -6,7 +6,7 @@ export async function POST() {
   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 }
 
-// Custom GET to fetch all unpaied tickets' emails for marketing purposes
+// Custom GET to fetch all unpaid tickets' emails for marketing purposes
 export async function GET(request: NextRequest) {
   // Check Admin Perms
   if (!canUserAccess(request, ProtectedResource.SUPER_ADMIN)) {

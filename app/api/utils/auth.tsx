@@ -1,4 +1,3 @@
-// lib/auth.js
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
