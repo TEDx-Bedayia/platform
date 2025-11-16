@@ -28,6 +28,9 @@ export default function MarketingMembers() {
       .then((res) => res.json())
       .then((data) => {
         if (!data.role) router.push("/admin/login");
+      })
+      .catch(() => {
+        router.push("/admin/login");
       });
   }, [router]);
 

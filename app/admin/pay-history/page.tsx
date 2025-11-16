@@ -104,6 +104,9 @@ export default function History() {
       .then((res) => res.json())
       .then((data) => {
         if (!data.role) router.push("/admin/login");
+      })
+      .catch(() => {
+        router.push("/admin/login");
       });
   }, [router]);
 
