@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let paymentMethod, name, email, phone, add, code;
+  let paymentMethod, name, email, phone, code;
   try {
     name = body.name?.toString().trim();
     email = body.email?.toString().trim().toLowerCase();
