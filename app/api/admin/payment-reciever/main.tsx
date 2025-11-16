@@ -1,9 +1,9 @@
 import { Applicant } from "@/app/admin/types/Applicant";
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
+import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
 import { ResponseCode } from "../../utils/response-codes";
-import { TicketType } from "../../utils/ticket-types";
 import { sendEmail } from "./eTicketEmail";
 
 export async function safeRandUUID() {

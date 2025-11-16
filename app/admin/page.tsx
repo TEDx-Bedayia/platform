@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
-import { getTicketTypeName, TicketType } from "../api/utils/ticket-types";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
   check,
@@ -16,6 +15,7 @@ import {
   speakerTicketIcon,
 } from "../icons";
 import { EVENT_DATE } from "../metadata";
+import { getTicketTypeName, TicketType } from "../ticket-types";
 import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
 import { Applicant } from "./types/Applicant";

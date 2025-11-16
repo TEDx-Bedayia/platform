@@ -1,59 +1,54 @@
 "use client";
 
-import styles from "./page.module.css"
-import image from "../../public/Item-Icon.png"
-import { useState, FC, CSSProperties } from "react";
-import { paymentOptions, PaymentMethodKey, PaymentOptionProps } from "./methods";
-
-const getInitialValue = (param: string): string => {
-  if (typeof window === 'undefined') return '';
-  try {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(param) || '';
-  } catch (error) {
-    console.error("Failed to parse URL search params:", error);
-    return '';
-  }
-};
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { CSSProperties, FC, useEffect, useState } from "react";
+import image from "../../public/Item-Icon.png";
+import { customAlert } from "../admin/custom-alert";
+import { addLoader, removeLoader } from "../global_components/loader";
+import {
+  PaymentMethodKey,
+  PaymentOptionProps,
+  paymentOptions,
+} from "../payment-methods";
+import { TicketType } from "../ticket-types";
+import styles from "./page.module.css";
 
 interface CustomerDetailsProps {
   name: string;
-  setName: (name: string) => void;
   phone: string;
-  setPhone: (phone: string) => void;
-  mail: string;
-  setMail: (mail: string) => void;
+  email: string;
 }
 
-const CustomerDetails: FC<CustomerDetailsProps> = ({name, setName, phone, setPhone, mail, setMail}) => {
+interface CustomerDetailsState {
+  name: string;
+  phone: string;
+  email: string;
+  price: number;
+  type: TicketType;
+  paymentMethod?: PaymentMethodKey;
+  additionalInfo?: string;
+  extraNames?: string[];
+  extraEmails?: string[];
+}
+
+const CustomerDetails: FC<CustomerDetailsProps> = ({ name, phone, email }) => {
   return (
     <div className={styles.customer_details}>
-      <h2 className={styles.customer_details_h2}>Contact Information</h2>
+      <h2 className={styles.customer_details_h2}>Your Information</h2>
       <div className={styles.customer_details_grid}>
-        <input
-          type="text"
-          placeholder="Full Name"
-          className={styles.pay_input}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email Address"
-          className={styles.pay_input}
-          value={mail}
-          onChange={(e) => setMail(e.target.value)}
-          required
-        />
-        <input
-          type="tel"
-          placeholder="Phone Number (e.g., 010xxxxxxxx)"
-          className={styles.pay_input}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          required
-        />
+        <div className={styles.customer_details_row}>
+          <span className={styles.customer_details_label}>Full Name</span>
+          <span className={styles.customer_details_value}>{name}</span>
+        </div>
+        <div className={styles.customer_details_row}>
+          <span className={styles.customer_details_label}>Phone Number</span>
+          <span className={styles.customer_details_value}>{phone}</span>
+        </div>
+        <div className={styles.customer_details_row}>
+          <span className={styles.customer_details_label}>Email Address</span>
+          <span className={styles.customer_details_value}>{email}</span>
+        </div>
       </div>
       <hr className={styles.customer_details_hr} />
     </div>
@@ -61,44 +56,75 @@ const CustomerDetails: FC<CustomerDetailsProps> = ({name, setName, phone, setPho
 };
 
 export default function Page() {
-  const [activeMethod, setActiveMethod] = useState<PaymentMethodKey>('telda');
-  const [hidden, setHidden] = useState<boolean>(true)
-  const currentOption = paymentOptions[activeMethod];
+  const router = useRouter();
+  const [customer, setCustomer] = useState<CustomerDetailsState>({
+    name: "Loading...",
+    phone: "Loading...",
+    email: "Loading...",
+    price: 0,
+    type: TicketType.INDIVIDUAL,
+    paymentMethod: "TLDA",
+  });
 
-  const [name, setName] = useState(getInitialValue('name'));
-  const [phone, setPhone] = useState(getInitialValue('phone'));
-  const [mail, setMail] = useState(getInitialValue('mail'));
+  useEffect(() => {
+    try {
+      const storedData = sessionStorage.getItem("checkout");
+      if (storedData)
+        setCustomer({ ...JSON.parse(storedData), paymentMethod: "TLDA" });
+      else router.push("/book");
+    } catch {}
+  }, [router]);
+
+  const activeMethod = customer.paymentMethod || "TLDA";
+  const currentOption = paymentOptions[activeMethod];
 
   const activeClassName = styles.payment_option_active;
 
-  const PaymentOption: FC<PaymentOptionProps> = ({ methodKey, name, transferTo, Icon }) => {
-    const isActive = activeMethod === methodKey && !hidden;
-    
+  const PaymentOption: FC<PaymentOptionProps> = ({ methodKey, name, Icon }) => {
+    const isActive = activeMethod === methodKey;
+
     const optionClassName = [
       styles.payment_option,
-      isActive ? activeClassName : ''
-    ].join(' ').trim();
+      isActive ? activeClassName : "",
+    ]
+      .join(" ")
+      .trim();
 
     const iconColorStyle: CSSProperties = {
-      color: isActive ? '#4f46e5' : '#4b5563',
+      color: isActive ? "#4f46e5" : "#4b5563",
     };
-    const transferColorStyle: CSSProperties = {
-      color: isActive ? '#4f46e5' : '#9ca3af',
-    };
-    const indicatorStyle: CSSProperties = isActive ? {
-        backgroundColor: '#4f46e5',
-        borderColor: 'white',
-    } : {};
-
+    const indicatorStyle: CSSProperties = isActive
+      ? {
+          backgroundColor: "#4f46e5",
+          borderColor: "white",
+        }
+      : {};
 
     return (
-      <div className={optionClassName} onClick={() => {setActiveMethod(methodKey); setHidden(false);}}>
+      <div
+        className={optionClassName}
+        onClick={() => {
+          if (!isActive) {
+            setCustomer((prev) => ({
+              ...prev,
+              additionalInfo: "",
+            }));
+          }
+          setCustomer((prev) => ({
+            ...prev,
+            paymentMethod: methodKey,
+          }));
+        }}
+      >
         <span className={styles.payment_option_icon} style={iconColorStyle}>
           <Icon />
         </span>
         <span className={styles.payment_option_name}>{name}</span>
-        <span className={styles.payment_option_transfer} style={transferColorStyle}>{transferTo}</span>
-        <div className={styles.payment_option_indicator} style={indicatorStyle}></div>
+
+        <div
+          className={styles.payment_option_indicator}
+          style={indicatorStyle}
+        ></div>
       </div>
     );
   };
@@ -107,14 +133,27 @@ export default function Page() {
     <div className={styles.container}>
       <div className={styles.product_area}>
         <div className={styles.product_info}>
-          <img src={image.src} alt="Item Icon" className={styles.product_info_img} />
-          <h1 className={styles.product_info_h1}>TedX Bedayia Ticket For 1 Person</h1>
+          <Image
+            width={70}
+            height={70}
+            src={image.src}
+            alt="Item Icon"
+            className={styles.product_info_img}
+          />
+          <h1 className={styles.product_info_h1}>TEDx Bedayia eTickets</h1>
         </div>
         <hr className={styles.product_area_hr} />
         <div className={styles.purchase_details}>
           <h2 className={styles.purchase_details_h2}>Order Cost</h2>
-          <h1 className={styles.purchase_details_h1}>EGP 400.00</h1>
-          <p>Ticket For 1 Person</p>
+          <h1 className={styles.purchase_details_h1}>
+            EGP {customer.price.toFixed(2)}
+          </h1>
+          <p>
+            Ticket For{" "}
+            {customer.type === TicketType.INDIVIDUAL
+              ? "1 Person"
+              : "Group of 4"}
+          </p>
         </div>
       </div>
 
@@ -122,43 +161,145 @@ export default function Page() {
         <h1 className={styles.payment_area_h1}>Checkout</h1>
         <hr className={styles.payment_area_hr} />
 
-        <form>
-          <CustomerDetails name={name} setName={setName} phone={phone} setPhone={setPhone} mail={mail} setMail={setMail} />
-          
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+
+            addLoader();
+            const response =
+              customer.type !== TicketType.GROUP ||
+              !customer.extraNames ||
+              customer.extraNames.length !== 3 ||
+              !customer.extraEmails ||
+              customer.extraEmails.length !== 3
+                ? await fetch("/api/tickets", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      name: customer.name,
+                      email: customer.email,
+                      phone: customer.phone,
+                      paymentMethod: customer.additionalInfo
+                        ? `${customer.paymentMethod}@${customer.additionalInfo}`
+                        : customer.paymentMethod,
+                    }),
+                  })
+                : await fetch("/api/tickets/group", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      name1: customer.name,
+                      email1: customer.email,
+                      name2: customer.extraNames[0],
+                      email2: customer.extraEmails[0],
+                      name3: customer.extraNames[1],
+                      email3: customer.extraEmails[1],
+                      name4: customer.extraNames[2],
+                      email4: customer.extraEmails[2],
+                      phone: customer.phone,
+                      paymentMethod: customer.additionalInfo
+                        ? `${customer.paymentMethod}@${customer.additionalInfo}`
+                        : customer.paymentMethod,
+                    }),
+                  });
+
+            if (response.ok) {
+              customAlert(
+                "Ticket booked successfully! It may take us up to 2 days to process your ticket."
+              );
+              sessionStorage.removeItem("checkout");
+              removeLoader();
+              router.push(
+                customer.type === TicketType.INDIVIDUAL
+                  ? "/book"
+                  : "/book/group"
+              );
+            } else {
+              customAlert(
+                (await response.json()).message ?? "An Error Occurred."
+              );
+              removeLoader();
+            }
+          }}
+        >
+          <CustomerDetails
+            name={customer.name}
+            phone={customer.phone}
+            email={customer.email}
+          />
+
           <h2 className={styles.payment_area_h2}>Payment Method</h2>
           <div className={styles.payment_options_list}>
-            {Object.keys(paymentOptions).map((key) => {
-              const methodKey = key as PaymentMethodKey;
-              const option = paymentOptions[methodKey];
-              return (
-                <PaymentOption
-                  key={methodKey}
-                  methodKey={methodKey}
-                  name={option.name}
-                  transferTo={option.transferTo}
-                  Icon={option.icon}
-                />
-              );
-            })}
+            {Object.keys(paymentOptions)
+              .filter((key) => key !== "CASH")
+              .map((key) => {
+                const methodKey = key as PaymentMethodKey;
+                const option = paymentOptions[methodKey];
+                return (
+                  <PaymentOption
+                    key={methodKey}
+                    methodKey={methodKey}
+                    name={option.displayName}
+                    Icon={option.icon}
+                  />
+                );
+              })}
           </div>
 
-          <div className={styles.instruction_block} hidden={hidden}>
-            <h3 className={styles.instruction_title}>How to Pay with {currentOption.name}</h3>
+          <div className={styles.instruction_block}>
+            {currentOption.instructions && (
+              <>
+                <h3 className={styles.instruction_title}>
+                  How to Pay with {currentOption.displayName}
+                </h3>
 
-            <ol className={styles.instruction_list}><currentOption.instructions/></ol>
+                <ol className={styles.instruction_list}>
+                  <currentOption.instructions price={customer.price} />
+                </ol>
+              </>
+            )}
 
-            <div>
-              <input
-                type="text"
-                id="user-handle"
-                placeholder={currentOption.placeholder}
-                className={styles.pay_input}
-                required
-              />
-            </div>
+            {currentOption.field && (
+              <div className={styles.pay_input_container}>
+                {currentOption.field.prefix && (
+                  <div className={styles.pay_input_prefix}>
+                    {currentOption.field.prefix}
+                  </div>
+                )}
+                <input
+                  id={currentOption.field.id}
+                  placeholder={currentOption.field.placeholder}
+                  className={styles.pay_input}
+                  required={currentOption.field.required}
+                  value={customer.additionalInfo || ""}
+                  onChange={(e) => {
+                    if (!currentOption.field) return;
+                    if (currentOption.field.type === "phone") {
+                      if (!/^\d*$/.test(e.target.value)) return;
+                      if (e.target.value.length > 10) return;
+                    } else if (currentOption.field.type === "alphanumeric") {
+                      if (!/^[a-zA-Z0-9]*$/.test(e.target.value)) return;
+                    }
+                    setCustomer((prev) => ({
+                      ...prev,
+                      additionalInfo: e.target.value,
+                    }));
+                  }}
+                />
+                {currentOption.field.suffix && (
+                  <div className={styles.pay_input_suffix}>
+                    {currentOption.field.suffix}
+                  </div>
+                )}
+              </div>
+            )}
 
             <button type="submit" className={styles.pay_button}>
-              Confirm EGP 400.00 Payment
+              Confirm EGP {customer.price.toFixed(2)} Payment
             </button>
           </div>
         </form>

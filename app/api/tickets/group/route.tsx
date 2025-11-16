@@ -1,6 +1,7 @@
 import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { TicketType } from "../../../ticket-types";
 import { initiateCardPayment } from "../../utils/card-payment";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import {
@@ -9,7 +10,6 @@ import {
   verifyEmail,
   verifyPaymentMethod,
 } from "../../utils/input-sanitization";
-import { TicketType } from "../../utils/ticket-types";
 import { price } from "../price/prices";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,

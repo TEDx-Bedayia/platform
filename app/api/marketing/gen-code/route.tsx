@@ -1,8 +1,8 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest } from "next/server";
+import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
 import { SQLSettings } from "../../utils/sql-settings";
-import { TicketType } from "../../utils/ticket-types";
 
 // Returns a random code in the format "XXXX-XXXX" alphanumeric
 async function randCode() {

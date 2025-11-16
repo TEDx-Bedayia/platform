@@ -5,24 +5,22 @@ import styles from "./book.module.css";
 import { motion } from "framer-motion";
 
 import { Poppins, Ubuntu } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { customAlert } from "../admin/custom-alert";
-import {
-  Field,
-  PaymentMethod,
-} from "../api/tickets/payment-methods/payment-methods";
 import "./htmlcolor.css";
 
 import { addLoader, removeLoader } from "../global_components/loader";
+import { TicketType } from "../ticket-types";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function SingleTickets() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     name: "",
     phone: "",
     paymentMethod: "",
-    additionalFields: {} as { [key: string]: string },
   });
 
   const [code, setCode] = useState("");
@@ -322,6 +320,23 @@ export default function SingleTickets() {
       return;
     }
 
+    // FOR NON CARD PAYMENTS (BACKUP SYSTEM)
+    if (type === "ONLINE") {
+      const dataToSendOver = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        price: 400, // TODO fetch actual price from API
+        type: TicketType.INDIVIDUAL,
+      };
+
+      sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
+
+      router.push("/pay-online");
+      removeLoader();
+      return;
+    }
+
     const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
@@ -340,14 +355,13 @@ export default function SingleTickets() {
           name: "",
           phone: "",
           paymentMethod: "",
-          additionalFields: {},
         });
         setCode("");
         removeLoader();
         return;
       }
 
-      window.location.href = jsonRes.paymentUrl;
+      if (jsonRes.paymentUrl) router.push(jsonRes.paymentUrl);
       return;
     } else {
       customAlert((await response.json()).message ?? "An Error Occurred.");
@@ -355,13 +369,13 @@ export default function SingleTickets() {
     removeLoader();
   }
 
-  // for PayMob & Cash
+  // for Online & Cash
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     document.body.focus();
 
     if (code !== "") await submitTicket("CASH");
-    else await submitTicket(formData.paymentMethod || "CARD");
+    else await submitTicket(formData.paymentMethod || "ONLINE");
   }
 
   return (

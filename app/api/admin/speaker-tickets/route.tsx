@@ -12,7 +12,7 @@ import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import path from "path";
-import { TicketType } from "../../utils/ticket-types";
+import { TicketType } from "../../../ticket-types";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function GET(request: NextRequest) {

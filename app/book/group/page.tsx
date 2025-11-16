@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styles from "../book.module.css";
 
@@ -6,6 +7,7 @@ import { motion } from "framer-motion";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
+import { TicketType } from "@/app/ticket-types";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
 import { addLoader, removeLoader } from "../../global_components/loader";
@@ -14,6 +16,7 @@ const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function GroupTickets() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     emails: ["", "", "", ""],
     names: ["", "", "", ""],
@@ -107,6 +110,28 @@ export default function GroupTickets() {
       formData.names[3] = formData.names[0];
     }
 
+    if (formData.paymentMethod === "ONLINE") {
+      const dataToSendOver = {
+        name: formData.names[0],
+        email: formData.emails[0],
+        phone: formData.phone,
+        price: 1400, // TODO fetch actual price from API
+        type: TicketType.GROUP,
+        extraNames: [formData.names[1], formData.names[2], formData.names[3]],
+        extraEmails: [
+          formData.emails[1],
+          formData.emails[2],
+          formData.emails[3],
+        ],
+      };
+
+      sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
+
+      router.push("/pay-online");
+      removeLoader();
+      return;
+    }
+
     const response = await fetch("/api/tickets/group", {
       method: "POST",
       headers: {
@@ -128,11 +153,6 @@ export default function GroupTickets() {
     });
 
     if (response.ok) {
-      if (formData.paymentMethod === "CARD") {
-        const { paymentUrl } = await response.json();
-        window.location.href = paymentUrl;
-        return;
-      }
       setFormData({
         emails: ["", "", "", ""],
         names: ["", "", "", ""],
@@ -372,7 +392,7 @@ export default function GroupTickets() {
                   type="submit"
                   style={{ ...title.style, width: "100%", marginTop: "12px" }}
                   onClick={() => {
-                    formData.paymentMethod = "CARD";
+                    formData.paymentMethod = "ONLINE";
                   }}
                 >
                   Pay Online

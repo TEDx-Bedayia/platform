@@ -1,9 +1,9 @@
 "use client";
-import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods";
 import { hidePopup, showPopup } from "@/app/api/utils/generic-popup";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
+import { PaymentMethod } from "@/app/payment-methods";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
@@ -149,12 +149,13 @@ export default function Payments() {
           };
 
           const methods: PaymentMethod[] = data.paymentMethods
-            .filter((method) => method.identifier != "CARD")
+            // .filter((method) => method.identifier != "CARD")
             .map((method) => ({
               displayName: method.displayName,
               identifier: method.identifier,
               to: method.to,
-              fields: method.fields,
+              field: method.field,
+              icon: method.icon,
             }));
 
           if (!localStorage.getItem("admin-token")) {
@@ -179,11 +180,7 @@ export default function Payments() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    if (
-      name == "username" &&
-      formData.method != "CASH" &&
-      value.includes("@")
-    ) {
+    if (name == "from" && formData.method != "CASH" && value.includes("@")) {
       return;
     }
     if (name == "method" && type == "school") {
@@ -208,15 +205,17 @@ export default function Payments() {
         date: getCurrentDate(),
       });
 
-      if (
-        paymentOptions.find((option) => option.identifier == value)?.fields
-          .length == 0
-      ) {
+      const paymentOptionField = paymentOptions.find(
+        (option) => option.identifier == value
+      )?.field;
+
+      if (paymentOptionField == undefined) {
         setChangingFieldTitle("Email Address Or ID");
       } else {
         setChangingFieldTitle(
-          paymentOptions.find((option) => option.identifier == value)?.fields[0]
-            .placeholder ?? "Email Address Or ID"
+          paymentOptionField.type === "phone"
+            ? "Phone Number"
+            : paymentOptionField.placeholder
         );
       }
     }

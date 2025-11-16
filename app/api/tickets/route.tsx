@@ -1,6 +1,7 @@
 import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { TicketType } from "../../ticket-types";
 import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../admin/payment-reciever/main";
 import { initiateCardPayment } from "../utils/card-payment";
@@ -10,8 +11,8 @@ import {
   checkSafety,
   handleMisspelling,
   verifyEmail,
+  verifyPaymentMethod,
 } from "../utils/input-sanitization";
-import { TicketType } from "../utils/ticket-types";
 import { price } from "./price/prices";
 
 // email, name, phone, paymentMethod
@@ -39,7 +40,6 @@ export async function POST(request: NextRequest) {
     email = body.email?.toString().trim().toLowerCase();
     phone = body.phone?.toString().trim();
     paymentMethod = body.paymentMethod?.toString().trim()!;
-    add = body.additionalFields;
     if (body.code) code = body.code?.toString().trim();
   } catch (error) {
     return Response.json(
@@ -47,9 +47,6 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-
-  if (add != undefined && add[paymentMethod.toLowerCase()] != undefined)
-    paymentMethod += "@" + add[paymentMethod.toLowerCase()].trim();
 
   try {
     return await submitOneTicket(email!, name!, phone!, paymentMethod, code);
@@ -102,6 +99,14 @@ async function submitOneTicket(
 
   if (!checkSafety(name)) {
     return Response.json({ message: "Invalid Name." }, { status: 400 });
+  }
+
+  paymentMethod = verifyPaymentMethod(paymentMethod);
+  if (!paymentMethod) {
+    return Response.json(
+      { message: "Invalid Payment Method." },
+      { status: 400 }
+    );
   }
 
   let id;
