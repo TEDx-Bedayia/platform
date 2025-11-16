@@ -6,8 +6,6 @@ import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
 import {
   getTicketTypeFromName,
-  getTicketTypeName,
-  TicketType,
 } from "@/app/ticket-types";
 import { Poppins } from "next/font/google";
 import { useEffect, useState } from "react";
