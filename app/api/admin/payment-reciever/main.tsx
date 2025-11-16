@@ -37,10 +37,10 @@ export async function pay(
   const client = await sql.connect();
 
   if (parseInt(amount) < 0) {
-    await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from.replaceAll(
-      "@",
-      " "
-    )}, 0, ${amount}, ${date})`;
+    const [first, ...rest] = from.split("@");
+    const parsedFrom = first + "@" + rest.join(" ");
+
+    await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${parsedFrom}, 0, ${amount}, ${date})`;
     client.release();
     return Response.json(
       { refund: true, message: "Refund Inserted." },
