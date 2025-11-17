@@ -10,6 +10,7 @@ import "./htmlcolor.css";
 
 import { addLoader, removeLoader } from "../global_components/loader";
 import { INDIVIDUAL_TICKET_PRICE } from "../metadata";
+import { TicketType } from "../ticket-types";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
@@ -319,6 +320,23 @@ export default function SingleTickets() {
       return;
     }
 
+    // TODO remove or uncomment when we know which system to use
+    // if (type === "ONLINE") {
+    //   const dataToSendOver = {
+    //     name: formData.name,
+    //     email: formData.email,
+    //     phone: formData.phone,
+    //     price: INDIVIDUAL_TICKET_PRICE,
+    //     type: TicketType.INDIVIDUAL,
+    //   };
+
+    //   sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
+
+    //   router.push("/pay-online");
+    //   removeLoader();
+    //   return;
+    // }
+
     const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
@@ -357,7 +375,7 @@ export default function SingleTickets() {
     document.body.focus();
 
     if (code !== "") await submitTicket("CASH");
-    else await submitTicket(formData.paymentMethod || "CARD");
+    else await submitTicket(formData.paymentMethod || "ONLINE");
   }
 
   return (
