@@ -320,23 +320,6 @@ export default function SingleTickets() {
       return;
     }
 
-    // TODO remove or uncomment when we know which system to use
-    // if (type === "ONLINE") {
-    //   const dataToSendOver = {
-    //     name: formData.name,
-    //     email: formData.email,
-    //     phone: formData.phone,
-    //     price: INDIVIDUAL_TICKET_PRICE,
-    //     type: TicketType.INDIVIDUAL,
-    //   };
-
-    //   sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
-
-    //   router.push("/pay-online");
-    //   removeLoader();
-    //   return;
-    // }
-
     const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
