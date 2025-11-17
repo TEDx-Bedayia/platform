@@ -27,7 +27,7 @@ export async function createAccountHolder(
   }
 }
 
-export async function addPaymentMethodsToAccountHolder(
+export async function setPaymentMethodsToAccountHolder(
   accountHolderId: number,
   paymentMethods: string[]
 ): Promise<boolean> {

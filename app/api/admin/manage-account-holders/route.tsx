@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
 import {
-  addPaymentMethodsToAccountHolder,
   createAccountHolder,
   getAllAccountHolders,
+  setPaymentMethodsToAccountHolder,
 } from "./utils";
 
 export async function POST(request: NextRequest) {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add payment methods
-    const addedMethods = await addPaymentMethodsToAccountHolder(
+    const addedMethods = await setPaymentMethodsToAccountHolder(
       user.id,
       paymentMethods
     );
