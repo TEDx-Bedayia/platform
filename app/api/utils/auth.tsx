@@ -58,6 +58,7 @@ export enum ProtectedResource {
   PAYMENT_LOGS = "payment_logs",
   QUERY_TICKETS = "query_tickets",
   INVITATIONS = "invitations",
+  MANAGE_ACCOUNT_HOLDERS = "manage_account_holders",
 }
 
 export function signToken(
@@ -94,6 +95,7 @@ function hasAccess(userRole: UserRole, resource: ProtectedResource): boolean {
     [ProtectedResource.SUPER_ADMIN]: [UserRole.ADMIN],
     [ProtectedResource.QUERY_TICKETS]: [UserRole.ADMIN, UserRole.SCHOOL_OFFICE],
     [ProtectedResource.INVITATIONS]: [UserRole.ADMIN],
+    [ProtectedResource.MANAGE_ACCOUNT_HOLDERS]: [UserRole.ADMIN],
   };
 
   return accessControl[resource].includes(userRole);
