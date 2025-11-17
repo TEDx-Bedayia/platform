@@ -95,9 +95,9 @@ export async function GET(request: NextRequest) {
           [ids, randUUIDs] // Parameters passed as arrays
         );
 
-        accepted.rows.forEach(async (row) => {
+        for (const row of accepted.rows) {
           await sendEmail(row.email, row.full_name, row.uuid, row.id);
-        });
+        }
       }
 
       await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${

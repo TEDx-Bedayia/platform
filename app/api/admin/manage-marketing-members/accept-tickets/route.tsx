@@ -34,21 +34,31 @@ export async function POST(request: NextRequest) {
 
     client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${stream}, ${paid}, ${paid}, NOW())`;
 
-    result.rows.forEach(async (row) => {
-      const attendeeId = row.attendee_id;
-      if (attendeeId) {
-        const attendee = await client.query(
-          `UPDATE attendees SET paid = TRUE, uuid = $1, sent = TRUE WHERE id = $2 AND paid = FALSE RETURNING *`,
-          [randomUUID(), attendeeId]
-        );
+    await Promise.all(
+      result.rows.map(async (row) => {
+        try {
+          const attendeeId = row.attendee_id;
+          if (attendeeId) {
+            const attendee = await client.query(
+              `UPDATE attendees SET paid = TRUE, uuid = $1, sent = TRUE WHERE id = $2 AND paid = FALSE RETURNING *`,
+              [randomUUID(), attendeeId]
+            );
 
-        await sendEmail(
-          attendee.rows[0].email,
-          attendee.rows[0].full_name,
-          attendee.rows[0].uuid
-        );
-      }
-    });
+            await sendEmail(
+              attendee.rows[0].email,
+              attendee.rows[0].full_name,
+              attendee.rows[0].uuid
+            );
+          }
+        } catch (error) {
+          console.error(
+            "[MANAGE MARKETNG] Error processing attendee ID:",
+            row.attendee_id,
+            error
+          );
+        }
+      })
+    );
 
     client.release();
 
