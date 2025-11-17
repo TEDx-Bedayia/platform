@@ -174,9 +174,17 @@ export default function History() {
         {data
           .filter((x) => x.stream.startsWith("Office"))
           .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. Cards:{" "}
+        EGP. Telda:{" "}
         {data
-          .filter((x) => x.stream.startsWith("Card"))
+          .filter((x) => x.stream.startsWith("Telda"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
+        EGP. Instapay:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("Instapay"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
+        EGP. eWallet:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("eWallet"))
           .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
         EGP.
       </p>
