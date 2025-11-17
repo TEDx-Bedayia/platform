@@ -310,12 +310,28 @@ export default function SingleTickets() {
 
   async function submitTicket(type: string) {
     addLoader();
-    formData.paymentMethod = (type === "ONLINE") ? "CARD" : type;
+    formData.paymentMethod = type;
     if (
       formData.phone.length < 11 ||
       (formData.phone.includes("+") && formData.phone.length != 13)
     ) {
       customAlert("Please enter a valid phone number");
+      removeLoader();
+      return;
+    }
+
+    if (type === "ONLINE") {
+      const dataToSendOver = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        price: INDIVIDUAL_TICKET_PRICE,
+        type: TicketType.INDIVIDUAL,
+      };
+
+      sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
+
+      router.push("/pay-online");
       removeLoader();
       return;
     }
