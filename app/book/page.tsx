@@ -1,14 +1,15 @@
 "use client";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "./book.module.css";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
 import "./htmlcolor.css";
 
 import { addLoader, removeLoader } from "../global_components/loader";
+import { INDIVIDUAL_TICKET_PRICE } from "../metadata";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
@@ -371,7 +372,9 @@ export default function SingleTickets() {
           Book a Ticket
         </h1>
         <h2 style={{ ...title.style, fontWeight: 900, color: "#F9F9F9" }}>
-          {code ? "Paid Ticket!" : "400 EGP"}
+          {code
+            ? "Paid Ticket!"
+            : `${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`}
         </h2>
       </motion.div>
       <motion.div

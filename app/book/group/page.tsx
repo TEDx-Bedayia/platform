@@ -6,6 +6,7 @@ import styles from "../book.module.css";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
+import { GROUP_TICKET_PRICE } from "@/app/metadata";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
 import { addLoader, removeLoader } from "../../global_components/loader";
@@ -175,10 +176,10 @@ export default function GroupTickets() {
             marginBottom: ".5rem",
           }}
         >
-          1, 400 EGP
+          {(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP
         </h2>
         <h2 style={{ ...title.style, fontWeight: 100, fontSize: ".75em" }}>
-          350 EGP/Person
+          {GROUP_TICKET_PRICE.toLocaleString()} EGP/Person
         </h2>
       </motion.div>
       <motion.div
