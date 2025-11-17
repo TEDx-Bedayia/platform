@@ -59,7 +59,7 @@ export async function sendEmail(
 
     return true;
   } catch (e) {
-    console.error("GMAIL OR SQL ERROR");
+    console.error("GMAIL OR SQL ERROR: ", e);
     return false;
   }
 }
