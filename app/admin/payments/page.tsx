@@ -175,6 +175,18 @@ export default function Payments() {
             ...prev,
             method: allowedMethods[0],
           }));
+
+          const field = paymentOptions.find(
+            (option) => option.identifier == allowedMethods[0]
+          )?.field;
+
+          if (!field) {
+            setChangingFieldTitle("Email Address Or ID");
+          } else {
+            setChangingFieldTitle(
+              field.type === "phone" ? "Phone Number" : field.placeholder
+            );
+          }
         }
       } catch (error) {
         console.error("Error fetching payment methods:", error);
