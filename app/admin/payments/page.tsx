@@ -1,9 +1,9 @@
 "use client";
-import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods";
 import { hidePopup, showPopup } from "@/app/api/utils/generic-popup";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
+import { getPaymentMethods, PaymentMethod } from "@/app/payment-methods";
 import { getTicketTypeFromName, TicketType } from "@/app/ticket-types";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
@@ -153,33 +153,27 @@ export default function Payments() {
         const allowedMethods = (res.methods as string[]) ?? [];
         setType(res.role === "school_office" ? "school" : "admin");
 
-        const response = await fetch("/api/tickets/payment-methods");
-        if (response.ok) {
-          const data = (await response.json()) as {
-            paymentMethods: PaymentMethod[];
-          };
+        const paymentMethods = getPaymentMethods();
 
-          const methods: PaymentMethod[] = data.paymentMethods
-            .filter((method) => !method.automatic)
-            .map((method) => ({
-              displayName: method.displayName,
-              identifier: method.identifier,
-              to: method.to,
-              fields: method.fields,
-            }));
+        const methods: PaymentMethod[] = paymentMethods
+          .filter((method) => !method.automatic)
+          .map((method) => ({
+            displayName: method.displayName,
+            identifier: method.identifier,
+            to: method.to,
+            field: method.field,
+            icon: method.icon,
+          }));
 
-          setPaymentOptions(
-            methods.filter((m) => allowedMethods.includes(m.identifier))
-          );
-          if (allowedMethods.length === 0) setPaymentOptions(methods);
-          if (allowedMethods.length === 1) {
-            setFormData((prev) => ({
-              ...prev,
-              method: allowedMethods[0],
-            }));
-          }
-        } else {
-          console.error("Failed to fetch payment methods");
+        setPaymentOptions(
+          methods.filter((m) => allowedMethods.includes(m.identifier))
+        );
+        if (allowedMethods.length === 0) setPaymentOptions(methods);
+        if (allowedMethods.length === 1) {
+          setFormData((prev) => ({
+            ...prev,
+            method: allowedMethods[0],
+          }));
         }
       } catch (error) {
         console.error("Error fetching payment methods:", error);
@@ -212,16 +206,14 @@ export default function Payments() {
         date: getCurrentDate(),
       });
 
-      if (
-        paymentOptions.find((option) => option.identifier == value)?.fields
-          .length == 0
-      ) {
+      const field = paymentOptions.find(
+        (option) => option.identifier == value
+      )?.field;
+
+      if (!field) {
         setChangingFieldTitle("Email Address Or ID");
       } else {
-        setChangingFieldTitle(
-          paymentOptions.find((option) => option.identifier == value)?.fields[0]
-            .placeholder ?? "Email Address Or ID"
-        );
+        setChangingFieldTitle(field.placeholder ?? "Email Address Or ID");
       }
     }
 

@@ -1,5 +1,4 @@
 import { sql } from "@vercel/postgres";
-import { get } from "http";
 import { NextRequest } from "next/server";
 import { getMarketingMemberPass } from "../../utils/auth";
 

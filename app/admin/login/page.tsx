@@ -43,6 +43,9 @@ export default function AdminLogin() {
           default:
             break;
         }
+      })
+      .catch(() => {
+        // Ignore errors on login page - user is not authenticated
       });
   }, [router]);
 

@@ -1,8 +1,9 @@
 import type { Author } from "next/dist/lib/metadata/types/metadata-types";
 
-export const PHONE = "+20 105 578 2533"; // Change to WhatsApp & VFCASH Enabled phone number
-export const TELDA = "@alymob"; // Change to Telda username
-export const IPN = "omarelmandooh@instapay"; // Change to Instapay details
+export const PHONE = "+20 105 578 2533"; // Leave as is
+export const VFCASH = "01003993559"; // Change to Vodafone Cash number
+export const TELDA = "@alykotb"; // Change to Telda username
+export const IPN = "reemabdulghaffar@instapay"; // Change to Instapay details
 
 export const INDIVIDUAL_TICKET_PRICE = 400; // Change to individual ticket price
 export const GROUP_TICKET_PRICE = 350; // Change to group ticket price per person

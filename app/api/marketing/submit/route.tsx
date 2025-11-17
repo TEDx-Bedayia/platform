@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
   }
 
   if (
-    request.headers.get("username") &&
+    !request.headers.get("username") ||
+    !request.headers.get("password") ||
     request.headers.get("password") !==
       getMarketingMemberPass(request.headers.get("username")!)
   ) {

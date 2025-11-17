@@ -123,7 +123,8 @@ export function canUserAccess(
       (method ? decoded.methods?.includes(method) ?? true : true)
     );
   } catch (error) {
-    console.error("Token verification failed:", error);
+    if (process.env.NODE_ENV !== "production")
+      console.error("Token verification failed:", error);
     return false;
   }
 }

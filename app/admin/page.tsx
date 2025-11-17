@@ -512,7 +512,7 @@ export default function AdminDashboard() {
     if (pageIndex > 0) {
       fetchApplicants(pageIndex);
     }
-  }, [pageIndex, filter]);
+  }, [pageIndex, filter, router]);
 
   // Admit Applicant Handler (toggle admit status)
   const admitApplicant = async (id: number, admitted: boolean) => {
