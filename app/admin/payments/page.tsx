@@ -176,7 +176,7 @@ export default function Payments() {
             method: allowedMethods[0],
           }));
 
-          const field = paymentOptions.find(
+          const field = methods.find(
             (option) => option.identifier == allowedMethods[0]
           )?.field;
 
