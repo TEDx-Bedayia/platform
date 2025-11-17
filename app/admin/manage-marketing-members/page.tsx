@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
+import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import {
   check,
@@ -331,6 +332,12 @@ export default function MarketingMembers() {
                               (m) => m.name
                             )} for rush hour / individual tickets on ${selectedDate}.`
                         );
+                      } else if (
+                        response.status ===
+                        ResponseCode.MARKETING_ACTIVITY_OUT_OF_SYNC
+                      ) {
+                        customAlert("Out of sync error. Refreshing data...");
+                        await fetchMemberActivity();
                       } else {
                         customAlert(
                           data.message || "Failed to accept tickets."
