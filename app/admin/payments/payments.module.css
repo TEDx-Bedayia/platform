@@ -153,6 +153,26 @@
   background-color: #8f1f2b;
 }
 
+.manageAccountHoldersButton {
+  margin-top: 1rem;
+  background-color: #0070f3;
+  position: absolute;
+  margin-left: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  flex-direction: row;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.manageAccountHoldersButton:hover {
+  background-color: #005bb5;
+}
+
 /* Responsive design */
 @media (max-width: 500px) {
   .formContainer {

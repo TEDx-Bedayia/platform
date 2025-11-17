@@ -50,7 +50,9 @@ export async function setPaymentMethodsToAccountHolder(
 export async function getAccountHolderInfo(
   username: string,
   password: string
-): Promise<object | undefined> {
+): Promise<
+  { id: number; username: string; allowed_methods: string[] } | undefined
+> {
   const result =
     await sql`SELECT * FROM account_holders WHERE username = ${username}`;
   const hashedPassword = result.rows[0]?.hashed_password;

@@ -62,3 +62,47 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Internal server error" }, { status: 500 });
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    if (!canUserAccess(request, ProtectedResource.MANAGE_ACCOUNT_HOLDERS)) {
+      return Response.json({ message: "Unauthorized." }, { status: 401 });
+    }
+
+    const { id, paymentMethods } = await request.json();
+
+    if (!id || !Array.isArray(paymentMethods)) {
+      return Response.json(
+        { message: "Invalid payload. Provide id and paymentMethods." },
+        { status: 400 }
+      );
+    }
+
+    const sanitizedMethods = paymentMethods
+      .filter((method: unknown): method is string => typeof method === "string")
+      .map((method) => method.trim())
+      .filter(Boolean);
+
+    const uniqueMethods = Array.from(new Set(sanitizedMethods));
+
+    const updated = await setPaymentMethodsToAccountHolder(
+      Number(id),
+      uniqueMethods
+    );
+
+    if (!updated) {
+      return Response.json(
+        { message: "Failed to update payment methods." },
+        { status: 500 }
+      );
+    }
+
+    return Response.json(
+      { message: "Payment methods updated." },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("Error in PATCH /manage-account-holders", err);
+    return Response.json({ message: "Internal server error" }, { status: 500 });
+  }
+}

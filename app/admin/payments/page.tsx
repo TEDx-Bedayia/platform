@@ -5,6 +5,7 @@ import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
 import { getPaymentMethods, PaymentMethod } from "@/app/payment-methods";
 import { getTicketTypeFromName, TicketType } from "@/app/ticket-types";
+import { UserCheck2 } from "lucide-react";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -151,7 +152,7 @@ export default function Payments() {
       try {
         const res = await fetch("/api/admin/auth").then((res) => res.json());
         const allowedMethods = (res.methods as string[]) ?? [];
-        setType(res.role === "school_office" ? "school" : "admin");
+        setType(res.role === "admin" ? "admin" : "school");
 
         const paymentMethods = getPaymentMethods();
 
@@ -381,6 +382,19 @@ export default function Payments() {
 
   return (
     <section id="admin-payments">
+      {type === "admin" && (
+        <>
+          {/* Floating Button to redirect to manage account holders */}
+          <button
+            className={styles.manageAccountHoldersButton}
+            onClick={() => router.push("/admin/manage-account-holders")}
+            title="Manage Account Holders"
+          >
+            <UserCheck2 />
+            Manage Account Holders
+          </button>
+        </>
+      )}
       <div
         className={styles.pageContainer}
         style={type == "school" ? { height: "100vh !important" } : {}}

@@ -40,6 +40,9 @@ export default function AdminLogin() {
           case "school_office":
             router.push("/admin/payments");
             break;
+          case "payment_handler":
+            router.push("/admin/payments");
+            break;
           default:
             break;
         }
@@ -77,6 +80,9 @@ export default function AdminLogin() {
             router.push("/admin/manage-marketing-members");
             break;
           case "school_office":
+            router.push("/admin/payments");
+            break;
+          case "payment_handler":
             router.push("/admin/payments");
             break;
           default:
