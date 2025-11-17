@@ -214,7 +214,9 @@ export default function Payments() {
       if (!field) {
         setChangingFieldTitle("Email Address Or ID");
       } else {
-        setChangingFieldTitle(field.placeholder ?? "Email Address Or ID");
+        setChangingFieldTitle(
+          field.type === "phone" ? "Phone Number" : field.placeholder
+        );
       }
     }
 
