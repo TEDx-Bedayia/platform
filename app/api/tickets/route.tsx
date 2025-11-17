@@ -109,6 +109,15 @@ async function submitOneTicket(
     return Response.json({ message: "Invalid Name." }, { status: 400 });
   }
 
+  if (!verifyEmail(email)) {
+    return Response.json(
+      {
+        message: "Please enter a valid email address.",
+      },
+      { status: 400 }
+    );
+  }
+
   let id;
   try {
     let res = await sql.query(
