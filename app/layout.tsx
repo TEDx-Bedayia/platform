@@ -1,4 +1,3 @@
-"use client";
 import type { Metadata } from "next";
 import "./globals.css";
 import { YEAR, support } from "./metadata";
@@ -98,6 +97,7 @@ export default function RootLayout({
         ></meta>
         <meta name="theme-color" content="#100d26"></meta>
         <link rel="manifest" href="/site.webmanifest" />
+        <title>{metadata.title!.toString()}</title>
       </head>
       <body>
         <h1
