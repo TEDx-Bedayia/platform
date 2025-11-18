@@ -310,7 +310,7 @@ export default function SingleTickets() {
 
   async function submitTicket(type: string) {
     addLoader();
-    formData.paymentMethod = type;
+    formData.paymentMethod = (type === "ONLINE") ? "CARD" : type;
     if (
       formData.phone.length < 11 ||
       (formData.phone.includes("+") && formData.phone.length != 13)
