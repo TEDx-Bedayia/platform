@@ -1,9 +1,10 @@
+"use client";
 import type { Metadata } from "next";
 import "./globals.css";
 import { YEAR, support } from "./metadata";
 
 /* DO NOT EDIT */
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: `TEDxBedayia | 20${YEAR}`,
   description:
     "Stop by the official TEDxBedayia Website to book your tickets, know more about us, and have some fun! Waiting for you!",

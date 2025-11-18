@@ -1,8 +1,9 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest } from "next/server";
-import { price } from "../../tickets/price/prices";
-import { SQLSettings } from "../../utils/sql-settings";
 import { TicketType } from "../../../ticket-types";
+import { price } from "../../tickets/price/prices";
+import { getMarketingMemberPass } from "../../utils/auth";
+import { SQLSettings } from "../../utils/sql-settings";
 
 // Returns a random code in the format "XXXX-XXXX" alphanumeric
 async function randCode() {
@@ -39,7 +40,9 @@ export async function POST(request: NextRequest) {
   }
 
   if (
-    request.headers.get("password") !== process.env.MARKETING_MEMBER_PASSWORD
+    !request.headers.get("username") ||
+    request.headers.get("password") !==
+      getMarketingMemberPass(request.headers.get("username")!)
   ) {
     return Response.json(
       { message: "Invalid marketing member credentials." },

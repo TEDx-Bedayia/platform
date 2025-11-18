@@ -1,11 +1,11 @@
-import { getIdentifiersForPaymentMethods } from "../tickets/payment-methods/payment-methods";
+import { getIdentifiersForPaymentMethods } from "../../payment-methods";
 
 export function verifyEmail(email: string | undefined): boolean {
   if (email === undefined) {
     return false;
   }
 
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (emailRegex.test(email.trim())) {
     return true;
   }

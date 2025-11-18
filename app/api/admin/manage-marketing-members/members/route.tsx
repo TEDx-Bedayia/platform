@@ -1,53 +1,37 @@
 // POST = Create a new member
 // GET = Get all members
 // DELETE = Delete a member by ID .. if ID is -1 then delete all members
+import {
+  canUserAccess,
+  getMarketingMemberPass,
+  ProtectedResource,
+} from "@/app/api/utils/auth";
 import { sql } from "@vercel/postgres";
-import { type NextRequest } from "next/server";
 import crypto from "crypto";
+import { type NextRequest } from "next/server";
 
 export const maxDuration = 15;
 
 export async function GET(request: NextRequest) {
-  if (
-    process.env.ADMIN_KEY === undefined ||
-    !process.env.ADMIN_KEY ||
-    !process.env.MARKETING_KEY ||
-    process.env.MARKETING_KEY === undefined
-  ) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY &&
-    request.headers.get("key") !== process.env.MARKETING_KEY
-  ) {
+  if (!canUserAccess(request, ProtectedResource.MARKETING_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   const members = await sql`SELECT * FROM marketing_members`;
-  return Response.json({ members: members.rows }, { status: 200 });
+
+  return Response.json(
+    {
+      members: members.rows.map((row) => {
+        row.password = getMarketingMemberPass(row.username);
+        return row;
+      }),
+    },
+    { status: 200 }
+  );
 }
 
 export async function POST(request: NextRequest) {
-  if (
-    process.env.ADMIN_KEY === undefined ||
-    !process.env.ADMIN_KEY ||
-    !process.env.MARKETING_KEY ||
-    process.env.MARKETING_KEY === undefined
-  ) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY &&
-    request.headers.get("key") !== process.env.MARKETING_KEY
-  ) {
+  if (!canUserAccess(request, ProtectedResource.MARKETING_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -67,26 +51,19 @@ export async function POST(request: NextRequest) {
     RETURNING *;
   `;
 
-  return Response.json({ member: newMember.rows[0] }, { status: 201 });
+  return Response.json(
+    {
+      member: {
+        ...newMember.rows[0],
+        password: getMarketingMemberPass(newMember.rows[0].username),
+      },
+    },
+    { status: 201 }
+  );
 }
 
 export async function DELETE(request: NextRequest) {
-  if (
-    process.env.ADMIN_KEY === undefined ||
-    !process.env.ADMIN_KEY ||
-    !process.env.MARKETING_KEY ||
-    process.env.MARKETING_KEY === undefined
-  ) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY &&
-    request.headers.get("key") !== process.env.MARKETING_KEY
-  ) {
+  if (!canUserAccess(request, ProtectedResource.MARKETING_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

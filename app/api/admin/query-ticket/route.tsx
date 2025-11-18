@@ -2,26 +2,12 @@ import { sql } from "@vercel/postgres";
 import { NextRequest } from "next/server";
 import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
+import { canUserAccess, ProtectedResource } from "../../utils/auth";
 
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
-  if (
-    process.env.ADMIN_KEY === undefined ||
-    !process.env.ADMIN_KEY ||
-    !process.env.SKL_OFFICE ||
-    process.env.SKL_OFFICE === undefined
-  ) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY &&
-    request.headers.get("key") !== process.env.SKL_OFFICE
-  ) {
+  if (!canUserAccess(request, ProtectedResource.QUERY_TICKETS)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

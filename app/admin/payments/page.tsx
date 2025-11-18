@@ -1,11 +1,13 @@
 "use client";
-import { PaymentMethod } from "@/app/api/tickets/payment-methods/payment-methods";
 import { hidePopup, showPopup } from "@/app/api/utils/generic-popup";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
+import { getPaymentMethods, PaymentMethod } from "@/app/payment-methods";
 import { getTicketTypeFromName, TicketType } from "@/app/ticket-types";
+import { UserCheck2 } from "lucide-react";
 import { Poppins } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { customAlert } from "../custom-alert";
 import { Applicant } from "../types/Applicant";
@@ -81,11 +83,6 @@ function IDCheckPopup(
                 )}`,
                 {
                   method: "GET",
-                  headers: {
-                    key: localStorage.getItem("school-token")
-                      ? (localStorage.getItem("school-token") as string)
-                      : (localStorage.getItem("admin-token") as string),
-                  },
                 }
               );
 
@@ -129,6 +126,7 @@ function IDCheckPopup(
 }
 
 export default function Payments() {
+  const router = useRouter();
   const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -144,42 +142,51 @@ export default function Payments() {
     date: getCurrentDate(),
   });
   const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
-  const [type, setType] = useState<"admin" | "school">("school");
+  const [type, setType] = useState("school" as "admin" | "school");
   const [changingFieldTitle, setChangingFieldTitle] = useState(
     "Email Address Or ID"
   );
 
   useEffect(() => {
-    if (localStorage.getItem("admin-token")) {
-      setType("admin");
-    }
-
     const fetchPaymentMethods = async () => {
       try {
-        const response = await fetch("/api/tickets/payment-methods");
-        if (response.ok) {
-          const data = (await response.json()) as {
-            paymentMethods: PaymentMethod[];
-          };
+        const res = await fetch("/api/admin/auth").then((res) => res.json());
+        const allowedMethods = (res.methods as string[]) ?? [];
+        setType(res.role === "admin" ? "admin" : "school");
 
-          const methods: PaymentMethod[] = data.paymentMethods
-            .filter((method) => method.identifier != "CARD")
-            .map((method) => ({
-              displayName: method.displayName,
-              identifier: method.identifier,
-              to: method.to,
-              fields: method.fields,
-            }));
+        const paymentMethods = getPaymentMethods();
 
-          if (!localStorage.getItem("admin-token")) {
-            setPaymentOptions(methods.filter((m) => m.identifier == "CASH"));
-            setFormData((prev) => ({
-              ...prev,
-              method: "CASH",
-            }));
-          } else setPaymentOptions(methods);
-        } else {
-          console.error("Failed to fetch payment methods");
+        const methods: PaymentMethod[] = paymentMethods
+          .filter((method) => !method.automatic)
+          .map((method) => ({
+            displayName: method.displayName,
+            identifier: method.identifier,
+            to: method.to,
+            field: method.field,
+            icon: method.icon,
+          }));
+
+        setPaymentOptions(
+          methods.filter((m) => allowedMethods.includes(m.identifier))
+        );
+        if (allowedMethods.length === 0) setPaymentOptions(methods);
+        if (allowedMethods.length === 1) {
+          setFormData((prev) => ({
+            ...prev,
+            method: allowedMethods[0],
+          }));
+
+          const field = methods.find(
+            (option) => option.identifier == allowedMethods[0]
+          )?.field;
+
+          if (!field) {
+            setChangingFieldTitle("Email Address Or ID");
+          } else {
+            setChangingFieldTitle(
+              field.type === "phone" ? "Phone Number" : field.placeholder
+            );
+          }
         }
       } catch (error) {
         console.error("Error fetching payment methods:", error);
@@ -200,16 +207,6 @@ export default function Payments() {
     ) {
       return;
     }
-    if (name == "method" && type == "school") {
-      setFormData({
-        ...formData,
-        method: "CASH",
-      });
-      return;
-    }
-    if (type == "school" && formData.method != "CASH") {
-      formData.method = "CASH";
-    }
 
     if (name == "method") {
       formData.from = "";
@@ -222,15 +219,15 @@ export default function Payments() {
         date: getCurrentDate(),
       });
 
-      if (
-        paymentOptions.find((option) => option.identifier == value)?.fields
-          .length == 0
-      ) {
+      const field = paymentOptions.find(
+        (option) => option.identifier == value
+      )?.field;
+
+      if (!field) {
         setChangingFieldTitle("Email Address Or ID");
       } else {
         setChangingFieldTitle(
-          paymentOptions.find((option) => option.identifier == value)?.fields[0]
-            .placeholder ?? "Email Address Or ID"
+          field.type === "phone" ? "Phone Number" : field.placeholder
         );
       }
     }
@@ -242,22 +239,23 @@ export default function Payments() {
   };
 
   useEffect(() => {
-    if (
-      !localStorage.getItem("admin-token") &&
-      !localStorage.getItem("school-token")
-    ) {
-      window.location.href = "/admin/login";
-    }
-  });
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.role) router.push("/admin/login");
+      })
+      .catch(() => {
+        router.push("/admin/login");
+      });
+  }, [router]);
 
   const resetForm = () => {
-    formData.method = type == "admin" ? formData.method : "CASH";
     formData.from = "";
     formData.amount = "";
     formData.date = getCurrentDate();
 
     setFormData({
-      method: type == "admin" ? formData.method : "CASH",
+      method: formData.method,
       from: "",
       amount: "",
       date: getCurrentDate(),
@@ -284,11 +282,6 @@ export default function Payments() {
           `/api/admin/query-ticket?id=${encodeURIComponent(from)}`,
           {
             method: "GET",
-            headers: {
-              key: localStorage.getItem("school-token")
-                ? (localStorage.getItem("school-token") as string)
-                : (localStorage.getItem("admin-token") as string),
-            },
           }
         );
 
@@ -321,11 +314,6 @@ export default function Payments() {
         )}`,
         {
           method: "GET",
-          headers: {
-            key: localStorage.getItem("school-token")
-              ? (localStorage.getItem("school-token") as string)
-              : (localStorage.getItem("admin-token") as string),
-          },
         }
       );
 
@@ -365,11 +353,6 @@ export default function Payments() {
                   )}&identification=${encodeURIComponent(idList.join(","))}`,
                   {
                     method: "GET",
-                    headers: {
-                      key: localStorage.getItem("school-token")
-                        ? (localStorage.getItem("school-token") as string)
-                        : (localStorage.getItem("admin-token") as string),
-                    },
                   }
                 );
 
@@ -388,8 +371,6 @@ export default function Payments() {
                   if (parseInt(amount) - paid > 0) {
                     formData.amount = (paid - parseInt(amount)).toString();
                   } else {
-                    formData.method =
-                      type == "admin" ? formData.method : "CASH";
                     formData.from = "";
                     formData.amount = "";
                     formData.date = getCurrentDate();
@@ -415,6 +396,19 @@ export default function Payments() {
 
   return (
     <section id="admin-payments">
+      {type === "admin" && (
+        <>
+          {/* Floating Button to redirect to manage account holders */}
+          <button
+            className={styles.manageAccountHoldersButton}
+            onClick={() => router.push("/admin/manage-account-holders")}
+            title="Manage Account Holders"
+          >
+            <UserCheck2 />
+            Manage Account Holders
+          </button>
+        </>
+      )}
       <div
         className={styles.pageContainer}
         style={type == "school" ? { height: "100vh !important" } : {}}
