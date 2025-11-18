@@ -124,7 +124,7 @@ export default function GroupTickets() {
         name4: formData.names[3],
         email4: formData.emails[3],
         phone: formData.phone,
-        paymentMethod: formData.paymentMethod,
+        paymentMethod: formData.paymentMethod === "ONLINE" ? "CARD" : formData.paymentMethod,
       }),
     });
 
