@@ -150,7 +150,12 @@ export default function Payments() {
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
-        const res = await fetch("/api/admin/auth").then((res) => res.json());
+        const resp = await fetch("/api/admin/auth");
+        const res = await resp.json();
+        if (!resp.ok) {
+          router.push("/admin/login");
+          return;
+        }
         const allowedMethods = (res.methods as string[]) ?? [];
         setType(res.role === "admin" ? "admin" : "school");
 
@@ -237,17 +242,6 @@ export default function Payments() {
       [name]: value,
     });
   };
-
-  useEffect(() => {
-    fetch("/api/admin/auth")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.role) router.push("/admin/login");
-      })
-      .catch(() => {
-        router.push("/admin/login");
-      });
-  }, [router]);
 
   const resetForm = () => {
     formData.from = "";
