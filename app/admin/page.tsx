@@ -451,18 +451,6 @@ export default function AdminDashboard() {
     );
   }
 
-  // Redirect if no token is found
-  useEffect(() => {
-    fetch("/api/admin/auth")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.role) router.push("/admin/login");
-      })
-      .catch(() => {
-        router.push("/admin/login");
-      });
-  }, [router]);
-
   // Fetch applicants from API
 
   // Intersection Observer to implement infinite scroll
@@ -501,9 +489,9 @@ export default function AdminDashboard() {
         if (response.status === 401) {
           router.push("/admin/login");
         } else {
-          setHasMore(false);
           customAlert("Failed to fetch applicants.");
         }
+        setHasMore(false);
       }
 
       setLoading(false);
