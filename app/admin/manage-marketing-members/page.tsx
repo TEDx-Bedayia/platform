@@ -24,16 +24,6 @@ const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function MarketingMembers() {
   const router = useRouter();
-  useEffect(() => {
-    fetch("/api/admin/auth")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.role) router.push("/admin/login");
-      })
-      .catch(() => {
-        router.push("/admin/login");
-      });
-  }, [router]);
 
   const [members, setMembers] = useState<MarketingMember[]>([]);
   const [rushHourDate, setRushHourDate] = useState<Date | null>(null);
@@ -54,15 +44,17 @@ export default function MarketingMembers() {
         "/api/admin/manage-marketing-members/members"
       );
       const data = await response.json();
-      if (data.members) {
-        setMembers(data.members);
-      } else {
-        customAlert(data.message || "Failed to fetch members");
-      }
+
       setIsLoading(false);
       if (response.status === 401) {
         router.push("/admin/login");
         return;
+      }
+
+      if (data.members) {
+        setMembers(data.members);
+      } else {
+        customAlert(data.message || "Failed to fetch members");
       }
     } catch (error) {
       customAlert("Failed to fetch members.");
@@ -75,6 +67,12 @@ export default function MarketingMembers() {
         "/api/admin/manage-marketing-members/member-activity"
       );
       const data = await response.json();
+
+      if (response.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+
       if (data.activity) {
         // Group by createdAt DATE without TIME then by memberId
         const groupedActivity = data.activity.reduce((acc: any, item: any) => {
@@ -102,10 +100,6 @@ export default function MarketingMembers() {
       } else {
         customAlert(data.message || "Failed to fetch member activity");
       }
-      if (response.status === 401) {
-        router.push("/admin/login");
-        return;
-      }
     } catch (error) {
       customAlert("Error fetching member activity.");
     }
@@ -123,6 +117,13 @@ export default function MarketingMembers() {
           }
         );
         const data = await response.json();
+
+        if (response.status === 401) {
+          router.push("/admin/login");
+          removeLoader();
+          return;
+        }
+
         if (data.date) {
           setRushHourDate(new Date(data.date));
         } else {
