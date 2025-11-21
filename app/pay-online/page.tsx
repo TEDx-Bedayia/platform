@@ -72,7 +72,11 @@ export default function Page() {
       if (storedData)
         setCustomer({ ...JSON.parse(storedData), paymentMethod: "TLDA" });
       else router.push("/book");
-    } catch {}
+    } catch (err) {
+      console.error("Failed to load checkout data from sessionStorage:", err);
+      customAlert("There was a problem loading your booking details. Please try again.");
+      router.push("/book?error=invalid_checkout_data");
+    }
   }, [router]);
 
   const activeMethod = customer.paymentMethod || "TLDA";
