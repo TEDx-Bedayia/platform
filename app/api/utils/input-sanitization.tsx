@@ -74,8 +74,14 @@ export function verifyPaymentMethod(paymentMethod: string): string | undefined {
 
   if (metadata && !checkSafety(metadata)) return;
   if (method === "VFCASH") {
-    if (!checkPhone(metadata)) return;
+    if (!metadata || !checkPhone(metadata)) return;
     paymentMethod = "VFCASH@0" + metadata;
+  }
+
+  if (method === "TLDA" || method === "IPN") {
+    if (!metadata) return;
+    const alphaNumeric = /^[a-zA-Z0-9_.]+$/;
+    if (!alphaNumeric.test(metadata)) return;
   }
 
   return paymentMethod;
@@ -89,7 +95,7 @@ export function checkSafety(str: string): boolean {
 }
 
 export function checkPhone(str: string): boolean {
-  const alphaNumericAndSymbols = /^[0-9+]*$/;
-  if (alphaNumericAndSymbols.test(str) && str.length >= 10) return true;
+  const numbers = /^[0-9+]*$/;
+  if (str && numbers.test(str) && str.length >= 10) return true;
   return false;
 }
