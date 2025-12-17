@@ -203,16 +203,16 @@ export default function Home() {
         </section>
         <section>
           <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">
-            Countdown
+            4/2/2026
           </div>
         </section>
       </center>
 
-      <section>
+      {/* <section>
         <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">
           Total attendee count: 40000+
         </div>
-      </section>
+      </section> */}
 
       <section className="testimonials">
         <div className="testimonial-slider">
@@ -290,7 +290,7 @@ export default function Home() {
                 ></Image>
               </span>{" "}
               is the precise moment when pressure, ideas, and forces converge — igniting change that cannot be undone. 
-              It is where silence breaks, movements begin, and the future shifts course. TEDxEventName: Flashpoint explores these 
+              It is where silence breaks, movements begin, and the future shifts course. Flashpoint explores these 
               critical moments of impact, when bold ideas challenge the status quo and spark transformation. These talks are not 
               about gradual change, but about the instant when everything changes — urging us to recognize our own flashpoints and 
               act with intention, courage, and clarity.
@@ -298,6 +298,8 @@ export default function Home() {
           </center>
         </div>
       </section>
+
+      
 
       <section
         id="info"
