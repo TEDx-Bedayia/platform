@@ -186,11 +186,11 @@ export default function Home() {
                 transition={{ ease: "easeInOut", duration: 0.75 }}
               >
                 <div className="secondary-wrapper relative mt-4 hover:-translate-y-2">
-                  <div className="absolute right-0 top-0 z-10 flex items-center justify-center rounded-full bg-[#6096E1] px-4 py-[0.375rem] max-phone:right-[-1rem] max-phone:top-[-1rem]">
+                  <div className="absolute right-0 top-0 z-10 flex items-center justify-center rounded-full bg-[#FBED0E] px-4 py-[0.375rem] max-phone:right-[-1rem] max-phone:top-[-1rem]">
                     <span className="font-special">15% OFF!</span>
                   </div>
                   <button
-                    className="max-phone:border-3 absolute bottom-0 left-0 w-[16.25rem] shrink-0 items-center justify-center rounded-2xl border-4 border-solid border-[#6096E1] bg-transparent py-5 text-center font-button max-phone:w-[16rem] max-phone:py-[0.9375rem]"
+                    className="max-phone:border-3 absolute bottom-0 left-0 w-[16.25rem] shrink-0 items-center justify-center rounded-2xl border-4 border-solid border-[#FBED0E] bg-transparent py-5 text-center font-button max-phone:w-[16rem] max-phone:py-[0.9375rem]"
                     style={{ ...button.style }}
                     onClick={() => (window.location.href = "/book/group")}
                   >
@@ -217,28 +217,28 @@ export default function Home() {
       <section className="testimonials">
         <div className="testimonial-slider">
           <div className="testimonial">
-            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
-            <p>- Ahmed mohsen</p>
+            <p className="testimonialText">&quot;TEDx hosts a beautiful culmination of knowledge and entertainment, curated to ensure you have the best of times&quot;</p>
+            <p>- Kareem</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
-            <p>- Ahmed mohsen</p>
+            <p className="testimonialText">&quot;I liked how TEDx had a diverse genre of topics that the speakers spoke about&quot;</p>
+            <p>- Abdelrahman El-Kalla</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
-            <p>- Ahmed mohsen</p>
+            <p className="testimonialText">&quot;The food tasted well and the speakers were fun&quot;</p>
+            <p>- Ibrahim Dawood</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
-            <p>- Ahmed mohsen</p>
+            <p className="testimonialText">&quot;The speaker lounge was perfect&quot;</p>
+            <p>- Omar Emara</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
-            <p>- Ahmed mohsen</p>
+            <p className="testimonialText">&quot;Very interactive audience, making the talks relatable&quot;</p>
+            <p>- Jude Ahmed</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;This was such a fascinating event that i loved&quot;</p>
-            <p>- Ahmed mohsen</p>
+            <p className="testimonialText">&quot;Best event you'll ever go to\!&quot;</p>
+            <p>- Omar Mohamed El-Mandooh</p>
           </div>
         </div>
       </section>
@@ -273,15 +273,13 @@ export default function Home() {
               className="mt-4 w-[40rem] text-center font-body text-gray-200 max-tablet:mt-2 max-phone:mt-3 max-phone:w-[85vw]"
               style={{ lineHeight: "2rem", ...ubuntu.style }}
             >
-              Time, like a vast and endless chamber, carries the echoes of
-              voices, dreams, and actions that ripple throughout generations.
-              The{" "}
+              The {" "}
               <span
-                className="align-start m-0 inline-flex w-max justify-start rounded-[0.75rem] bg-accent py-1 pl-4 pr-2 font-bold"
+                className="align-start m-0 inline-flex w-max justify-start rounded-[0.75rem] bg-[#FE0000] py-1 pl-4 pr-2 font-bold"
                 style={{ lineHeight: "1rem" }}
               >
                 <span>
-                  <span style={{ color: "#F9F9F9" }}>Echoes of Time</span>
+                  <span style={{ color: "#F9F9F9" }}>Flashpoint</span>
                 </span>
                 <Image
                   className="h-4 w-4"
@@ -291,11 +289,11 @@ export default function Home() {
                   alt="Impactful Unique TEDx Event and Ideas"
                 ></Image>
               </span>{" "}
-              remind us that each idea shared and every story told reverberates
-              through history, shaping the present and inspiring the future.
-              These echoes are not merely remnants of the past; they are calls
-              to action, urging us to embrace their lessons and create a legacy
-              that resonates for years to come.
+              is the precise moment when pressure, ideas, and forces converge — igniting change that cannot be undone. 
+              It is where silence breaks, movements begin, and the future shifts course. TEDxEventName: Flashpoint explores these 
+              critical moments of impact, when bold ideas challenge the status quo and spark transformation. These talks are not 
+              about gradual change, but about the instant when everything changes — urging us to recognize our own flashpoints and 
+              act with intention, courage, and clarity.
             </p>
           </center>
         </div>
