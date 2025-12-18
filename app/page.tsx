@@ -237,7 +237,7 @@ export default function Home() {
             <p>- Jude Ahmed</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;Best event you'll ever go to\!&quot;</p>
+            <p className="testimonialText">&quot;Best event you&apos;ll ever go to&quot;</p>
             <p>- Omar Mohamed El-Mandooh</p>
           </div>
         </div>
