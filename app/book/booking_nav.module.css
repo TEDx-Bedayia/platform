@@ -55,7 +55,7 @@
 }
 
 .mainBookingContainer {
-  background-image: url("/asfalt-light.png");
+  background-image: url("/asfalt-dark.png");
   display: flex;
   flex-direction: column;
   align-items: center;
