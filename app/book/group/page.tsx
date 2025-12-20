@@ -109,6 +109,28 @@ export default function GroupTickets() {
       formData.names[3] = formData.names[0];
     }
 
+    if (formData.paymentMethod === "ONLINE") {
+      const dataToSendOver = {
+        name: formData.names[0],
+        email: formData.emails[0],
+        phone: formData.phone,
+        price: GROUP_TICKET_PRICE * 4,
+        type: TicketType.GROUP,
+        extraNames: [formData.names[1], formData.names[2], formData.names[3]],
+        extraEmails: [
+          formData.emails[1],
+          formData.emails[2],
+          formData.emails[3],
+        ],
+      };
+
+      sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
+
+      router.push("/pay-online");
+      removeLoader();
+      return;
+    }
+
     const response = await fetch("/api/tickets/group", {
       method: "POST",
       headers: {
@@ -124,23 +146,11 @@ export default function GroupTickets() {
         name4: formData.names[3],
         email4: formData.emails[3],
         phone: formData.phone,
-        paymentMethod: formData.paymentMethod === "ONLINE" ? "CARD" : formData.paymentMethod,
+        paymentMethod: formData.paymentMethod,
       }),
     });
 
     if (response.ok) {
-      if (formData.paymentMethod === "ONLINE") {
-        const { paymentUrl } = await response.json();
-        if (paymentUrl) {
-          router.push(paymentUrl);
-        } else {
-          customAlert(
-            "Payment URL is missing. Please try again or contact support."
-          );
-        }
-        removeLoader();
-        return;
-      }
       setFormData({
         emails: ["", "", "", ""],
         names: ["", "", "", ""],
