@@ -74,39 +74,24 @@ export default function Page() {
       else router.push("/book");
     } catch (err) {
       console.error("Failed to load checkout data from sessionStorage:", err);
-      customAlert("There was a problem loading your booking details. Please try again.");
+      customAlert(
+        "There was a problem loading your booking details. Please try again."
+      );
       router.push("/book?error=invalid_checkout_data");
     }
   }, [router]);
 
-  const activeMethod = customer.paymentMethod || "TLDA";
+  const activeMethod = customer.paymentMethod || paymentOptions.TLDA.identifier;
   const currentOption = paymentOptions[activeMethod];
-
-  const activeClassName = styles.payment_option_active;
 
   const PaymentOption: FC<PaymentOptionProps> = ({ methodKey, name, Icon }) => {
     const isActive = activeMethod === methodKey;
 
-    const optionClassName = [
-      styles.payment_option,
-      isActive ? activeClassName : "",
-    ]
-      .join(" ")
-      .trim();
-
-    const iconColorStyle: CSSProperties = {
-      color: isActive ? "#4f46e5" : "#4b5563",
-    };
-    const indicatorStyle: CSSProperties = isActive
-      ? {
-          backgroundColor: "#4f46e5",
-          borderColor: "white",
-        }
-      : {};
-
     return (
       <div
-        className={optionClassName}
+        className={`${styles.payment_option}${
+          isActive ? ` ${styles.active}` : ""
+        }`}
         onClick={() => {
           if (!isActive) {
             setCustomer((prev) => ({
@@ -120,15 +105,10 @@ export default function Page() {
           }));
         }}
       >
-        <span className={styles.payment_option_icon} style={iconColorStyle}>
+        <span className={styles.payment_option_icon}>
           <Icon />
         </span>
         <span className={styles.payment_option_name}>{name}</span>
-
-        <div
-          className={styles.payment_option_indicator}
-          style={indicatorStyle}
-        ></div>
       </div>
     );
   };
@@ -286,7 +266,7 @@ export default function Page() {
                       if (!/^\d*$/.test(e.target.value)) return;
                       if (e.target.value.length > 10) return;
                     } else if (currentOption.field.type === "alphanumeric") {
-                      if (!/^[a-zA-Z0-9]*$/.test(e.target.value)) return;
+                      if (!/^[a-zA-Z0-9\-_.]*$/.test(e.target.value)) return;
                     }
                     setCustomer((prev) => ({
                       ...prev,
