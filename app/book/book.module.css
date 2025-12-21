@@ -9,8 +9,6 @@
 
 .container,
 .successContainer {
-  background-image: url("/asfalt-dark.png");
-
   color: #fff; /* White text for readability */
   margin: 0;
   padding: 0;
@@ -19,10 +17,37 @@
   align-items: center;
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
   width: 100vw !important;
   flex-direction: column;
   margin-top: 4rem;
+}
+
+/* The entire scrollbar */
+.container::-webkit-scrollbar,
+.successContainer::-webkit-scrollbar {
+  width: 10px; /* Width of vertical scrollbar */
+  height: 10px; /* Height of horizontal scrollbar */
+}
+
+/* The track (background) */
+.container::-webkit-scrollbar-track,
+.successContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+/* The thumb (draggable handle) */
+.container::-webkit-scrollbar-thumb,
+.successContainer::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+/* The thumb on hover */
+.container::-webkit-scrollbar-thumb:hover,
+.successContainer::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .container h1 {
@@ -328,7 +353,7 @@
 
 .container button[type="submit"],
 .codeInputDialog button {
-  background-color: #FE0000;
+  background-color: #fe0000;
   /* background: linear-gradient(45deg, #007bff, #0056b3); */
   color: #fff;
   padding: 12px 0px;
@@ -352,7 +377,7 @@
 
 .schoolOfficeButton {
   background-color: transparent;
-  border: #FBED0E 4px solid;
+  border: #fbed0e 4px solid;
   color: #fff;
   padding: 12px 0px;
   text-align: center;
