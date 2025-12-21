@@ -91,7 +91,10 @@ function hasAccess(userRole: UserRole, resource: ProtectedResource): boolean {
       UserRole.PAYMENT_HANDLER,
       UserRole.SCHOOL_OFFICE,
     ],
-    [ProtectedResource.PAYMENT_LOGS]: [UserRole.ADMIN],
+    [ProtectedResource.PAYMENT_LOGS]: [
+      UserRole.ADMIN,
+      UserRole.PAYMENT_HANDLER,
+    ],
     [ProtectedResource.SUPER_ADMIN]: [UserRole.ADMIN],
     [ProtectedResource.QUERY_TICKETS]: [UserRole.ADMIN, UserRole.SCHOOL_OFFICE],
     [ProtectedResource.INVITATIONS]: [UserRole.ADMIN],
