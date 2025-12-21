@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { TicketType } from "../../utils/ticket-types";
+import { TicketType } from "../../../ticket-types";
 import { price } from "./prices";
 
 export async function GET(request: NextRequest) {

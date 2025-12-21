@@ -1,3 +1,4 @@
+import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
 import { type NextRequest } from "next/server";
 import { pay } from "../main";
 
@@ -6,10 +7,7 @@ export const maxDuration = 15;
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY ||
-    !process.env.ADMIN_KEY
-  ) {
+  if (!canUserAccess(request, ProtectedResource.PAYMENT_DASHBOARD, "IPN")) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

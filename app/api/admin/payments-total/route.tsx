@@ -1,13 +1,11 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
-import { TicketType } from "../../utils/ticket-types";
+import { canUserAccess, ProtectedResource } from "../../utils/auth";
 
 export async function GET(request: NextRequest) {
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY ||
-    !process.env.ADMIN_KEY
-  ) {
+  if (!canUserAccess(request, ProtectedResource.PAYMENT_LOGS)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

@@ -53,7 +53,7 @@ export default function RefundPolicy() {
           <li>
             If the event is <strong>canceled</strong> by the organizers, ticket
             holders will receive a full refund to the original payment method
-            (for PayMob payments) or in cash (for school office payments).
+            (for online payments) or in cash (for school office payments).
           </li>
           <li>
             If the event is <strong>rescheduled</strong>, existing eTickets will

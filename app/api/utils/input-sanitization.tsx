@@ -1,11 +1,11 @@
-import { getIdentifiersForPaymentMethods } from "../tickets/payment-methods/payment-methods";
+import { getIdentifiersForPaymentMethods } from "../../payment-methods";
 
 export function verifyEmail(email: string | undefined): boolean {
   if (email === undefined) {
     return false;
   }
 
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (emailRegex.test(email.trim())) {
     return true;
   }
@@ -61,21 +61,30 @@ export function handleMisspelling(email: string): string {
   return email;
 }
 
-export async function verifyPaymentMethod(
-  paymentMethod: string
-): Promise<string | undefined> {
+export function verifyPaymentMethod(paymentMethod: string): string | undefined {
   const method = paymentMethod.split("@")[0];
   let metadata = paymentMethod.split("@")[1];
   if (metadata && metadata.includes("@")) {
     return;
   }
-  const options = getIdentifiersForPaymentMethods();
+  const options = getIdentifiersForPaymentMethods().map((id) => id.toString());
   if (!paymentMethod || !options.includes(method)) {
     return;
   }
 
-  if (checkSafety(metadata)) return paymentMethod;
-  return;
+  if (metadata && !checkSafety(metadata)) return;
+  if (method === "VFCASH") {
+    if (!metadata || !checkPhone(metadata)) return;
+    paymentMethod = "VFCASH@0" + metadata;
+  }
+
+  if (method === "TLDA" || method === "IPN") {
+    if (!metadata) return;
+    const alphaNumeric = /^[a-zA-Z0-9_.]+$/;
+    if (!alphaNumeric.test(metadata)) return;
+  }
+
+  return paymentMethod;
 }
 
 export function checkSafety(str: string): boolean {
@@ -86,16 +95,7 @@ export function checkSafety(str: string): boolean {
 }
 
 export function checkPhone(str: string): boolean {
-  const alphaNumericAndSymbols = /^[0-9+]*$/;
-  if (alphaNumericAndSymbols.test(str)) return true;
+  const numbers = /^[0-9+]*$/;
+  if (str && numbers.test(str) && str.length >= 10) return true;
   return false;
-}
-
-export function generateRandomString(length: number) {
-  const characters = "abcdefghijklmnopqrstuvwxyz";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
 }

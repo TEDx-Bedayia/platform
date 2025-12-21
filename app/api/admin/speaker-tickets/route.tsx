@@ -12,16 +12,14 @@ import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import path from "path";
-import { TicketType } from "../../utils/ticket-types";
+import { TicketType } from "../../../ticket-types";
+import { canUserAccess, ProtectedResource } from "../../utils/auth";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY ||
-    !process.env.ADMIN_KEY
-  ) {
+  if (!canUserAccess(request, ProtectedResource.INVITATIONS)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

@@ -1,29 +1,18 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
+import { canUserAccess, ProtectedResource } from "../../utils/auth";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import { sendEmail } from "../payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../payment-reciever/main";
 
-// Handler for POST requests
 export async function POST(request: NextRequest) {
-  if (process.env.ADMIN_KEY === undefined || !process.env.ADMIN_KEY) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (request.headers.get("key") !== process.env.ADMIN_KEY) {
+  if (!canUserAccess(request, ProtectedResource.TICKET_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   const { id, email } = await request.json();
 
   try {
-    // Update the admitted status for the specified applicant
-    const applicant = await sql`SELECT * FROM attendees WHERE id = ${id}`;
-    const oldEmail = applicant.rows[0].email;
-
     const result = await sql.query(
       "UPDATE attendees SET email = $1 WHERE id = $2 RETURNING *",
       [email, id]
@@ -36,23 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (result.rows[0].type === "group") {
-      await sql`
-        UPDATE groups
-        SET 
-          email1 = CASE WHEN email1 = ${oldEmail} THEN ${email} ELSE email1 END,
-          email2 = CASE WHEN email2 = ${oldEmail} THEN ${email} ELSE email2 END,
-          email3 = CASE WHEN email3 = ${oldEmail} THEN ${email} ELSE email3 END,
-          email4 = CASE WHEN email4 = ${oldEmail} THEN ${email} ELSE email4 END
-        WHERE 
-          email1 = ${oldEmail} OR 
-          email2 = ${oldEmail} OR 
-          email3 = ${oldEmail} OR 
-          email4 = ${oldEmail}
-      `;
-    }
-
-    if (result.rows[0].paid === false) {
+    if (
+      result.rows[0].paid === false &&
+      result.rows[0].payment_method.toString().split("@")[0] === "CASH"
+    ) {
       await sendBookingConfirmation(
         result.rows[0].payment_method,
         result.rows[0].full_name,

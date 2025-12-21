@@ -1,4 +1,6 @@
-> Welcome to the main documentation for TEDx'25 at Bedayia School.
+# TEDx Bedayia
+
+> Welcome to the main documentation for TEDx at Bedayia School.
 
 **Author**: Aly Mobarak.
 

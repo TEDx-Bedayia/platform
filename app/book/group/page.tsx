@@ -1,11 +1,13 @@
 "use client";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styles from "../book.module.css";
 
-import { motion } from "framer-motion";
-
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
+import { GROUP_TICKET_PRICE } from "@/app/metadata";
+import { TicketType } from "@/app/ticket-types";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
 import { addLoader, removeLoader } from "../../global_components/loader";
@@ -14,12 +16,12 @@ const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function GroupTickets() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     emails: ["", "", "", ""],
     names: ["", "", "", ""],
     phone: "",
     paymentMethod: "",
-    additionalFields: {} as { [key: string]: string },
   });
 
   const [useSameEmail, setUseSameEmail] = useState(true);
@@ -107,6 +109,28 @@ export default function GroupTickets() {
       formData.names[3] = formData.names[0];
     }
 
+    if (formData.paymentMethod === "ONLINE") {
+      const dataToSendOver = {
+        name: formData.names[0],
+        email: formData.emails[0],
+        phone: formData.phone,
+        price: GROUP_TICKET_PRICE * 4,
+        type: TicketType.GROUP,
+        extraNames: [formData.names[1], formData.names[2], formData.names[3]],
+        extraEmails: [
+          formData.emails[1],
+          formData.emails[2],
+          formData.emails[3],
+        ],
+      };
+
+      sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
+
+      router.push("/pay-online");
+      removeLoader();
+      return;
+    }
+
     const response = await fetch("/api/tickets/group", {
       method: "POST",
       headers: {
@@ -123,24 +147,17 @@ export default function GroupTickets() {
         email4: formData.emails[3],
         phone: formData.phone,
         paymentMethod: formData.paymentMethod,
-        additionalFields: formData.additionalFields,
       }),
     });
 
     if (response.ok) {
-      if (formData.paymentMethod === "CARD") {
-        const { paymentUrl } = await response.json();
-        window.location.href = paymentUrl;
-        return;
-      }
       setFormData({
         emails: ["", "", "", ""],
         names: ["", "", "", ""],
         phone: "",
         paymentMethod: "",
-        additionalFields: {} as { [key: string]: string },
       });
-      setUseSameEmail(false);
+      setUseSameEmail(true);
       customAlert((await response.json()).message ?? "Submitted.");
       setCurrentPerson(0);
     } else {
@@ -170,10 +187,10 @@ export default function GroupTickets() {
             marginBottom: ".5rem",
           }}
         >
-          1, 400 EGP
+          {(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP
         </h2>
         <h2 style={{ ...title.style, fontWeight: 100, fontSize: ".75em" }}>
-          350 EGP/Person
+          {GROUP_TICKET_PRICE.toLocaleString()} EGP/Person
         </h2>
       </motion.div>
       <motion.div
@@ -224,7 +241,13 @@ export default function GroupTickets() {
                   checked={!useSameEmail}
                   onChange={(e) => {
                     setUseSameEmail(!e.target.checked);
-                    if (!e.target.checked) {
+                    if (useSameEmail) {
+                      setFormData({
+                        ...formData,
+                        emails: [formData.emails[0], "", "", ""],
+                        names: [formData.names[0], "", "", ""],
+                      });
+                    } else {
                       setFormData({
                         ...formData,
                         emails: [
@@ -232,6 +255,12 @@ export default function GroupTickets() {
                           formData.emails[0],
                           formData.emails[0],
                           formData.emails[0],
+                        ],
+                        names: [
+                          formData.names[0],
+                          formData.names[0],
+                          formData.names[0],
+                          formData.names[0],
                         ],
                       });
                     }
@@ -241,7 +270,13 @@ export default function GroupTickets() {
                   className={styles.checkMark}
                   onClick={() => {
                     setUseSameEmail(!useSameEmail);
-                    if (!useSameEmail) {
+                    if (useSameEmail) {
+                      setFormData({
+                        ...formData,
+                        emails: [formData.emails[0], "", "", ""],
+                        names: [formData.names[0], "", "", ""],
+                      });
+                    } else {
                       setFormData({
                         ...formData,
                         emails: [
@@ -249,6 +284,12 @@ export default function GroupTickets() {
                           formData.emails[0],
                           formData.emails[0],
                           formData.emails[0],
+                        ],
+                        names: [
+                          formData.names[0],
+                          formData.names[0],
+                          formData.names[0],
+                          formData.names[0],
                         ],
                       });
                     }
@@ -372,16 +413,14 @@ export default function GroupTickets() {
                   type="submit"
                   style={{ ...title.style, width: "100%", marginTop: "12px" }}
                   onClick={() => {
-                    formData.paymentMethod = "CARD";
+                    formData.paymentMethod = "ONLINE";
                   }}
                 >
                   Pay Online
                 </button>
               </motion.div>
 
-              <div className="flex items-center justify-center mt-4 mb-4 font-bold">
-                OR
-              </div>
+              <div className="flex items-center justify-center mt-2 mb-2 font-bold"></div>
 
               <motion.div
                 initial={{ opacity: 0.2 }}

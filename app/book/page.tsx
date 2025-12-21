@@ -1,28 +1,26 @@
 "use client";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "./book.module.css";
 
-import { motion } from "framer-motion";
-
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../admin/custom-alert";
-import {
-  Field,
-  PaymentMethod,
-} from "../api/tickets/payment-methods/payment-methods";
 import "./htmlcolor.css";
 
 import { addLoader, removeLoader } from "../global_components/loader";
+import { INDIVIDUAL_TICKET_PRICE } from "../metadata";
+import { TicketType } from "../ticket-types";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function SingleTickets() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     name: "",
     phone: "",
     paymentMethod: "",
-    additionalFields: {} as { [key: string]: string },
   });
 
   const [code, setCode] = useState("");
@@ -193,7 +191,7 @@ export default function SingleTickets() {
                   ref={(el) => {
                     inputRefs.current[adjustedIndex] = el;
                   }}
-                  className="border-b border-white w-8 text-center outline-none"
+                  className="border-b rounded-sm border-white w-8 text-center outline-none"
                   contentEditable
                   suppressContentEditableWarning
                   onInput={(e) => handleInput(e, adjustedIndex)}
@@ -322,6 +320,22 @@ export default function SingleTickets() {
       return;
     }
 
+    if (type === "ONLINE") {
+      const dataToSendOver = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        price: INDIVIDUAL_TICKET_PRICE,
+        type: TicketType.INDIVIDUAL,
+      };
+
+      sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
+
+      router.push("/pay-online");
+      removeLoader();
+      return;
+    }
+
     const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
@@ -340,14 +354,13 @@ export default function SingleTickets() {
           name: "",
           phone: "",
           paymentMethod: "",
-          additionalFields: {},
         });
         setCode("");
         removeLoader();
         return;
       }
 
-      window.location.href = jsonRes.paymentUrl;
+      if (jsonRes.paymentUrl) router.push(jsonRes.paymentUrl);
       return;
     } else {
       customAlert((await response.json()).message ?? "An Error Occurred.");
@@ -361,7 +374,7 @@ export default function SingleTickets() {
     document.body.focus();
 
     if (code !== "") await submitTicket("CASH");
-    else await submitTicket(formData.paymentMethod || "CARD");
+    else await submitTicket(formData.paymentMethod || "ONLINE");
   }
 
   return (
@@ -376,7 +389,9 @@ export default function SingleTickets() {
           Book a Ticket
         </h1>
         <h2 style={{ ...title.style, fontWeight: 900, color: "#F9F9F9" }}>
-          {code ? "Paid Ticket!" : "400 EGP"}
+          {code
+            ? "Paid Ticket!"
+            : `${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`}
         </h2>
       </motion.div>
       <motion.div
@@ -448,9 +463,7 @@ export default function SingleTickets() {
           </motion.div>
           {code === "" && (
             <>
-              <div className="flex items-center justify-center mt-4 mb-4 font-bold">
-                OR
-              </div>
+              <div className="flex items-center justify-center mt-2 mb-2 font-bold"></div>
 
               <motion.div
                 initial={{ scale: 2, opacity: 0.2 }}

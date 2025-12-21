@@ -1,8 +1,9 @@
 import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { TicketType } from "../../ticket-types";
 import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
-import { pay, safeRandUUID } from "../admin/payment-reciever/main";
+import { safeRandUUID } from "../admin/payment-reciever/main";
 import { initiateCardPayment } from "../utils/card-payment";
 import { sendBookingConfirmation } from "../utils/email-helper";
 import {
@@ -12,14 +13,12 @@ import {
   verifyEmail,
   verifyPaymentMethod,
 } from "../utils/input-sanitization";
-import { TicketType } from "../utils/ticket-types";
-import { getPaymentMethods } from "./payment-methods/payment-methods";
 import { price } from "./price/prices";
 
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {
   if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
-    if (process.env.ADMIN_KEY !== "dev")
+    if (process.env.PAYMOB_TEST_MODE !== "true")
       return Response.json(
         { message: "Ticket sales are currently closed." },
         { status: 400 }
@@ -35,13 +34,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let paymentMethod: string, name, email, phone, add, code;
+  let paymentMethod, name, email, phone, code;
   try {
     name = body.name?.toString().trim();
     email = body.email?.toString().trim().toLowerCase();
     phone = body.phone?.toString().trim();
-    paymentMethod = body.paymentMethod?.toString().trim()!;
-    add = body.additionalFields;
+    paymentMethod = body.paymentMethod?.toString().trim();
     if (body.code) code = body.code?.toString().trim();
   } catch (error) {
     return Response.json(
@@ -50,8 +48,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (add != undefined && add[paymentMethod.toLowerCase()] != undefined)
-    paymentMethod += "@" + add[paymentMethod.toLowerCase()].trim();
+  paymentMethod = verifyPaymentMethod(paymentMethod);
+  if (paymentMethod === undefined || paymentMethod.split("@").length > 2) {
+    return Response.json(
+      { message: "Please enter a valid payment method." },
+      { status: 400 }
+    );
+  }
 
   try {
     return await submitOneTicket(email!, name!, phone!, paymentMethod, code);
@@ -104,6 +107,15 @@ async function submitOneTicket(
 
   if (!checkSafety(name)) {
     return Response.json({ message: "Invalid Name." }, { status: 400 });
+  }
+
+  if (!verifyEmail(email)) {
+    return Response.json(
+      {
+        message: "Please enter a valid email address.",
+      },
+      { status: 400 }
+    );
   }
 
   let id;
@@ -179,6 +191,14 @@ async function submitOneTicket(
     }
 
     paymentUrl = (await initiateCardPaymentResponse.json()).paymentUrl;
+
+    return Response.json(
+      {
+        paymentUrl: paymentUrl,
+        success: true,
+      },
+      { status: 200 }
+    );
   }
 
   try {
@@ -194,15 +214,6 @@ async function submitOneTicket(
       );
     }
 
-    if (paymentMethod === "CARD") {
-      return Response.json(
-        {
-          paymentUrl: paymentUrl,
-          success: true,
-        },
-        { status: 200 }
-      );
-    }
     return Response.json(
       {
         message: `Ticket Booked Successfully! Please check your email to continue.${

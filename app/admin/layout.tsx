@@ -13,11 +13,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const [mode, setMode] = useState<"school" | "admin">("school");
+  const [mode, setMode] = useState<"other" | "admin">("other");
   useEffect(() => {
-    if (localStorage.getItem("admin-token")) {
-      setMode("admin");
-    }
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.role === "admin") setMode("admin");
+      });
   }, []);
   return (
     <div className={styles.adminContainer}>

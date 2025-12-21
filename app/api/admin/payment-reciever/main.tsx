@@ -1,9 +1,9 @@
 import { Applicant } from "@/app/admin/types/Applicant";
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
+import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
 import { ResponseCode } from "../../utils/response-codes";
-import { TicketType } from "../../utils/ticket-types";
 import { sendEmail } from "./eTicketEmail";
 
 export async function safeRandUUID() {
@@ -22,12 +22,7 @@ export async function pay(
   date: string,
   id_if_needed: string
 ) {
-  if (
-    process.env.ADMIN_KEY === undefined ||
-    !process.env.ADMIN_KEY ||
-    !process.env.SKL_OFFICE ||
-    process.env.SKL_OFFICE === undefined
-  ) {
+  if (process.env.JWT_SECRET === undefined) {
     return Response.json(
       { message: "Key is not set. Contact the maintainer." },
       { status: 500 }
@@ -37,10 +32,10 @@ export async function pay(
   const client = await sql.connect();
 
   if (parseInt(amount) < 0) {
-    await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from.replaceAll(
-      "@",
-      " "
-    )}, 0, ${amount}, ${date})`;
+    const [first, ...rest] = from.split("@");
+    const parsedFrom = first + "@" + rest.join(" ");
+
+    await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${parsedFrom}, 0, ${amount}, ${date})`;
     client.release();
     return Response.json(
       { refund: true, message: "Refund Inserted." },

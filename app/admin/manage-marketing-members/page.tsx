@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
+import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import {
   check,
@@ -12,6 +13,7 @@ import {
 } from "@/app/icons";
 import { motion } from "framer-motion";
 import { Poppins, Ubuntu } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { customAlert } from "../custom-alert";
 import { MarketingMember } from "../types/MarketingMember";
 import styles from "./marketing-members.module.css"; // Import CSS styles
@@ -21,17 +23,9 @@ const title = Poppins({ weight: "700", subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
 
 export default function MarketingMembers() {
-  useEffect(() => {
-    if (
-      !localStorage.getItem("admin-token") &&
-      !localStorage.getItem("marketing-token")
-    ) {
-      window.location.href = "/admin/login";
-    }
-  }, []);
+  const router = useRouter();
 
   const [members, setMembers] = useState<MarketingMember[]>([]);
-  const [password, setPassword] = useState<string>("Loading...");
   const [rushHourDate, setRushHourDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -45,56 +39,40 @@ export default function MarketingMembers() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   async function fetchMembers() {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     try {
       const response = await fetch(
-        "/api/admin/manage-marketing-members/members",
-        {
-          headers: {
-            key: token,
-          },
-        }
+        "/api/admin/manage-marketing-members/members"
       );
       const data = await response.json();
+
+      setIsLoading(false);
+      if (response.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+
       if (data.members) {
         setMembers(data.members);
       } else {
         customAlert(data.message || "Failed to fetch members");
       }
-      setIsLoading(false);
     } catch (error) {
       customAlert("Failed to fetch members.");
     }
   }
 
   async function fetchMemberActivity() {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     try {
       const response = await fetch(
-        "/api/admin/manage-marketing-members/member-activity",
-        {
-          headers: {
-            key: token,
-          },
-        }
+        "/api/admin/manage-marketing-members/member-activity"
       );
       const data = await response.json();
+
+      if (response.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+
       if (data.activity) {
         // Group by createdAt DATE without TIME then by memberId
         const groupedActivity = data.activity.reduce((acc: any, item: any) => {
@@ -128,55 +106,24 @@ export default function MarketingMembers() {
   }
 
   useEffect(() => {
-    if (
-      !localStorage.getItem("admin-token") &&
-      !localStorage.getItem("marketing-token")
-    ) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     async function runEffect() {
       addLoader();
-
-      try {
-        const response = await fetch(
-          "/api/admin/manage-marketing-members/get-pass",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              key:
-                (localStorage.getItem("admin-token") ||
-                  localStorage.getItem("marketing-token")) ??
-                "",
-            },
-          }
-        );
-        const data = await response.json();
-        if (data.pass) {
-          setPassword(data.pass);
-        } else {
-          customAlert(data.message || "Failed to fetch password");
-        }
-      } catch (error) {
-        customAlert("Error fetching password.");
-      }
 
       try {
         const response = await fetch(
           "/api/admin/manage-marketing-members/rush-hour-date",
           {
             method: "GET",
-            headers: {
-              key:
-                (localStorage.getItem("admin-token") ||
-                  localStorage.getItem("marketing-token")) ??
-                "",
-            },
           }
         );
         const data = await response.json();
+
+        if (response.status === 401) {
+          router.push("/admin/login");
+          removeLoader();
+          return;
+        }
+
         if (data.date) {
           setRushHourDate(new Date(data.date));
         } else {
@@ -197,15 +144,6 @@ export default function MarketingMembers() {
   }, []);
 
   function createMember(name: string) {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     if (!name) {
       customAlert("Name is required.");
       return;
@@ -217,7 +155,6 @@ export default function MarketingMembers() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        key: token,
       },
       body: JSON.stringify({ name }),
     })
@@ -237,15 +174,6 @@ export default function MarketingMembers() {
   }
 
   function deleteMember(id: number) {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
     addLoader();
 
     fetch(
@@ -254,9 +182,6 @@ export default function MarketingMembers() {
       )}`,
       {
         method: "DELETE",
-        headers: {
-          key: token,
-        },
       }
     )
       .then((res) => {
@@ -271,33 +196,6 @@ export default function MarketingMembers() {
         }
       })
       .catch((error) => customAlert("Error deleting member."));
-  }
-
-  function deleteAllMembers() {
-    const token =
-      localStorage.getItem("admin-token") ||
-      localStorage.getItem("marketing-token");
-
-    if (!token) {
-      window.location.href = "/admin/login";
-      return;
-    }
-
-    fetch("/api/admin/manage-marketing-members/members?id=-1", {
-      method: "DELETE",
-      headers: {
-        key: token,
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          setMembers([]);
-          customAlert("All members deleted successfully.");
-        } else {
-          customAlert("Failed to delete all members");
-        }
-      })
-      .catch((error) => customAlert("Error deleting all members."));
   }
 
   return (
@@ -329,10 +227,6 @@ export default function MarketingMembers() {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
-                    key:
-                      (localStorage.getItem("admin-token") ||
-                        localStorage.getItem("marketing-token")) ??
-                      "",
                   },
                   body: JSON.stringify({ date: rushHourDate.toISOString() }),
                 }
@@ -410,10 +304,6 @@ export default function MarketingMembers() {
                           method: "POST",
                           headers: {
                             "Content-Type": "application/json",
-                            key:
-                              (localStorage.getItem("admin-token") ||
-                                localStorage.getItem("marketing-token")) ??
-                              "",
                           },
                           body: JSON.stringify({
                             memberId: Number(memberId),
@@ -443,6 +333,12 @@ export default function MarketingMembers() {
                               (m) => m.name
                             )} for rush hour / individual tickets on ${selectedDate}.`
                         );
+                      } else if (
+                        response.status ===
+                        ResponseCode.MARKETING_ACTIVITY_OUT_OF_SYNC
+                      ) {
+                        customAlert("Out of sync error. Refreshing data...");
+                        await fetchMemberActivity();
                       } else {
                         customAlert(
                           data.message || "Failed to accept tickets."
@@ -498,7 +394,7 @@ export default function MarketingMembers() {
 
               <div className={styles.detailContainer}>
                 <span>{shieldLock}</span>
-                <span>{password}</span>
+                <span>{member.password}</span>
               </div>
             </div>
 

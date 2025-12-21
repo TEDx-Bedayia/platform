@@ -1,15 +1,13 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
+import { canUserAccess, ProtectedResource } from "../../utils/auth";
 import { sendEmail } from "../payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
-  if (
-    request.headers.get("key") !== process.env.ADMIN_KEY ||
-    !process.env.ADMIN_KEY
-  ) {
+  if (!canUserAccess(request, ProtectedResource.TICKET_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

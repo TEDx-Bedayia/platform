@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 
 import { Poppins, Ubuntu } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { customAlert } from "../custom-alert";
 import styles from "./history.module.css"; // Import CSS styles
 
@@ -93,24 +94,27 @@ interface Transaction {
 }
 
 export default function History() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<Transaction[]>([]);
   const [total, setTotal] = useState<number>(0);
   // Redirect if no token is found
   useEffect(() => {
-    if (!localStorage.getItem("admin-token")) {
-      window.location.href = "/admin/login";
-    }
-  }, []);
+    fetch("/api/admin/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.role) router.push("/admin/login");
+      })
+      .catch(() => {
+        router.push("/admin/login");
+      });
+  }, [router]);
 
   // Fetch applicants from API
   const fetchData = async () => {
     setLoading(true);
     const response = await fetch(`/api/admin/payments-history`, {
       method: "GET",
-      headers: {
-        key: `${localStorage.getItem("admin-token")}`,
-      },
     });
 
     if (response.ok) {
@@ -119,16 +123,12 @@ export default function History() {
     } else {
       if (response.status === 401) {
         customAlert("Unauthorized");
-        localStorage.removeItem("admin-token");
-        window.location.href = "/admin/login";
+        router.push("/admin/login");
       } else customAlert("Failed to fetch payments.");
     }
 
     const response2 = await fetch(`/api/admin/payments-total`, {
       method: "GET",
-      headers: {
-        key: `${localStorage.getItem("admin-token")}`,
-      },
     });
 
     if (response2.ok) {
@@ -174,9 +174,17 @@ export default function History() {
         {data
           .filter((x) => x.stream.startsWith("Office"))
           .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. Cards:{" "}
+        EGP. Telda:{" "}
         {data
-          .filter((x) => x.stream.startsWith("Card"))
+          .filter((x) => x.stream.startsWith("Telda"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
+        EGP. Instapay:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("Instapay"))
+          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
+        EGP. eWallet:{" "}
+        {data
+          .filter((x) => x.stream.startsWith("eWallet"))
           .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
         EGP.
       </p>

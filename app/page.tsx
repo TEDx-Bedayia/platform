@@ -2,12 +2,12 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import "../mohamed/style.css";
 import "./styles/globals.css";
 import "./styles/hero.css";
 import "./styles/info.css";
 import "./styles/navigation.css";
 import "./styles/theme.css";
-import "../mohamed/style.css";
 
 import { Bungee, Ubuntu } from "next/font/google";
 import Footer from "./global_components/footer";
@@ -29,8 +29,6 @@ function infoItem(text: string, svg: any) {
   );
 }
 
-
-
 function infoLink(text: string, svg: any, link: string) {
   return (
     <div className="flex flex-row items-center justify-center gap-2">
@@ -50,7 +48,6 @@ function infoLink(text: string, svg: any, link: string) {
   );
 }
 
-
 export default function Home() {
   return (
     <main className="wrapper" style={{ scrollBehavior: "smooth" }}>
@@ -67,6 +64,7 @@ export default function Home() {
             className="cursor-pointer hover:opacity-75 transition-opacity opacity-100 duration-200"
           >
             <Image
+              suppressHydrationWarning
               width="448"
               height="36"
               className="h-9 w-[28rem] max-phone:h-[1.6875rem] max-phone:w-[21rem]"
@@ -147,6 +145,7 @@ export default function Home() {
               transition={{ ease: "easeInOut", duration: 0.75 }}
             >
               <Image
+                suppressHydrationWarning
                 width="1440"
                 height="358"
                 className="w-[45rem] max-phone:w-[95vw]"
@@ -247,6 +246,7 @@ export default function Home() {
         className="relative mx-0 mb-[4.5rem] mt-16 w-[100%] max-w-[100vw]"
       >
         <Image
+          suppressHydrationWarning
           src="/theme-star.png"
           alt="TEDx Bedayia School Empowerment Inspiring Next Generation 2025 Cairo Egypt Event"
           width="120"
@@ -254,6 +254,7 @@ export default function Home() {
           className="absolute left-[16rem] top-4 max-phone:hidden"
         ></Image>
         <Image
+          suppressHydrationWarning
           src="/theme-moon.png"
           alt="Echoes in Time TEDx Bedayia Cool Event"
           width="129"
@@ -263,6 +264,7 @@ export default function Home() {
         <div>
           <center>
             <Image
+              suppressHydrationWarning
               width="1440"
               height="540"
               src="/theme-title.png"
@@ -282,6 +284,7 @@ export default function Home() {
                   <span style={{ color: "#F9F9F9" }}>Flashpoint</span>
                 </span>
                 <Image
+                  suppressHydrationWarning
                   className="h-4 w-4"
                   src="/mini-stars-dreamscape.png"
                   height={28}

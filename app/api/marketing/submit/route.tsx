@@ -1,9 +1,10 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest } from "next/server";
+import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
+import { getMarketingMemberPass } from "../../utils/auth";
 import { verifyEmail } from "../../utils/input-sanitization";
 import { SQLSettings } from "../../utils/sql-settings";
-import { TicketType } from "../../utils/ticket-types";
 
 export async function POST(request: NextRequest) {
   let body: any;
@@ -17,7 +18,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (
-    request.headers.get("password") !== process.env.MARKETING_MEMBER_PASSWORD
+    !request.headers.get("username") ||
+    !request.headers.get("password") ||
+    request.headers.get("password") !==
+      getMarketingMemberPass(request.headers.get("username")!)
   ) {
     return Response.json(
       { message: "Invalid marketing member credentials." },

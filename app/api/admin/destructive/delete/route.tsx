@@ -1,22 +1,11 @@
+import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
 import { SQLSettings } from "@/app/api/utils/sql-settings";
 import { EVENT_DATE } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  if (process.env.ADMIN_KEY === undefined || !process.env.ADMIN_KEY) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (
-    req.headers.get("key") !== process.env.ADMIN_KEY ||
-    !process.env.ADMIN_KEY ||
-    !process.env.DESTRUCTIVE_KEY ||
-    req.nextUrl.searchParams.get("verification") === null
-  ) {
+  if (!canUserAccess(req, ProtectedResource.SUPER_ADMIN)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -32,7 +21,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (new Date() <= EVENT_DATE && process.env.ADMIN_KEY !== "dev") {
+  if (new Date() <= EVENT_DATE && process.env.MAINTAINER !== "dev") {
     return NextResponse.json(
       { message: "Event has not concluded yet." },
       { status: 400 }
@@ -46,10 +35,12 @@ export async function GET(req: NextRequest) {
     await client.sql`DELETE FROM marketing_members`;
     await client.sql`DELETE FROM attendees`;
     await client.sql`DELETE FROM pay_backup`;
+    await client.sql`DELETE FROM account_holders`;
     await client.sql`ALTER SEQUENCE attendees_id_seq RESTART WITH 140`;
     await client.sql`ALTER SEQUENCE groups_grpid_seq RESTART WITH 1`;
     await client.sql`ALTER SEQUENCE marketing_members_id_seq RESTART WITH 1`;
     await client.sql`ALTER SEQUENCE rush_hour_id_seq RESTART WITH 1`;
+    await client.sql`ALTER SEQUENCE account_holders_id_seq RESTART WITH 1`;
 
     await client.sql`UPDATE settings SET value = NULL WHERE key = ${SQLSettings.RUSH_HOUR_DATE}`;
     client.release();

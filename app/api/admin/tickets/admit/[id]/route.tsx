@@ -1,3 +1,4 @@
+import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,14 +11,7 @@ export async function POST(
     params: Promise<{ id: string }>;
   }
 ) {
-  if (process.env.ADMIN_KEY === undefined || !process.env.ADMIN_KEY) {
-    return Response.json(
-      { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
-    );
-  }
-
-  if (request.headers.get("key") !== process.env.ADMIN_KEY) {
+  if (!canUserAccess(request, ProtectedResource.TICKET_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 

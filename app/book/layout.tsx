@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  return ( 
+  return (
     <div className={styles.mainBookingContainer}>
       <motion.div
         initial={{ opacity: 0 }}
@@ -31,6 +31,7 @@ export default function RootLayout({
       >
         <nav className={styles.navigation} style={ubuntu.style}>
           <Image
+            suppressHydrationWarning
             width="336"
             height="27"
             src="/main-logo.png"
