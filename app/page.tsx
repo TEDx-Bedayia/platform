@@ -15,6 +15,101 @@ import Footer from "./global_components/footer";
 const button = Bungee({ weight: "400", subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: "400", subsets: ["latin"] });
 
+import React, { useState } from "react";
+
+const FAQComponent = () => {
+  const faqData = [
+    {
+      question: "What is the date of the next event?",
+      answer: "The next event date is still to be released. Await us!",
+    },
+    {
+      question: "How can I buy tickets?",
+      answer: "Tickets can be purchased online through our website.",
+    },
+    {
+      question: "How can I contact support?",
+      answer:
+        "Email us at tedxyouth@bedayia.com for event-related inquiries, or send us a WhatsApp message at +201055782533 for technical support.",
+    },
+  ];
+
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const toggleFAQ = (index: number) => {
+    // If clicking the one currently open, close it (set to null).
+    // Otherwise, open the new one (set to index).
+    setActiveIndex(activeIndex === index ? null : index);
+  };
+
+  return (
+    <section
+      id="faq"
+      className="faq-container"
+      style={{ padding: "2rem", maxWidth: "800px", margin: "auto" }}
+    >
+      <h2 style={{ textAlign: "center", marginBottom: "2rem" }}>
+        Frequently Asked Questions
+      </h2>
+      {faqData.map((item, index) => {
+        const isOpen = activeIndex === index;
+
+        return (
+          <div
+            key={index}
+            className="faq-item"
+            style={{ borderBottom: "1px solid #ddd", padding: "1rem 0" }}
+          >
+            {/* The Question Header */}
+            <div
+              className="faq-question"
+              onClick={() => toggleFAQ(index)}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                outline: "none",
+                border: "none",
+                background: "none",
+                fontSize: "1.1rem",
+                textAlign: "left",
+                width: "100%",
+              }}
+            >
+              {item.question}
+
+              {/* The Icon */}
+              <span
+                className="faq-icon"
+                style={{
+                  transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                  transition: "transform 0.3s ease", // Added for smooth rotation
+                }}
+              >
+                +
+              </span>
+            </div>
+
+            {isOpen && (
+              <div
+                className="faq-answer"
+                style={{
+                  display: "block",
+                  paddingTop: "0.5rem",
+                  color: "#555",
+                }}
+              >
+                {item.answer}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </section>
+  );
+};
+
 function infoItem(text: string, svg: any) {
   return (
     <div className="flex flex-row items-center justify-center gap-2">
@@ -64,7 +159,6 @@ export default function Home() {
             className="cursor-pointer hover:opacity-75 transition-opacity opacity-100 duration-200"
           >
             <Image
-              suppressHydrationWarning
               width="448"
               height="36"
               className="h-9 w-[28rem] max-phone:h-[1.6875rem] max-phone:w-[21rem]"
@@ -145,7 +239,6 @@ export default function Home() {
               transition={{ ease: "easeInOut", duration: 0.75 }}
             >
               <Image
-                suppressHydrationWarning
                 width="1440"
                 height="358"
                 className="w-[45rem] max-phone:w-[95vw]"
@@ -216,37 +309,51 @@ export default function Home() {
       <section className="testimonials">
         <div className="testimonial-slider">
           <div className="testimonial">
-            <p className="testimonialText">&quot;TEDx hosts a beautiful culmination of knowledge and entertainment, curated to ensure you have the best of times&quot;</p>
+            <p className="testimonialText">
+              &quot;TEDx hosts a beautiful culmination of knowledge and
+              entertainment, curated to ensure you have the best of times&quot;
+            </p>
             <p>- Kareem</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;I liked how TEDx had a diverse genre of topics that the speakers spoke about&quot;</p>
+            <p className="testimonialText">
+              &quot;I liked how TEDx had a diverse genre of topics that the
+              speakers spoke about&quot;
+            </p>
             <p>- Abdelrahman El-Kalla</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;The food tasted well and the speakers were fun&quot;</p>
+            <p className="testimonialText">
+              &quot;The food tasted well and the speakers were fun&quot;
+            </p>
             <p>- Ibrahim Dawood</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;The speaker lounge was perfect&quot;</p>
+            <p className="testimonialText">
+              &quot;The speaker lounge was perfect&quot;
+            </p>
             <p>- Omar Emara</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;Very interactive audience, making the talks relatable&quot;</p>
+            <p className="testimonialText">
+              &quot;Very interactive audience, making the talks relatable&quot;
+            </p>
             <p>- Jude Ahmed</p>
           </div>
           <div className="testimonial">
-            <p className="testimonialText">&quot;Best event you&apos;ll ever go to&quot;</p>
+            <p className="testimonialText">
+              &quot;Best event you&apos;ll ever go to&quot;
+            </p>
             <p>- Omar Mohamed El-Mandooh</p>
           </div>
         </div>
       </section>
+
       <section
         id="theme"
         className="relative mx-0 mb-[4.5rem] mt-16 w-[100%] max-w-[100vw]"
       >
         <Image
-          suppressHydrationWarning
           src="/theme-star.png"
           alt="TEDx Bedayia School Empowerment Inspiring Next Generation 2025 Cairo Egypt Event"
           width="120"
@@ -254,7 +361,6 @@ export default function Home() {
           className="absolute left-[16rem] top-4 max-phone:hidden"
         ></Image>
         <Image
-          suppressHydrationWarning
           src="/theme-moon.png"
           alt="Echoes in Time TEDx Bedayia Cool Event"
           width="129"
@@ -264,7 +370,6 @@ export default function Home() {
         <div>
           <center>
             <Image
-              suppressHydrationWarning
               width="1440"
               height="540"
               src="/theme-title.png"
@@ -275,7 +380,7 @@ export default function Home() {
               className="mt-4 w-[40rem] text-center font-body text-gray-200 max-tablet:mt-2 max-phone:mt-3 max-phone:w-[85vw]"
               style={{ lineHeight: "2rem", ...ubuntu.style }}
             >
-              The {" "}
+              The{" "}
               <span
                 className="align-start m-0 inline-flex w-max justify-start rounded-[0.75rem] bg-[#FE0000] py-1 pl-4 pr-2 font-bold"
                 style={{ lineHeight: "1rem" }}
@@ -284,7 +389,6 @@ export default function Home() {
                   <span style={{ color: "#F9F9F9" }}>Flashpoint</span>
                 </span>
                 <Image
-                  suppressHydrationWarning
                   className="h-4 w-4"
                   src="/mini-stars-dreamscape.png"
                   height={28}
@@ -292,17 +396,18 @@ export default function Home() {
                   alt="Impactful Unique TEDx Event and Ideas"
                 ></Image>
               </span>{" "}
-              is the precise moment when pressure, ideas, and forces converge — igniting change that cannot be undone. 
-              It is where silence breaks, movements begin, and the future shifts course. Flashpoint explores these 
-              critical moments of impact, when bold ideas challenge the status quo and spark transformation. These talks are not 
-              about gradual change, but about the instant when everything changes — urging us to recognize our own flashpoints and 
-              act with intention, courage, and clarity.
+              is the precise moment when pressure, ideas, and forces converge —
+              igniting change that cannot be undone. It is where silence breaks,
+              movements begin, and the future shifts course. Flashpoint explores
+              these critical moments of impact, when bold ideas challenge the
+              status quo and spark transformation. These talks are not about
+              gradual change, but about the instant when everything changes —
+              urging us to recognize our own flashpoints and act with intention,
+              courage, and clarity.
             </p>
           </center>
         </div>
       </section>
-
-      
 
       <section
         id="info"
@@ -317,7 +422,7 @@ export default function Home() {
         <center className="flex w-screen shrink-0 flex-row justify-center gap-5 text-start max-phone:flex-col">
           <div className="flex w-full flex-col gap-4 text-center">
             {infoItem(
-              "Friday, 26st of January, 2026",
+              "Await US!",
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"
@@ -361,7 +466,7 @@ export default function Home() {
               </svg>
             )}
             {infoItem(
-              "03:00 PM",
+              "??:?? PM",
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"
@@ -437,11 +542,7 @@ export default function Home() {
           </div>
         </center>
       </section>
-      <section>
-        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">
-          FAQS
-        </div>
-      </section>
+      {FAQComponent()}
 
       {Footer()}
     </main>
