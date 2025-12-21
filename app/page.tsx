@@ -542,9 +542,9 @@ export default function Home() {
           </div>
         </center>
       </section>
-      {FAQComponent()}
+      <FAQComponent />
 
-      {Footer()}
+      <Footer />
     </main>
   );
 }

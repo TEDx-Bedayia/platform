@@ -10,7 +10,7 @@ body {
   margin: 0;
   padding: 0;
   overscroll-behavior: none;
-  background-image: url(/asfalt-light.png);
+  background-image: url(/asfalt-dark.png);
 }
 
 .popupContainer {

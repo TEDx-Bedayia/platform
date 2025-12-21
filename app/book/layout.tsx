@@ -47,7 +47,9 @@ export default function RootLayout({
         </nav>
       </motion.div>
       {children}
-      <div className={styles.footerContainer}>{Footer()}</div>
+      <div className={styles.footerContainer}>
+        <Footer />
+      </div>
     </div>
   );
 }
