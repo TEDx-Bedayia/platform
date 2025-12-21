@@ -4,7 +4,7 @@
 
 :root {
   /* Colors */
-  background-image: url("/asfalt-light.png");
+  background-image: url("/asfalt-dark.png");
   --background: rgba(249, 249, 249, 1);
 }
 
@@ -76,6 +76,7 @@
   line-height: 1.25rem;
   font-weight: 700;
   font-style: normal;
+  color: rgb(0, 0, 0);
 }
 
 .font-navButton {
@@ -112,11 +113,11 @@
 }
 
 .btnColor {
-  background-color: #007bff;
+  background-color: #FE0000;
 }
 
 .btnColor:hover {
-  background-color: #0066cc;
+  background-color: #c70303;
 }
 
 @font-face {
@@ -335,7 +336,7 @@ td {
   outline: 0;
 }
 body {
-  background-image: url("/asfalt-light.png"); /* Background image isnt even here */
+  background-image: url("/asfalt-dark.png"); /* Background image isnt even here */
   background-repeat: repeat;
   background-size: auto;
   background-attachment: scroll;

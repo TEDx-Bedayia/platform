@@ -9,7 +9,8 @@
 
 .container,
 .successContainer {
-  /* background-color: #0056b3; */
+  background-image: url("/asfalt-dark.png");
+
   color: #fff; /* White text for readability */
   margin: 0;
   padding: 0;
@@ -327,7 +328,7 @@
 
 .container button[type="submit"],
 .codeInputDialog button {
-  background-color: #007bff;
+  background-color: #FE0000;
   /* background: linear-gradient(45deg, #007bff, #0056b3); */
   color: #fff;
   padding: 12px 0px;
@@ -346,12 +347,12 @@
 
 .container button[type="submit"]:hover {
   /* background: linear-gradient(-45deg, #007bff, #0056b3); */
-  background-color: #0056b3;
+  background-color: #c70303;
 }
 
 .schoolOfficeButton {
   background-color: transparent;
-  border: #007bff 4px solid;
+  border: #FBED0E 4px solid;
   color: #fff;
   padding: 12px 0px;
   text-align: center;
