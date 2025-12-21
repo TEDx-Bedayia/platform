@@ -78,9 +78,15 @@ export function verifyPaymentMethod(paymentMethod: string): string | undefined {
     paymentMethod = "VFCASH@0" + metadata;
   }
 
-  if (method === "TLDA" || method === "IPN") {
+  if (method === "TLDA") {
     if (!metadata) return;
-    const alphaNumeric = /^[a-zA-Z0-9_.]+$/;
+    const alphaNumeric = /^[a-zA-Z0-9]+$/;
+    if (!alphaNumeric.test(metadata)) return;
+  }
+
+  if (method === "IPN") {
+    if (!metadata) return;
+    const alphaNumeric = /^[a-zA-Z0-9_.\-]+$/;
     if (!alphaNumeric.test(metadata)) return;
   }
 
