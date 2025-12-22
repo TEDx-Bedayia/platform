@@ -21,16 +21,16 @@ const FAQComponent = () => {
   const faqData = [
     {
       question: "What is the date of the next event?",
-      answer: "The next event date is still to be released. Await us!",
+      answer: "13th of February 2026",
     },
     {
       question: "How can I buy tickets?",
-      answer: "Tickets can be purchased online through our website.",
+      answer: "You can buy the tickets through our website link either through telda, instapay, vodafone cash or Cash at our Bedayia High School Office",
     },
     {
       question: "How can I contact support?",
       answer:
-        "Email us at tedxyouth@bedayia.com for event-related inquiries, or send us a WhatsApp message at +201055782533 for technical support.",
+        "For any support or inquiries, you can contact +2001013389776 or +20 10 08527016. Or you can send an email to tedxyouth@bedayia.com",
     },
   ];
 
@@ -422,7 +422,7 @@ export default function Home() {
         <center className="flex w-screen shrink-0 flex-row justify-center gap-5 text-start max-phone:flex-col">
           <div className="flex w-full flex-col gap-4 text-center">
             {infoItem(
-              "Await US!",
+              "13/2/2026",
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"
@@ -466,7 +466,7 @@ export default function Home() {
               </svg>
             )}
             {infoItem(
-              "??:?? PM",
+              "3:00 PM",
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"
