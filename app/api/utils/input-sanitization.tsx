@@ -67,9 +67,16 @@ export function verifyPaymentMethod(paymentMethod: string): string | undefined {
   if (metadata && metadata.includes("@")) {
     return;
   }
+
   const options = getIdentifiersForPaymentMethods().map((id) => id.toString());
   if (!paymentMethod || !options.includes(method)) {
     return;
+  }
+
+  // Lowercase metadata
+  if (metadata) {
+    metadata = metadata.toLowerCase();
+    paymentMethod = method + "@" + metadata;
   }
 
   if (metadata && !checkSafety(metadata)) return;

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     return Response.json({ message: "Date is required." }, { status: 400 });
   }
 
-  from = "IPN@" + from.trim();
+  from = "IPN@" + from.trim().toLowerCase();
 
   let id_if_needed = params.get("identification");
   if (id_if_needed !== null) id_if_needed = id_if_needed.trim();

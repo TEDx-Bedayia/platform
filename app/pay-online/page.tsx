@@ -265,6 +265,13 @@ export default function Page() {
                     if (currentOption.field.type === "phone") {
                       if (!/^\d*$/.test(e.target.value)) return;
                       if (e.target.value.length > 10) return;
+                      if (e.target.value.startsWith("0")) {
+                        setCustomer((prev) => ({
+                          ...prev,
+                          additionalInfo: e.target.value.slice(1),
+                        }));
+                        return;
+                      }
                     } else if (currentOption.field.type === "alphanumeric") {
                       if (!/^[a-zA-Z0-9\-_.]*$/.test(e.target.value)) return;
                     }
