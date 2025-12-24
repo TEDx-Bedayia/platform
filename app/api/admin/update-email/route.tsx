@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         result.rows[0].id,
         result.rows[0].type
       );
-    } else {
+    } else if (result.rows[0].paid === true) {
       const newUUID = await safeRandUUID();
       await sql`
         UPDATE attendees
