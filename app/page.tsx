@@ -17,6 +17,9 @@ const ubuntu = Ubuntu({ weight: "400", subsets: ["latin"] });
 
 import React, { useState } from "react";
 
+// Import the ImageSlider component
+import ImageSlider from "./components/ImageSlider";
+
 const FAQComponent = () => {
   const faqData = [
     {
@@ -251,7 +254,7 @@ export default function Home() {
               style={ubuntu.style}
             >
               Step into a day packed with inspiring talks, powerful
-              performances, and fresh perspectives. Together, we’ll uncover
+              performances, and fresh perspectives. Together, we'll uncover
               ideas worth spreading, spark meaningful conversations, and
               celebrate the power of innovation. Join a community of curious
               minds hungry for change &ndash; this is where inspiration begins.{" "}
@@ -293,11 +296,10 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section>
-          <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">
-            4/2/2026
-          </div>
-        </section>
+
+        {/* Image Slider Section */}
+        <ImageSlider />
+
       </center>
 
       {/* <section>
@@ -411,7 +413,7 @@ export default function Home() {
 
       <section
         id="info"
-        className="max-phone:pt-[2'rem] mx-0 mb-[4.5rem] mt-4 w-[100%] max-w-[100vw]"
+        className="max-phone:pt-[2rem] mx-0 mb-[4.5rem] mt-4 w-[100%] max-w-[100vw]"
       >
         <div
           id="info-title"
