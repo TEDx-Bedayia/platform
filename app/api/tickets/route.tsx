@@ -210,6 +210,7 @@ async function submitOneTicket(
   try {
     // send payment details and next steps.
     if (paymentMethod == "CASH") {
+      // here only early bird or regular individual tickets can reach this state
       await sendBookingConfirmation(paymentMethod, name, email, id, ticketType);
     }
 
