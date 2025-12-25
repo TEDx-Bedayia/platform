@@ -6,7 +6,11 @@ import styles from "../book.module.css";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
 import { backArrow, forwardArrow } from "@/app/icons";
-import { GROUP_TICKET_PRICE } from "@/app/metadata";
+import {
+  EARLY_BIRD_UNTIL,
+  GROUP_EARLY_PRICE,
+  GROUP_TICKET_PRICE,
+} from "@/app/metadata";
 import { TicketType } from "@/app/ticket-types";
 import { Poppins, Ubuntu } from "next/font/google";
 import { customAlert } from "../../admin/custom-alert";
@@ -114,7 +118,10 @@ export default function GroupTickets() {
         name: formData.names[0],
         email: formData.emails[0],
         phone: formData.phone,
-        price: GROUP_TICKET_PRICE * 4,
+        price:
+          EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
+            ? GROUP_EARLY_PRICE * 4
+            : GROUP_TICKET_PRICE * 4,
         type: TicketType.GROUP,
         extraNames: [formData.names[1], formData.names[2], formData.names[3]],
         extraEmails: [
@@ -187,9 +194,19 @@ export default function GroupTickets() {
             marginBottom: ".5rem",
           }}
         >
-          {EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
-            ? `${(GROUP_EARLY_PRICE * 4).toLocaleString()} EGP (Early Bird!)`
-            : `${(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP`}
+          {EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL ? (
+            <>
+              <s>{`${(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP`}</s>{" "}
+              {`${(
+                GROUP_EARLY_PRICE * 4
+              ).toLocaleString()} EGP (if you pay before ${EARLY_BIRD_UNTIL.toLocaleDateString(
+                "en-GB",
+                { timeZone: "UTC" }
+              )}!)`}
+            </>
+          ) : (
+            `${(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP`
+          )}
         </h2>
         <h2 style={{ ...title.style, fontWeight: 100, fontSize: ".75em" }}>
           {EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL

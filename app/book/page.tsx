@@ -9,7 +9,11 @@ import { customAlert } from "../admin/custom-alert";
 import "./htmlcolor.css";
 
 import { addLoader, removeLoader } from "../global_components/loader";
-import { INDIVIDUAL_TICKET_PRICE } from "../metadata";
+import {
+  EARLY_BIRD_UNTIL,
+  INDIVIDUAL_EARLY_PRICE,
+  INDIVIDUAL_TICKET_PRICE,
+} from "../metadata";
 import { TicketType } from "../ticket-types";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
@@ -325,7 +329,10 @@ export default function SingleTickets() {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        price: INDIVIDUAL_TICKET_PRICE,
+        price:
+          EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
+            ? INDIVIDUAL_EARLY_PRICE
+            : INDIVIDUAL_TICKET_PRICE,
         type: TicketType.INDIVIDUAL,
       };
 
@@ -389,11 +396,19 @@ export default function SingleTickets() {
           Book a Ticket
         </h1>
         <h2 style={{ ...title.style, fontWeight: 900, color: "#F9F9F9" }}>
-          {code
-            ? "Paid Ticket!"
-            : EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
-            ? `${INDIVIDUAL_EARLY_PRICE.toLocaleString()} EGP (Early Bird!)`
-            : `${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`}
+          {code ? (
+            "Paid Ticket!"
+          ) : EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL ? (
+            <>
+              <s>{`${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`}</s>{" "}
+              {`${INDIVIDUAL_EARLY_PRICE.toLocaleString()} EGP (if you pay before ${EARLY_BIRD_UNTIL.toLocaleDateString(
+                "en-GB",
+                { timeZone: "UTC" }
+              )}!)`}
+            </>
+          ) : (
+            `${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`
+          )}
         </h2>
       </motion.div>
       <motion.div
