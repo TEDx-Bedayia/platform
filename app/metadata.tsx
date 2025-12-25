@@ -14,10 +14,10 @@ export const TICKET_WINDOW = [
   new Date("2026-01-01T22:00:00Z"),
   new Date("2026-02-12T23:59:59Z"),
 ]; // Change to actual ticket window
-export const EVENT_DATE = new Date("2026-02-12T23:59:59Z"); // Change to event date
+export const EVENT_DATE = new Date("2026-02-13T23:59:59Z"); // Change to event date
 export const HOST = "https://tedxbedayia.com";
 
-export const EVENT_DESC = "TESTING PHASE. ANY QR CODE TICKETS ARE INVALID."; // Change to event description
+export const EVENT_DESC = "The event will be held on Friday, 13th of February, 2026 from 3 P.M. to 10 P.M. at Bedayia International School Gate 2."; // Change to event description
 
 export const YEAR = 26; // Increment for each event
 
