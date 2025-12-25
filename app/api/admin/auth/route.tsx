@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     let username = params.get("username")?.toString();
     let password = params.get("password")?.toString();
-    let accountName = params.get("name")?.toString().toLowerCase().trim();
+    let accountName = params.get("name")?.toString()?.toLowerCase()?.trim();
     if (username === "" || !username || password === "" || !password) {
       return NextResponse.json({ message: "Error." }, { status: 400 });
     }
