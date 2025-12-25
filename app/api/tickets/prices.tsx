@@ -31,10 +31,18 @@ const getPrice = (type: TicketType, method: string = "") => {
   return Math.round(basePrice);
 };
 
-export let price = {
-  individual: getPrice(TicketType.INDIVIDUAL),
-  group: getPrice(TicketType.GROUP),
-  discounted: getPrice(TicketType.DISCOUNTED),
-  teacher: getPrice(TicketType.TEACHER),
+export const price = {
+  get individual() {
+    return getPrice(TicketType.INDIVIDUAL);
+  },
+  get group() {
+    return getPrice(TicketType.GROUP);
+  },
+  get discounted() {
+    return getPrice(TicketType.DISCOUNTED);
+  },
+  get teacher() {
+    return getPrice(TicketType.TEACHER);
+  },
   getPrice: getPrice,
 };
