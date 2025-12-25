@@ -6,6 +6,10 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 226;
   --background-end-rgb: 255, 255, 255;
+
+  /* Colors */
+  background-image: url("/asfalt-dark.png");
+  --background: rgba(249, 249, 249, 1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,7 +44,7 @@
 
 .swiper-button-next,
 .swiper-button-prev {
-  color: #E0E0E0 !important; /* Use the site's color scheme */
+  color: #e0e0e0 !important; /* Use the site's color scheme */
   background: rgba(0, 0, 0, 0.3);
   width: 44px;
   height: 44px;
@@ -61,14 +65,14 @@
 }
 
 .swiper-pagination-bullet {
-  background: #E0E0E0;
+  background: #e0e0e0;
   opacity: 0.7;
   transition: all 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
   opacity: 1;
-  background: #FBED0E; /* Use the site's accent color */
+  background: #fbed0e; /* Use the site's accent color */
   transform: scale(1.2);
 }
 
@@ -96,12 +100,6 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
-}
-
-:root {
-  /* Colors */
-  background-image: url("/asfalt-dark.png");
-  --background: rgba(249, 249, 249, 1);
 }
 
 .fixed {
@@ -209,7 +207,7 @@
 }
 
 .btnColor {
-  background-color: #FE0000;
+  background-color: #fe0000;
 }
 
 .btnColor:hover {
