@@ -1,21 +1,8 @@
-// app/api/logout/route.ts
-import cookie from "cookie";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST() {
-  const response = NextResponse.json({ message: "Logged out" });
-
-  // Clear the JWT cookie
-  response.headers.set(
-    "Set-Cookie",
-    cookie.serialize("token", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 0, // expires immediately
-    })
-  );
-
-  return response;
+  const cookieStore = await cookies();
+  cookieStore.delete("token");
+  return NextResponse.json({ message: "Logged out" });
 }

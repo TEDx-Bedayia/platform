@@ -1,65 +1,45 @@
-import cookie from "cookie";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { signToken, UserRole, verifyToken } from "../../utils/auth";
 import { getAccountHolderInfo } from "../manage-account-holders/utils";
 
+const DAY = 60 * 60 * 24;
 export async function POST(request: NextRequest) {
   try {
+    const cookieStore = await cookies();
     // Artificial delay to simulate a slow server
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     let params = await request.formData();
 
     let username = params.get("username")?.toString();
-    if (
-      username === null ||
-      username === "" ||
-      username === undefined ||
-      !username
-    ) {
-      return Response.json({ message: "Error." }, { status: 400 });
-    }
-
     let password = params.get("password")?.toString();
-    if (
-      password === null ||
-      password === "" ||
-      password === undefined ||
-      !password
-    ) {
-      return Response.json({ message: "Error." }, { status: 400 });
+    let accountName = params.get("name")?.toString()?.toLowerCase()?.trim();
+    if (!username || !password || !accountName) {
+      return NextResponse.json({ message: "Error." }, { status: 400 });
     }
 
     if (
       process.env.SKLOFFICE &&
       process.env.SKLOFFICEPASS &&
-      params.get("name")?.toString().toLowerCase().trim() === "school office" &&
+      accountName === "school office" &&
       username === process.env.SKLOFFICE &&
       password === process.env.SKLOFFICEPASS
     ) {
-      const token = signToken(
-        {
-          role: UserRole.SCHOOL_OFFICE,
-          methods: ["CASH"],
-        },
-        "28d"
-      );
-      const response = NextResponse.json({
+      const data = {
         role: UserRole.SCHOOL_OFFICE,
         methods: ["CASH"],
+      };
+      const token = signToken(data, "28d");
+      cookieStore.set("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 28 * DAY,
+        path: "/",
       });
-      response.headers.set(
-        "Set-Cookie",
-        cookie.serialize("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          path: "/",
-          maxAge: 60 * 60 * 24 * 28, // 28 days
-        })
-      );
 
-      return response;
+      return NextResponse.json(data);
     }
 
     if (
@@ -70,20 +50,17 @@ export async function POST(request: NextRequest) {
       password === process.env.ADMIN_PASSWORD &&
       params.get("name")?.toString().trim() === process.env.MAINTAINER
     ) {
-      const token = signToken({ role: UserRole.ADMIN });
-      const response = NextResponse.json({ role: UserRole.ADMIN });
-      response.headers.set(
-        "Set-Cookie",
-        cookie.serialize("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7, // 7 days
-        })
-      );
+      const data = { role: UserRole.ADMIN };
+      const token = signToken(data);
+      cookieStore.set("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * DAY,
+        path: "/",
+      });
 
-      return response;
+      return NextResponse.json(data);
     }
 
     if (
@@ -91,63 +68,52 @@ export async function POST(request: NextRequest) {
       process.env.MARKETING_PASSWORD &&
       username === process.env.MARKETING_USERNAME &&
       password === process.env.MARKETING_PASSWORD &&
-      params.get("name")?.toString().toLowerCase().trim() === "marketing"
+      accountName === "marketing"
     ) {
-      const token = signToken({ role: UserRole.MARKETING_HEAD }, "14d");
-      const response = NextResponse.json({ role: UserRole.MARKETING_HEAD });
-      response.headers.set(
-        "Set-Cookie",
-        cookie.serialize("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          path: "/",
-          maxAge: 60 * 60 * 24 * 14, // 14 days
-        })
-      );
+      const data = { role: UserRole.MARKETING_HEAD };
+      const token = signToken(data, "14d");
+      cookieStore.set("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 14 * DAY,
+        path: "/",
+      });
 
-      return response;
+      return NextResponse.json(data);
     }
 
-    if (
-      params.get("name")?.toString().toLowerCase().trim() === "account holder"
-    ) {
+    if (accountName === "account holder") {
       const accountHolder = await getAccountHolderInfo(username, password);
       if (!accountHolder) {
-        return Response.json(
+        return NextResponse.json(
           { message: "Invalid Credentials." },
           { status: 403 }
         );
       }
 
-      const token = signToken(
-        {
-          role: UserRole.PAYMENT_HANDLER,
-          methods: accountHolder.allowed_methods,
-        },
-        "14d"
-      );
-      const response = NextResponse.json({
+      const data = {
         role: UserRole.PAYMENT_HANDLER,
         methods: accountHolder.allowed_methods,
+      };
+      const token = signToken(data, "14d");
+      cookieStore.set("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 14 * DAY,
+        path: "/",
       });
-      response.headers.set(
-        "Set-Cookie",
-        cookie.serialize("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          path: "/",
-          maxAge: 60 * 60 * 24 * 14, // 14 days
-        })
-      );
 
-      return response;
+      return NextResponse.json(data);
     }
 
-    return Response.json({ message: "Invalid Credentials." }, { status: 403 });
+    return NextResponse.json(
+      { message: "Invalid Credentials." },
+      { status: 403 }
+    );
   } catch (error) {
-    return Response.json(
+    return NextResponse.json(
       {
         message:
           "An error occurred during authentication. Please try again later.",

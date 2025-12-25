@@ -76,7 +76,11 @@ export function verifyToken(token: string) {
     throw new Error("JWT_SECRET is not defined");
   }
 
-  return jwt.verify(token, secret);
+  try {
+    return jwt.verify(token, secret);
+  } catch (error) {
+    throw new Error("Invalid token");
+  }
 }
 
 function hasAccess(userRole: UserRole, resource: ProtectedResource): boolean {

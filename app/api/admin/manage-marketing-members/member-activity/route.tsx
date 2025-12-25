@@ -1,11 +1,11 @@
 import { price } from "@/app/api/tickets/price/prices";
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
 import { sql } from "@vercel/postgres";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   if (!canUserAccess(request, ProtectedResource.MARKETING_DASHBOARD)) {
-    return Response.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       await sql`SELECT * FROM rush_hour WHERE processed = FALSE ORDER BY created_at DESC`;
 
     if (rows.length === 0) {
-      return Response.json({ activity: [] }, { status: 200 });
+      return NextResponse.json({ activity: [] }, { status: 200 });
     }
     rows = rows.map((row) => ({
       memberId: row.marketing_member_id,
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return Response.json({ activity: rows }, { status: 200 });
+    return NextResponse.json({ activity: rows }, { status: 200 });
   } catch (error) {
     console.error("Error fetching member activity:", error);
     return new Response("Internal Server Error", { status: 500 });
