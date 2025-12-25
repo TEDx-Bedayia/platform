@@ -325,19 +325,15 @@ export default function SingleTickets() {
     }
 
     if (type === "ONLINE") {
-      const ticketType =
-        EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
-          ? TicketType.EARLY_BIRD_INDIVIDUAL
-          : TicketType.INDIVIDUAL;
       const dataToSendOver = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         price:
-          ticketType === TicketType.EARLY_BIRD_INDIVIDUAL
+          EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
             ? INDIVIDUAL_EARLY_PRICE
             : INDIVIDUAL_TICKET_PRICE,
-        type: ticketType,
+        type: TicketType.INDIVIDUAL,
       };
 
       sessionStorage.setItem("checkout", JSON.stringify(dataToSendOver));
@@ -400,11 +396,19 @@ export default function SingleTickets() {
           Book a Ticket
         </h1>
         <h2 style={{ ...title.style, fontWeight: 900, color: "#F9F9F9" }}>
-          {code
-            ? "Paid Ticket!"
-            : EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
-            ? `${INDIVIDUAL_EARLY_PRICE.toLocaleString()} EGP (Early Bird!)`
-            : `${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`}
+          {code ? (
+            "Paid Ticket!"
+          ) : EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL ? (
+            <>
+              <s>{`${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`}</s>{" "}
+              {`${INDIVIDUAL_EARLY_PRICE.toLocaleString()} EGP (if you pay before ${EARLY_BIRD_UNTIL.toLocaleDateString(
+                "en-GB",
+                { timeZone: "UTC" }
+              )}!)`}
+            </>
+          ) : (
+            `${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`
+          )}
         </h2>
       </motion.div>
       <motion.div

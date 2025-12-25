@@ -9,6 +9,7 @@ export const INDIVIDUAL_TICKET_PRICE = 400; // Change to individual ticket price
 export const GROUP_TICKET_PRICE = 350; // Change to group ticket price per person
 
 export const DISCOUNTED_TICKET_PRICE = 300; // Change to rush hour ticket price
+
 export const INDIVIDUAL_EARLY_PRICE = 350; // Change to early bird individual ticket price
 export const GROUP_EARLY_PRICE = 300; // Change to early bird group ticket price per person
 
