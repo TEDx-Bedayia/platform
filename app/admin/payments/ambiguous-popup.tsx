@@ -1,7 +1,7 @@
 import { price } from "@/app/api/tickets/price/prices";
 import { hidePopup } from "@/app/api/utils/generic-popup";
-import { getTicketTypeName, TicketType } from "@/app/ticket-types";
 import { cross, group, onePerson, whiteCheck, whiteCross } from "@/app/icons";
+import { getTicketTypeName, TicketType } from "@/app/ticket-types";
 import { Poppins, Ubuntu } from "next/font/google";
 import { useState } from "react";
 import { customAlert } from "../custom-alert";
@@ -50,6 +50,9 @@ const AmbiguousTicketCard: React.FC<Props> = ({
   amountIn,
   getTotal,
 }) => {
+  const isGroup =
+    applicant.ticket_type === TicketType.GROUP ||
+    applicant.ticket_type === TicketType.EARLY_BIRD_GROUP;
   return (
     <div
       className={`${styles.applicantCard} ${
@@ -74,14 +77,13 @@ const AmbiguousTicketCard: React.FC<Props> = ({
           }}
         >
           <div style={{ position: "relative", width: "32px", height: "32px" }}>
-            {applicant.ticket_type === TicketType.GROUP ? group : onePerson}
+            {isGroup ? group : onePerson}
             <span
               style={{
                 fontSize: ".5rem",
                 fontWeight: 700,
                 position: "absolute",
-                width:
-                  applicant.ticket_type === TicketType.GROUP ? "71.5%" : "100%",
+                width: isGroup ? "71.5%" : "100%",
                 textAlign: "center",
                 top: "20px",
               }}
@@ -233,10 +235,14 @@ const AmbiguityResolver: React.FC<AmbiguityResolverProps> = ({
   function calculateTotalPrice() {
     return selectedIDList.reduce((total, id) => {
       const applicant = found.find((app) => app.id === id);
+      const isGroup = applicant
+        ? applicant.ticket_type === TicketType.GROUP ||
+          applicant.ticket_type === TicketType.EARLY_BIRD_GROUP
+        : false;
       return (
         total +
         (applicant
-          ? (applicant.ticket_type === TicketType.GROUP ? 4 : 1) *
+          ? (isGroup ? 4 : 1) *
             price.getPrice(
               applicant.ticket_type as TicketType,
               applicant.payment_method

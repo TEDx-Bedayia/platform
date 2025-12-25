@@ -14,9 +14,9 @@ export function getTicketTypeName(type: TicketType): string {
     case TicketType.DISCOUNTED:
       return "Rush Hour";
     case TicketType.EARLY_BIRD_GROUP:
-      return "G Early Bird";
+      return "Early Group";
     case TicketType.EARLY_BIRD_INDIVIDUAL:
-      return "I Early Bird";
+      return "Early Individual";
     default:
       return type.toString();
   }
