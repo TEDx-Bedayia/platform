@@ -2,16 +2,15 @@ import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
 import { EVENT_DATE, IPN, PHONE, TELDA, YEAR } from "../../metadata";
-import { price } from "../tickets/price/prices";
 import { TicketType } from "../../ticket-types";
+import { price } from "../tickets/price/prices";
 
 export async function sendBookingConfirmation(
   paymentMethod: string,
   name: string,
   email: string,
   ID: string,
-  ticketType: TicketType,
-  paymentUrl: string | undefined = undefined
+  ticketType: TicketType
 ) {
   const filePath = path.join(process.cwd(), "public/booked.html"); // path to booked.html
   const htmlContent = await promises.readFile(filePath, "utf8");
@@ -22,7 +21,8 @@ export async function sendBookingConfirmation(
   }
 
   let pricingDesc =
-    ticketType === TicketType.GROUP
+    ticketType === TicketType.GROUP ||
+    ticketType === TicketType.EARLY_BIRD_GROUP
       ? `The price for your entire group ticket (4 people) is: <strong>${
           price.getPrice(
             ticketType,
