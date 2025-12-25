@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Navigation } from 'swiper/modules';
+import { Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-import Image from 'next/image';
-import styles from './ImageSlider.module.css';
+import Image from "next/image";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import styles from "./ImageSlider.module.css";
 
 const ImageSlider = () => {
   // List of images in the public/pictures folder
   const images = [
-    { id: 1, src: '/pictures/IMG_1575.JPG', alt: 'Gallery Image 3' },
-    { id: 2, src: '/pictures/DSC_0701.JPG', alt: 'Gallery Image 2' },
-    { id: 3, src: '/pictures/DSC_0691.JPG', alt: 'Gallery Image 1' },
-    { id: 4, src: '/pictures/IMG_1587.jpg', alt: 'Gallery Image 4' },
-    { id: 5, src: '/pictures/IMG_1673.jpg', alt: 'Gallery Image 5' },
-    { id: 6, src: '/pictures/IMG_1698.jpg', alt: 'Gallery Image 6' },
-    { id: 7, src: '/pictures/IMG_1708.jpg', alt: 'Gallery Image 7' },
-    { id: 8, src: '/pictures/IMG_1732.jpg', alt: 'Gallery Image 8' },
+    { id: 1, src: "/pictures/IMG_1575.JPG", alt: "Gallery Image 3" },
+    { id: 2, src: "/pictures/DSC_0701.JPG", alt: "Gallery Image 2" },
+    { id: 3, src: "/pictures/DSC_0691.JPG", alt: "Gallery Image 1" },
+    { id: 4, src: "/pictures/IMG_1587.jpg", alt: "Gallery Image 4" },
+    { id: 5, src: "/pictures/IMG_1673.jpg", alt: "Gallery Image 5" },
+    { id: 6, src: "/pictures/IMG_1698.jpg", alt: "Gallery Image 6" },
+    { id: 7, src: "/pictures/IMG_1708.jpg", alt: "Gallery Image 7" },
+    { id: 8, src: "/pictures/IMG_1732.jpg", alt: "Gallery Image 8" },
   ];
 
   return (
