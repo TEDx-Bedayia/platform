@@ -9,12 +9,16 @@ export const INDIVIDUAL_TICKET_PRICE = 400; // Change to individual ticket price
 export const GROUP_TICKET_PRICE = 350; // Change to group ticket price per person
 
 export const DISCOUNTED_TICKET_PRICE = 300; // Change to rush hour ticket price
+export const INDIVIDUAL_EARLY_PRICE = 350; // Change to early bird individual ticket price
+export const GROUP_EARLY_PRICE = 300; // Change to early bird group ticket price per person
 
 export const TICKET_WINDOW = [
-  new Date("2025-08-01T22:00:00Z"),
-  new Date("2025-11-29T23:59:59Z"),
+  new Date("2025-12-24T22:00:00Z"),
+  new Date("2026-02-01T23:59:59Z"),
 ]; // Change to actual ticket window
-export const EVENT_DATE = new Date("2020-01-01T23:59:59Z"); // Change to event date
+export const EARLY_BIRD_UNTIL: Date | null = new Date("2026-01-07T23:59:59Z"); // Change to actual early bird deadline or null if not applicable
+
+export const EVENT_DATE = new Date("2026-02-13T23:59:59Z"); // Change to event date end
 export const HOST = "https://tedxbedayia.com";
 
 export const EVENT_DESC = "TESTING PHASE. ANY QR CODE TICKETS ARE INVALID."; // Change to event description
@@ -28,4 +32,4 @@ export const support: Author = {
   url: "mailto:alymmobarak@hotmail.com",
 };
 
-export const paymentProcessor = "PayMob"; // Change to payment processor name
+export const paymentProcessor = "Telda, Instapay, and eWallet"; // Change to payment processor name

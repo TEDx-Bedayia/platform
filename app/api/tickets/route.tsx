@@ -1,4 +1,4 @@
-import { TICKET_WINDOW } from "@/app/metadata";
+import { EARLY_BIRD_UNTIL, TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { TicketType } from "../../ticket-types";
@@ -118,6 +118,12 @@ async function submitOneTicket(
     );
   }
 
+  // ticket type if not rush hour
+  const ticketType =
+    new Date() < (EARLY_BIRD_UNTIL ?? new Date(0))
+      ? TicketType.EARLY_BIRD_INDIVIDUAL
+      : TicketType.INDIVIDUAL;
+
   let id;
   try {
     let res = await sql.query(
@@ -127,7 +133,7 @@ async function submitOneTicket(
         name,
         paymentMethod,
         phone,
-        code ? TicketType.DISCOUNTED : TicketType.INDIVIDUAL,
+        code ? TicketType.DISCOUNTED : ticketType,
       ]
     );
     id = res.rows[0].id;
@@ -173,7 +179,7 @@ async function submitOneTicket(
 
   let paymentUrl = "";
   if (paymentMethod === "CARD") {
-    let amount = price.getPrice(TicketType.INDIVIDUAL, "CARD");
+    let amount = price.getPrice(ticketType, "CARD");
     const initiateCardPaymentResponse = await initiateCardPayment(
       name,
       phone,
@@ -204,21 +210,14 @@ async function submitOneTicket(
   try {
     // send payment details and next steps.
     if (paymentMethod == "CASH") {
-      await sendBookingConfirmation(
-        paymentMethod,
-        name,
-        email,
-        id,
-        TicketType.INDIVIDUAL,
-        paymentUrl
-      );
+      await sendBookingConfirmation(paymentMethod, name, email, id, ticketType);
     }
 
     return Response.json(
       {
-        message: `Ticket Booked Successfully! Please check your email to continue.${
+        message: `Ticket Booked Successfully!${
           paymentMethod === "CASH"
-            ? ` Your Attendee ID is ${id}. Use it to pay at the school office.`
+            ? ` Please check your email to continue. Your Attendee ID is ${id}. Use it to pay at the school office.`
             : ""
         }`,
         success: true,
@@ -248,7 +247,7 @@ export async function GET() {
   let query = await sql`SELECT COUNT(*) FROM attendees;`;
   let query2 = await sql`SELECT COUNT(*) FROM attendees WHERE paid = true;`;
   let query3 =
-    await sql`SELECT COUNT(*) FROM attendees WHERE paid = true AND type IN ('individual', 'group', 'teacher', 'discounted');`;
+    await sql`SELECT COUNT(*) FROM attendees WHERE paid = true AND type IN ('individual', 'early_bird_individual', 'early_bird_group', 'group', 'teacher', 'discounted');`;
   return Response.json(
     {
       total: query.rows[0].count,

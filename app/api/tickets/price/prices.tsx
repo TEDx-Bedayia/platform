@@ -1,11 +1,13 @@
 import {
   DISCOUNTED_TICKET_PRICE,
+  GROUP_EARLY_PRICE,
   GROUP_TICKET_PRICE,
+  INDIVIDUAL_EARLY_PRICE,
   INDIVIDUAL_TICKET_PRICE,
 } from "@/app/metadata";
 import { TicketType } from "../../../ticket-types";
 
-// Use this function to calculate the price of a ticket if fees are imposed on certain methods.
+// Use this function to calculate the price of a ticket.
 const getPrice = (type: TicketType, method: string) => {
   // return rounded price to nearest integer
   let basePrice = INDIVIDUAL_TICKET_PRICE;
@@ -15,6 +17,10 @@ const getPrice = (type: TicketType, method: string) => {
     basePrice = DISCOUNTED_TICKET_PRICE;
   } else if (type === TicketType.TEACHER) {
     basePrice = 0.5 * INDIVIDUAL_TICKET_PRICE;
+  } else if (type === TicketType.EARLY_BIRD_INDIVIDUAL) {
+    basePrice = INDIVIDUAL_EARLY_PRICE;
+  } else if (type === TicketType.EARLY_BIRD_GROUP) {
+    basePrice = GROUP_EARLY_PRICE;
   } else if (type == TicketType.SPEAKER || type == TicketType.GIVEAWAY) {
     return 0;
   }
