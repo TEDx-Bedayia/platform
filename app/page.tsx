@@ -28,7 +28,8 @@ const FAQComponent = () => {
     },
     {
       question: "How can I buy tickets?",
-      answer: "You can buy the tickets through our website link either through telda, instapay, vodafone cash or Cash at our Bedayia High School Office",
+      answer:
+        "You can buy the tickets through our website link either through telda, instapay, vodafone cash or Cash at our Bedayia High School Office",
     },
     {
       question: "How can I contact support?",
@@ -299,7 +300,6 @@ export default function Home() {
 
         {/* Image Slider Section */}
         <ImageSlider />
-
       </center>
 
       {/* <section>
@@ -424,7 +424,7 @@ export default function Home() {
         <center className="flex w-screen shrink-0 flex-row justify-center gap-5 text-start max-phone:flex-col">
           <div className="flex w-full flex-col gap-4 text-center">
             {infoItem(
-              "13/2/2026",
+              "13th of February, 2026",
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"
