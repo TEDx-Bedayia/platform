@@ -146,7 +146,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
             <span>
               {" ("}
               <span style={{ fontWeight: 400 }}>
-                {(applicant.ticket_type == TicketType.GROUP ? 4 : 1) *
+                {(isGroup ? 4 : 1) *
                   price.getPrice(
                     applicant.ticket_type as TicketType,
                     applicant.payment_method
@@ -174,7 +174,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
                 : "bg-[#b02a37] hover:bg-[#8f1f2b]"
             } ${
               getTotal() +
-                (applicant.ticket_type == TicketType.GROUP ? 4 : 1) *
+                (isGroup ? 4 : 1) *
                   price.getPrice(
                     applicant.ticket_type as TicketType,
                     applicant.payment_method
@@ -189,7 +189,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
               } else {
                 if (
                   getTotal() +
-                    (applicant.ticket_type == TicketType.GROUP ? 4 : 1) *
+                    (isGroup ? 4 : 1) *
                       price.getPrice(
                         applicant.ticket_type as TicketType,
                         applicant.payment_method
