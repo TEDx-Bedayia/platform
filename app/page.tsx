@@ -34,7 +34,7 @@ const FAQComponent = () => {
     {
       question: "How can I contact support?",
       answer:
-        "For any support or inquiries, you can contact +2001013389776 or +20 10 08527016. Or you can send an email to tedxyouth@bedayia.com",
+        "For any support or inquiries, you can contact +20 10 13389776 or +20 10 08527016. Or you can send an email to tedxyouth@bedayia.com",
     },
   ];
 
