@@ -79,7 +79,7 @@ export function verifyToken(token: string) {
   try {
     return jwt.verify(token, secret);
   } catch (error) {
-    return null;
+    throw new Error("Invalid token");
   }
 }
 
