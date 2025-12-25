@@ -8,8 +8,8 @@ import {
 } from "@/app/metadata";
 import { TicketType } from "../../ticket-types";
 
-// Use this function to calculate the price of a ticket if fees are imposed on certain methods.
-const getPrice = (type: TicketType) => {
+// Use this function to calculate the price of a ticket based on its type & payment method.
+const getPrice = (type: TicketType, method: string = "") => {
   // return rounded price to nearest integer
   let basePrice =
     EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
