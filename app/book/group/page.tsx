@@ -187,10 +187,15 @@ export default function GroupTickets() {
             marginBottom: ".5rem",
           }}
         >
-          {(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP
+          {EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
+            ? `${(GROUP_EARLY_PRICE * 4).toLocaleString()} EGP (Early Bird!)`
+            : `${(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP`}
         </h2>
         <h2 style={{ ...title.style, fontWeight: 100, fontSize: ".75em" }}>
-          {GROUP_TICKET_PRICE.toLocaleString()} EGP/Person
+          {EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
+            ? GROUP_EARLY_PRICE.toLocaleString()
+            : GROUP_TICKET_PRICE.toLocaleString()}{" "}
+          EGP/Person
         </h2>
       </motion.div>
       <motion.div

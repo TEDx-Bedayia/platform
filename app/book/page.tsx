@@ -391,6 +391,8 @@ export default function SingleTickets() {
         <h2 style={{ ...title.style, fontWeight: 900, color: "#F9F9F9" }}>
           {code
             ? "Paid Ticket!"
+            : EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
+            ? `${INDIVIDUAL_EARLY_PRICE.toLocaleString()} EGP (Early Bird!)`
             : `${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`}
         </h2>
       </motion.div>
