@@ -1,6 +1,7 @@
 import { Applicant } from "@/app/admin/types/Applicant";
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
+import { NextResponse } from "next/server";
 import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/price/prices";
 import { ResponseCode } from "../../utils/response-codes";
@@ -23,7 +24,7 @@ export async function pay(
   id_if_needed: string
 ) {
   if (process.env.JWT_SECRET === undefined) {
-    return Response.json(
+    return NextResponse.json(
       { message: "Key is not set. Contact the maintainer." },
       { status: 500 }
     );
@@ -37,7 +38,7 @@ export async function pay(
 
     await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${parsedFrom}, 0, ${amount}, ${date})`;
     client.release();
-    return Response.json(
+    return NextResponse.json(
       { refund: true, message: "Refund Inserted." },
       { status: 200 }
     );
@@ -57,7 +58,7 @@ export async function pay(
 
   if (query.rows.length === 0) {
     client.release();
-    return Response.json(
+    return NextResponse.json(
       {
         message:
           "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
@@ -75,7 +76,7 @@ export async function pay(
       await client.sql`SELECT * FROM groups WHERE id1 = ${query.rows[0].id} OR id2 = ${query.rows[0].id} OR id3 = ${query.rows[0].id} OR id4 = ${query.rows[0].id}`;
     if (xx.rows.length === 0) {
       client.release();
-      return Response.json(
+      return NextResponse.json(
         {
           message:
             "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
@@ -99,7 +100,10 @@ export async function pay(
 
   if (unpaid.length === 0) {
     client.release();
-    return Response.json({ message: "Nobody to pay for." }, { status: 400 });
+    return NextResponse.json(
+      { message: "Nobody to pay for." },
+      { status: 400 }
+    );
   }
 
   let total = 0;
@@ -134,7 +138,7 @@ export async function pay(
             await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
           if (group.rows.length === 0) {
             client.release();
-            return Response.json(
+            return NextResponse.json(
               {
                 message:
                   "Not found. Try Again or Refund (Ticket isn't marked as paid yet). #3687",
@@ -174,7 +178,7 @@ export async function pay(
       return x;
     });
     client.release();
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Not enough money to pay for all tickets. Identify using IDs.",
         found,
@@ -213,7 +217,7 @@ export async function pay(
           await client.sql`SELECT * FROM groups WHERE id1 = ${row.id} OR id2 = ${row.id} OR id3 = ${row.id} OR id4 = ${row.id}`;
         if (group.rows.length === 0) {
           client.release();
-          return Response.json(
+          return NextResponse.json(
             {
               message:
                 "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
@@ -249,7 +253,10 @@ export async function pay(
 
     if (unpaid.length === 0) {
       client.release();
-      return Response.json({ message: "Nobody to pay for." }, { status: 400 });
+      return NextResponse.json(
+        { message: "Nobody to pay for." },
+        { status: 400 }
+      );
     }
 
     total = 0;
@@ -275,7 +282,7 @@ export async function pay(
         } catch (e) {
           paid -= unpaid[i].price;
           client.release();
-          return Response.json(
+          return NextResponse.json(
             { message: "Err #7109. Contact Support or Try Again." },
             { status: 500 }
           );
@@ -296,7 +303,7 @@ export async function pay(
             await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
           if (group.rows.length === 0) {
             client.release();
-            return Response.json(
+            return NextResponse.json(
               {
                 message:
                   "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
@@ -340,7 +347,7 @@ export async function pay(
           return x;
         });
         client.release();
-        return Response.json(
+        return NextResponse.json(
           {
             message:
               "Not enough money to pay for all tickets. Identify using IDs.",
@@ -403,7 +410,7 @@ export async function pay(
             paid -= price.group * 4;
             console.error(e);
             client.release();
-            return Response.json(
+            return NextResponse.json(
               { message: "Err #7109. Contact Support or Try Again." },
               { status: 500 }
             );
@@ -423,7 +430,7 @@ export async function pay(
       }
     } else if (paid == 0) {
       client.release();
-      return Response.json(
+      return NextResponse.json(
         {
           message:
             "Nothing was paid. To pay for all tickets: " +
@@ -445,7 +452,7 @@ export async function pay(
       }
     } catch (e) {
       client.release();
-      return Response.json(
+      return NextResponse.json(
         { message: "Err #9194. Contact Support or Try Again." },
         { status: 500 }
       );
@@ -456,7 +463,7 @@ export async function pay(
         "OH NO! INSANE ERROR! HUGE ERROR! MASSIVE ERROR! main.tsx line 282"
       );
       client.release();
-      return Response.json(
+      return NextResponse.json(
         {
           message:
             "Err #9184. Contact Support or Try Again. (Total price doesn't match paid amount)",
@@ -465,12 +472,12 @@ export async function pay(
       );
     }
     client.release();
-    return Response.json(
+    return NextResponse.json(
       { refund: false, paid, accepted: paidFor },
       { status: 200 }
     );
   } catch (e) {
     client.release();
-    return Response.json(e, { status: 500 });
+    return NextResponse.json(e, { status: 500 });
   }
 }

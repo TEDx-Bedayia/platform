@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
 import {
   createAccountHolder,
@@ -9,7 +9,7 @@ import {
 export async function POST(request: NextRequest) {
   try {
     if (!canUserAccess(request, ProtectedResource.MANAGE_ACCOUNT_HOLDERS)) {
-      return Response.json({ message: "Unauthorized." }, { status: 401 });
+      return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
     }
 
     const { username, password, paymentMethods } = await request.json();
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // Create user
     const user = await createAccountHolder(username, password);
     if (!user.id) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Failed to create user." },
         { status: 500 }
       );
@@ -30,19 +30,22 @@ export async function POST(request: NextRequest) {
     );
 
     if (!addedMethods) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Failed to add payment methods" },
         { status: 500 }
       );
     }
 
-    return Response.json(
+    return NextResponse.json(
       { message: "Account holder created successfully" },
       { status: 200 }
     );
   } catch (err) {
     console.error("Error in POST /manage-account-holders", err);
-    return Response.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -56,23 +59,26 @@ export async function GET(request: NextRequest) {
 
     const accountHolders = await getAllAccountHolders();
 
-    return Response.json({ accountHolders }, { status: 200 });
+    return NextResponse.json({ accountHolders }, { status: 200 });
   } catch (err) {
     console.error("Error in GET /manage-account-holders", err);
-    return Response.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
     if (!canUserAccess(request, ProtectedResource.MANAGE_ACCOUNT_HOLDERS)) {
-      return Response.json({ message: "Unauthorized." }, { status: 401 });
+      return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
     }
 
     const { id, paymentMethods } = await request.json();
 
     if (!id || !Array.isArray(paymentMethods)) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Invalid payload. Provide id and paymentMethods." },
         { status: 400 }
       );
@@ -91,18 +97,21 @@ export async function PATCH(request: NextRequest) {
     );
 
     if (!updated) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Failed to update payment methods." },
         { status: 500 }
       );
     }
 
-    return Response.json(
+    return NextResponse.json(
       { message: "Payment methods updated." },
       { status: 200 }
     );
   } catch (err) {
     console.error("Error in PATCH /manage-account-holders", err);
-    return Response.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

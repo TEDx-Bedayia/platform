@@ -1,5 +1,5 @@
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { pay } from "../main";
 
 export const maxDuration = 15;
@@ -8,12 +8,12 @@ export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
   if (!canUserAccess(request, ProtectedResource.PAYMENT_DASHBOARD, "TLDA")) {
-    return Response.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   let from = params.get("from");
   if (from === null) {
-    return Response.json(
+    return NextResponse.json(
       { message: "Username of Sender is required." },
       { status: 400 }
     );
@@ -21,12 +21,15 @@ export async function GET(request: NextRequest) {
 
   let amount = params.get("amount");
   if (amount === null) {
-    return Response.json({ message: "Amount is required." }, { status: 400 });
+    return NextResponse.json(
+      { message: "Amount is required." },
+      { status: 400 }
+    );
   }
 
   let date = params.get("date");
   if (date === null) {
-    return Response.json({ message: "Date is required." }, { status: 400 });
+    return NextResponse.json({ message: "Date is required." }, { status: 400 });
   }
 
   from = "TLDA@" + from.trim().toLowerCase();

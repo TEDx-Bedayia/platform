@@ -6,12 +6,12 @@ import {
 } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "../../payment-reciever/eTicketEmail";
 
 export async function POST(request: NextRequest) {
   if (!canUserAccess(request, ProtectedResource.MARKETING_DASHBOARD)) {
-    return Response.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!memberId || !date || !paid) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Member ID, Date, and Paid amount are required." },
         { status: 400 }
       );
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     // 3. Perform the validation check
     if (paid !== totalDue) {
-      return Response.json(
+      return NextResponse.json(
         { message: `Insufficient payment. Total due is ${totalDue}.` },
         { status: ResponseCode.MARKETING_ACTIVITY_OUT_OF_SYNC }
       );
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     client.release();
 
-    return Response.json({ message: "Success." }, { status: 200 });
+    return NextResponse.json({ message: "Success." }, { status: 200 });
   } catch (error) {
     console.error("Error accepting ticket:", error);
     return new Response("Internal Server Error", { status: 500 });

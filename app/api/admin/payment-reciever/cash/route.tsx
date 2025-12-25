@@ -2,7 +2,7 @@ import { price } from "@/app/api/tickets/price/prices";
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
 import { TicketType } from "@/app/ticket-types";
 import { sql } from "@vercel/postgres";
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { sendEmail } from "../eTicketEmail";
 import { pay, safeRandUUID } from "../main";
 
@@ -12,12 +12,12 @@ export async function GET(request: NextRequest) {
   let params = request.nextUrl.searchParams;
 
   if (!canUserAccess(request, ProtectedResource.PAYMENT_DASHBOARD, "CASH")) {
-    return Response.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   let from = params.get("from");
   if (from === null) {
-    return Response.json(
+    return NextResponse.json(
       { message: "Email/ID of Sender is required." },
       { status: 400 }
     );
@@ -25,23 +25,26 @@ export async function GET(request: NextRequest) {
 
   let amount = params.get("amount");
   if (amount === null) {
-    return Response.json({ message: "Amount is required." }, { status: 400 });
+    return NextResponse.json(
+      { message: "Amount is required." },
+      { status: 400 }
+    );
   }
 
   let date = params.get("date");
   if (date === null) {
-    return Response.json({ message: "Date is required." }, { status: 400 });
+    return NextResponse.json({ message: "Date is required." }, { status: 400 });
   }
 
   if (!isNaN(Number(from))) {
     let res = await sql`SELECT * FROM attendees WHERE id = ${Number(from)}`;
 
     if (res.rowCount === 0) {
-      return Response.json({ message: "User not found." }, { status: 404 });
+      return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
     if (res.rows[0].paid) {
-      return Response.json(
+      return NextResponse.json(
         { message: "User has already paid." },
         { status: 400 }
       );
@@ -50,7 +53,7 @@ export async function GET(request: NextRequest) {
     let toBePaid = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
     if (res.rows[0].type == TicketType.GROUP) toBePaid = toBePaid * 4;
     if (Number(amount) < toBePaid) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Amount is less than the required amount." },
         { status: 400 }
       );
@@ -106,13 +109,16 @@ export async function GET(request: NextRequest) {
     } catch (e) {
       console.error(e);
       await sql`UPDATE attendees SET paid = false, uuid = NULL WHERE id = ${from}`;
-      return Response.json(
+      return NextResponse.json(
         { message: "Err #7109. Contact Support or Try Again." },
         { status: 500 }
       );
     }
 
-    return Response.json({ refund: false, paid: toBePaid }, { status: 200 });
+    return NextResponse.json(
+      { refund: false, paid: toBePaid },
+      { status: 200 }
+    );
   }
 
   from = "CASH@" + from.trim();

@@ -15,17 +15,8 @@ export async function POST(request: NextRequest) {
     let username = params.get("username")?.toString();
     let password = params.get("password")?.toString();
     let accountName = params.get("name")?.toString().toLowerCase().trim();
-    if (
-      username === null ||
-      username === "" ||
-      username === undefined ||
-      !username ||
-      password === null ||
-      password === "" ||
-      password === undefined ||
-      !password
-    ) {
-      return Response.json({ message: "Error." }, { status: 400 });
+    if (username === "" || !username || password === "" || !password) {
+      return NextResponse.json({ message: "Error." }, { status: 400 });
     }
 
     if (
@@ -95,7 +86,7 @@ export async function POST(request: NextRequest) {
     if (accountName === "account holder") {
       const accountHolder = await getAccountHolderInfo(username, password);
       if (!accountHolder) {
-        return Response.json(
+        return NextResponse.json(
           { message: "Invalid Credentials." },
           { status: 403 }
         );
