@@ -3,7 +3,7 @@ import {
   GROUP_TICKET_PRICE,
   INDIVIDUAL_TICKET_PRICE,
 } from "@/app/metadata";
-import { TicketType } from "../../../ticket-types";
+import { TicketType } from "../../ticket-types";
 
 // Use this function to calculate the price of a ticket if fees are imposed on certain methods.
 const getPrice = (type: TicketType, method: string) => {
