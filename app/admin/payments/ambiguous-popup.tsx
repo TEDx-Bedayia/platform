@@ -1,7 +1,7 @@
-import { price } from "@/app/api/tickets/price/prices";
+import { price } from "@/app/api/tickets/prices";
 import { hidePopup } from "@/app/api/utils/generic-popup";
-import { getTicketTypeName, TicketType } from "@/app/ticket-types";
 import { cross, group, onePerson, whiteCheck, whiteCross } from "@/app/icons";
+import { getTicketTypeName, TicketType } from "@/app/ticket-types";
 import { Poppins, Ubuntu } from "next/font/google";
 import { useState } from "react";
 import { customAlert } from "../custom-alert";

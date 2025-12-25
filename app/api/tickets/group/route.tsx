@@ -10,7 +10,7 @@ import {
   verifyEmail,
   verifyPaymentMethod,
 } from "../../utils/input-sanitization";
-import { price } from "../price/prices";
+import { price } from "../prices";
 
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod

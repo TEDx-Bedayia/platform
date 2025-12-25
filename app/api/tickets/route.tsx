@@ -13,7 +13,7 @@ import {
   verifyEmail,
   verifyPaymentMethod,
 } from "../utils/input-sanitization";
-import { price } from "./price/prices";
+import { price } from "./prices";
 
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {

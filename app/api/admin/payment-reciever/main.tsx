@@ -3,7 +3,7 @@ import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { TicketType } from "../../../ticket-types";
-import { price } from "../../tickets/price/prices";
+import { price } from "../../tickets/prices";
 import { ResponseCode } from "../../utils/response-codes";
 import { sendEmail } from "./eTicketEmail";
 

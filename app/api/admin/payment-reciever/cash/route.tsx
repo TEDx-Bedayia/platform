@@ -1,4 +1,4 @@
-import { price } from "@/app/api/tickets/price/prices";
+import { price } from "@/app/api/tickets/prices";
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
 import { TicketType } from "@/app/ticket-types";
 import { sql } from "@vercel/postgres";

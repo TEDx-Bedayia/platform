@@ -2,8 +2,8 @@ import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
 import { EVENT_DATE, IPN, PHONE, TELDA, YEAR } from "../../metadata";
-import { price } from "../tickets/price/prices";
 import { TicketType } from "../../ticket-types";
+import { price } from "../tickets/prices";
 
 export async function sendBookingConfirmation(
   paymentMethod: string,

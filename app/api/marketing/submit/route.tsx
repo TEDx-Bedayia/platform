@@ -1,7 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest } from "next/server";
 import { TicketType } from "../../../ticket-types";
-import { price } from "../../tickets/price/prices";
+import { price } from "../../tickets/prices";
 import { getMarketingMemberPass } from "../../utils/auth";
 import { verifyEmail } from "../../utils/input-sanitization";
 import { SQLSettings } from "../../utils/sql-settings";
