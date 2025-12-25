@@ -134,9 +134,7 @@ export default function Page() {
           </h1>
           <p>
             Ticket For{" "}
-            {customer.type === TicketType.INDIVIDUAL ||
-            customer.type === TicketType.EARLY_BIRD_INDIVIDUAL ||
-            customer.type === TicketType.DISCOUNTED
+            {customer.type === TicketType.INDIVIDUAL
               ? "1 Person"
               : "Group of 4"}
           </p>

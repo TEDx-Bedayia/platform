@@ -310,16 +310,13 @@ export default function AdminDashboard() {
               <span
                 style={{ fontWeight: "700" }}
                 className={
-                  applicant.ticket_type != TicketType.GROUP &&
-                  applicant.ticket_type != TicketType.EARLY_BIRD_GROUP &&
-                  !applicant.paid
+                  applicant.ticket_type != TicketType.GROUP && !applicant.paid
                     ? styles.ticketType + " cursor-pointer"
                     : ""
                 }
                 onClick={() => {
                   if (
                     applicant.ticket_type != TicketType.GROUP &&
-                    applicant.ticket_type != TicketType.EARLY_BIRD_GROUP &&
                     !applicant.paid
                   )
                     customAlert2(
@@ -360,8 +357,7 @@ export default function AdminDashboard() {
                       Object.values(TicketType).filter((value) => {
                         return (
                           value != TicketType.GROUP &&
-                          value != TicketType.SPEAKER &&
-                          value != TicketType.EARLY_BIRD_GROUP
+                          value != TicketType.SPEAKER
                         );
                       })
                     );

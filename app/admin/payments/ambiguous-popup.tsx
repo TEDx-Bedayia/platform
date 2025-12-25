@@ -1,7 +1,7 @@
 import { price } from "@/app/api/tickets/price/prices";
 import { hidePopup } from "@/app/api/utils/generic-popup";
-import { cross, group, onePerson, whiteCheck, whiteCross } from "@/app/icons";
 import { getTicketTypeName, TicketType } from "@/app/ticket-types";
+import { cross, group, onePerson, whiteCheck, whiteCross } from "@/app/icons";
 import { Poppins, Ubuntu } from "next/font/google";
 import { useState } from "react";
 import { customAlert } from "../custom-alert";
@@ -50,9 +50,6 @@ const AmbiguousTicketCard: React.FC<Props> = ({
   amountIn,
   getTotal,
 }) => {
-  const isGroup =
-    applicant.ticket_type === TicketType.GROUP ||
-    applicant.ticket_type === TicketType.EARLY_BIRD_GROUP;
   return (
     <div
       className={`${styles.applicantCard} ${
@@ -77,13 +74,14 @@ const AmbiguousTicketCard: React.FC<Props> = ({
           }}
         >
           <div style={{ position: "relative", width: "32px", height: "32px" }}>
-            {isGroup ? group : onePerson}
+            {applicant.ticket_type === TicketType.GROUP ? group : onePerson}
             <span
               style={{
                 fontSize: ".5rem",
                 fontWeight: 700,
                 position: "absolute",
-                width: isGroup ? "71.5%" : "100%",
+                width:
+                  applicant.ticket_type === TicketType.GROUP ? "71.5%" : "100%",
                 textAlign: "center",
                 top: "20px",
               }}
@@ -146,7 +144,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
             <span>
               {" ("}
               <span style={{ fontWeight: 400 }}>
-                {(isGroup ? 4 : 1) *
+                {(applicant.ticket_type == TicketType.GROUP ? 4 : 1) *
                   price.getPrice(
                     applicant.ticket_type as TicketType,
                     applicant.payment_method
@@ -174,7 +172,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
                 : "bg-[#b02a37] hover:bg-[#8f1f2b]"
             } ${
               getTotal() +
-                (isGroup ? 4 : 1) *
+                (applicant.ticket_type == TicketType.GROUP ? 4 : 1) *
                   price.getPrice(
                     applicant.ticket_type as TicketType,
                     applicant.payment_method
@@ -189,7 +187,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
               } else {
                 if (
                   getTotal() +
-                    (isGroup ? 4 : 1) *
+                    (applicant.ticket_type == TicketType.GROUP ? 4 : 1) *
                       price.getPrice(
                         applicant.ticket_type as TicketType,
                         applicant.payment_method
@@ -235,14 +233,10 @@ const AmbiguityResolver: React.FC<AmbiguityResolverProps> = ({
   function calculateTotalPrice() {
     return selectedIDList.reduce((total, id) => {
       const applicant = found.find((app) => app.id === id);
-      const isGroup = applicant
-        ? applicant.ticket_type === TicketType.GROUP ||
-          applicant.ticket_type === TicketType.EARLY_BIRD_GROUP
-        : false;
       return (
         total +
         (applicant
-          ? (isGroup ? 4 : 1) *
+          ? (applicant.ticket_type === TicketType.GROUP ? 4 : 1) *
             price.getPrice(
               applicant.ticket_type as TicketType,
               applicant.payment_method

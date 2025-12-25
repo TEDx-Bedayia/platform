@@ -69,8 +69,7 @@ export async function pay(
 
   if (
     from === "CASH" &&
-    (query.rows[0].type == TicketType.GROUP ||
-      query.rows[0].type == TicketType.EARLY_BIRD_GROUP) &&
+    query.rows[0].type == TicketType.GROUP &&
     query.rows.length == 1
   ) {
     let xx =
@@ -112,10 +111,7 @@ export async function pay(
   let containsGroup = false;
   for (let i = 0; i < unpaid.length; i++) {
     total += unpaid[i].price;
-    if (
-      unpaid[i].type != TicketType.GROUP &&
-      unpaid[i].type != TicketType.EARLY_BIRD_GROUP
-    ) {
+    if (unpaid[i].type != TicketType.GROUP) {
       containsIndv = true;
     } else {
       containsGroup = true;
@@ -135,8 +131,7 @@ export async function pay(
     if (containsGroup) {
       for (let i = 0; i < unpaid.length; i++) {
         if (
-          (unpaid[i].type === TicketType.GROUP ||
-            unpaid[i].type === TicketType.EARLY_BIRD_GROUP) &&
+          unpaid[i].type === TicketType.GROUP &&
           !processedIDs.has(unpaid[i].id)
         ) {
           const group =
@@ -217,10 +212,7 @@ export async function pay(
     for (let i = 0; i < originalUnpaidLength; i++) {
       let row = unpaid[i];
       // If the row is a group ticket get the other emails as well
-      if (
-        row.type === TicketType.GROUP ||
-        row.type === TicketType.EARLY_BIRD_GROUP
-      ) {
+      if (row.type === TicketType.GROUP) {
         const group =
           await client.sql`SELECT * FROM groups WHERE id1 = ${row.id} OR id2 = ${row.id} OR id3 = ${row.id} OR id4 = ${row.id}`;
         if (group.rows.length === 0) {
@@ -280,11 +272,7 @@ export async function pay(
 
   try {
     for (let i = 0; i < unpaid.length; i++) {
-      if (
-        unpaid[i].type == TicketType.GROUP ||
-        unpaid[i].type == TicketType.EARLY_BIRD_GROUP
-      )
-        continue;
+      if (unpaid[i].type == TicketType.GROUP) continue;
 
       paid += unpaid[i].price;
       if (paid <= parseInt(amount)) {
@@ -310,10 +298,7 @@ export async function pay(
     // If there are group tickets to pay for
     if (paidFor.length !== unpaid.length) {
       for (let i = 0; i < unpaid.length; i++) {
-        if (
-          unpaid[i].type == TicketType.GROUP ||
-          unpaid[i].type == TicketType.EARLY_BIRD_GROUP
-        ) {
+        if (unpaid[i].type == TicketType.GROUP) {
           let group =
             await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
           if (group.rows.length === 0) {

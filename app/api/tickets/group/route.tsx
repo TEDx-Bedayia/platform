@@ -1,4 +1,4 @@
-import { EARLY_BIRD_UNTIL, TICKET_WINDOW } from "@/app/metadata";
+import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { TicketType } from "../../../ticket-types";
@@ -69,19 +69,8 @@ export async function POST(request: NextRequest) {
   emails = emails.map((email) => handleMisspelling(email));
 
   try {
-    const ticketType =
-      new Date() < (EARLY_BIRD_UNTIL ?? new Date(0))
-        ? TicketType.EARLY_BIRD_GROUP
-        : TicketType.GROUP;
-
     let names = [name1, name2, name3, name4];
-    let resp = await submitTickets(
-      emails,
-      names,
-      phone,
-      paymentMethod,
-      ticketType
-    );
+    let resp = await submitTickets(emails, names, phone, paymentMethod);
     if (resp.status != 200) {
       return resp;
     }
@@ -90,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     let paymentUrl = "";
     if (paymentMethod === "CARD") {
-      let amount = price.getPrice(ticketType, "CARD") * 4;
+      let amount = price.getPrice(TicketType.GROUP, "CARD") * 4;
 
       const initiateCardPaymentResponse = await initiateCardPayment(
         name1,
@@ -131,7 +120,8 @@ export async function POST(request: NextRequest) {
           name1,
           emails[0],
           ids[0],
-          ticketType
+          TicketType.GROUP,
+          paymentUrl
         );
       }
 
@@ -160,9 +150,9 @@ export async function POST(request: NextRequest) {
 
     return Response.json(
       {
-        message: `Group Tickets Booked Successfully!${
+        message: `Group Tickets Booked Successfully! Please check your email to continue.${
           paymentMethod === "CASH"
-            ? ` Please check your email to continue. Your Group ID is ${ids[0]}. Use it to pay at the school office.`
+            ? ` Your Group ID is ${ids[0]}. Use it to pay at the school office.`
             : ""
         }`,
         success: true,
@@ -186,8 +176,7 @@ async function submitTickets(
   emails: any,
   names: any,
   phone: string | undefined,
-  paymentMethod: string | undefined,
-  ticketType: TicketType
+  paymentMethod: string | undefined
 ) {
   if (!names || !emails || !phone || !paymentMethod || emails.length != 4) {
     return Response.json(
@@ -244,7 +233,7 @@ async function submitTickets(
 
   let q = "";
   for (let i = 0; i < emails.length; i++) {
-    q += `('${emails[i]}', '${names[i]}', '${paymentMethod}', '${phone}', '${ticketType}')`;
+    q += `('${emails[i]}', '${names[i]}', '${paymentMethod}', '${phone}', '${TicketType.GROUP}')`;
     if (i != emails.length - 1) {
       q += ", ";
     }
