@@ -24,7 +24,7 @@ const getPrice = (type: TicketType, method: string = "") => {
     basePrice = DISCOUNTED_TICKET_PRICE;
   } else if (type === TicketType.TEACHER) {
     basePrice = 0.5 * INDIVIDUAL_TICKET_PRICE;
-  } else if (type == TicketType.SPEAKER || type == TicketType.GIVEAWAY) {
+  } else if (type === TicketType.SPEAKER || type === TicketType.GIVEAWAY) {
     return 0;
   }
 
