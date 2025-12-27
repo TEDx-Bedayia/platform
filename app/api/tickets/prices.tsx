@@ -11,8 +11,8 @@ import { TicketType } from "../../ticket-types";
 // Use this function to calculate the price of a ticket based on its type & payment method.
 const getPrice = (
   type: TicketType,
-  method: string = "",
-  recieved_at: Date = new Date()
+  recieved_at: Date = new Date(),
+  method: string = ""
 ) => {
   // return rounded price to nearest integer
   let basePrice =
@@ -28,6 +28,10 @@ const getPrice = (
     basePrice = DISCOUNTED_TICKET_PRICE;
   } else if (type === TicketType.TEACHER) {
     basePrice = 0.5 * INDIVIDUAL_TICKET_PRICE;
+  } else if (type === TicketType.INDIVIDUAL_EARLY_BIRD) {
+    basePrice = INDIVIDUAL_EARLY_PRICE;
+  } else if (type === TicketType.GROUP_EARLY_BIRD) {
+    basePrice = GROUP_EARLY_PRICE;
   } else if (type === TicketType.SPEAKER || type === TicketType.GIVEAWAY) {
     return 0;
   }
