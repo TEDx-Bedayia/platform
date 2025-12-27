@@ -17,7 +17,7 @@ export const TICKET_WINDOW = [
   new Date("2026-01-03T22:00:00Z"), // 2026-01-04 00:00 GMT+2
   new Date("2026-02-03T22:00:00Z"), // 2026-02-04 00:00 GMT+2
 ]; // Change to actual ticket window
-export const EARLY_BIRD_UNTIL: Date | null = new Date("2025-12-26T22:00:00Z"); // Change to actual early bird deadline or null if not applicable
+export const EARLY_BIRD_UNTIL: Date | null = new Date("2026-01-10T22:00:00Z"); // Change to actual early bird deadline or null if not applicable
 
 export const EVENT_DATE = new Date("2026-02-13T23:59:59Z"); // Change to event date end
 export const HOST = "https://tedxbedayia.com";
