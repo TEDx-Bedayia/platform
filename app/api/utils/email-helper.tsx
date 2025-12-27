@@ -1,7 +1,7 @@
 import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
-import { EVENT_DATE, PHONE, YEAR } from "../../metadata";
+import { EARLY_BIRD_UNTIL, EVENT_DATE, PHONE, YEAR } from "../../metadata";
 import { isGroup, TicketType } from "../../ticket-types";
 import { price } from "../tickets/prices";
 
@@ -23,13 +23,21 @@ export async function sendBookingConfirmation(
 
   let pricingDesc = isGroup(ticketType)
     ? `The price for your entire group ticket (4 people) is: <strong>${
-        price.getPrice(ticketType, paymentMethod.split("@")[0].toLowerCase()) *
-        4
+        price.getPrice(
+          ticketType,
+          new Date(),
+          paymentMethod.split("@")[0].toLowerCase()
+        ) * 4
       } EGP</strong>. Make sure you as the group leader pay the exact due amount at once to avoid delays. You can't pay for each ticket separately.`
     : `The price for your ticket is: <strong>${price.getPrice(
         ticketType,
+        new Date(),
         paymentMethod.split("@")[0].toLowerCase()
       )} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
+
+  if (EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL) {
+    pricingDesc += `<br/><br/>Note: You are eligible for the Early Bird discount if you pay before ${EARLY_BIRD_UNTIL.toLocaleDateString()}! Thank you for booking early.`;
+  }
 
   // Replace placeholders in the HTML
   const personalizedHtml = htmlContent

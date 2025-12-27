@@ -42,6 +42,7 @@ type Props = {
   isIDIncluded: (id: number) => boolean;
   groupMembers?: Applicant[];
   amountIn: number;
+  dateReceived: Date;
   getTotal: () => number;
 };
 
@@ -53,6 +54,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
   isIDIncluded,
   amountIn,
   getTotal,
+  dateReceived,
 }) => {
   return (
     <div
@@ -150,6 +152,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
                 {(isGroupString(applicant.ticket_type) ? 4 : 1) *
                   price.getPrice(
                     applicant.ticket_type as TicketType,
+                    dateReceived,
                     applicant.payment_method
                   )}
               </span>
@@ -178,6 +181,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
                 (isGroupString(applicant.ticket_type) ? 4 : 1) *
                   price.getPrice(
                     applicant.ticket_type as TicketType,
+                    dateReceived,
                     applicant.payment_method
                   ) >
                 amountIn && !isIDIncluded(applicant.id)
@@ -193,6 +197,7 @@ const AmbiguousTicketCard: React.FC<Props> = ({
                     (isGroupString(applicant.ticket_type) ? 4 : 1) *
                       price.getPrice(
                         applicant.ticket_type as TicketType,
+                        dateReceived,
                         applicant.payment_method
                       ) <=
                   amountIn
@@ -222,6 +227,7 @@ type AmbiguityResolverProps = {
   found: Applicant[];
   groupMembers: { [key: string]: Applicant[] };
   amountIn: number;
+  dateReceived: Date;
   callback: (idList: number[]) => void;
 };
 
@@ -230,6 +236,7 @@ const AmbiguityResolver: React.FC<AmbiguityResolverProps> = ({
   groupMembers,
   callback,
   amountIn,
+  dateReceived,
 }) => {
   const [selectedIDList, setSelectedIDList] = useState<number[]>([]);
 
@@ -242,6 +249,7 @@ const AmbiguityResolver: React.FC<AmbiguityResolverProps> = ({
           ? (isGroupString(applicant.ticket_type) ? 4 : 1) *
             price.getPrice(
               applicant.ticket_type as TicketType,
+              dateReceived,
               applicant.payment_method
             )
           : 0)
@@ -281,6 +289,7 @@ const AmbiguityResolver: React.FC<AmbiguityResolverProps> = ({
               setSelectedIDList((prev) => prev.filter((item) => item !== id));
             }}
             isIDIncluded={(id: number) => selectedIDList.includes(id)}
+            dateReceived={dateReceived}
             getTotal={calculateTotalPrice}
             groupMembers={groupMembers[applicant.id]}
           />

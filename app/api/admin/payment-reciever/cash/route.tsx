@@ -52,7 +52,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let toBePaid = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
+    let toBePaid = price.getPrice(
+      res.rows[0].type,
+      new Date(),
+      res.rows[0].payment_method
+    );
     if (res.rows[0].type == TicketType.GROUP) toBePaid = toBePaid * 4;
     if (Number(amount) < toBePaid) {
       return NextResponse.json(

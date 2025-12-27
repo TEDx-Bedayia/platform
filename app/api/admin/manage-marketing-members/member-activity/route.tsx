@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       return {
         ...row,
         price: attendee
-          ? price.getPrice(attendee.type, "CASH")
+          ? price.getPrice(attendee.type, new Date(), "CASH")
           : price.discounted,
       };
     });

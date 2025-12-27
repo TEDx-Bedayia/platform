@@ -173,7 +173,7 @@ async function submitOneTicket(
 
   let paymentUrl = "";
   if (paymentMethod === "CARD") {
-    let amount = price.getPrice(TicketType.INDIVIDUAL, "CARD");
+    let amount = price.getPrice(TicketType.INDIVIDUAL, new Date(), "CARD");
     const initiateCardPaymentResponse = await initiateCardPayment(
       name,
       phone,
