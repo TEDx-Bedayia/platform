@@ -14,15 +14,16 @@ export const INDIVIDUAL_EARLY_PRICE = 350; // Change to early bird individual ti
 export const GROUP_EARLY_PRICE = 300; // Change to early bird group ticket price per person
 
 export const TICKET_WINDOW = [
-  new Date("2025-12-24T22:00:00Z"),
-  new Date("2026-02-01T23:59:59Z"),
+  new Date("2026-01-03T22:00:00Z"), // 2026-01-04 00:00 GMT+2
+  new Date("2026-02-03T22:00:00Z"), // 2026-02-04 00:00 GMT+2
 ]; // Change to actual ticket window
-export const EARLY_BIRD_UNTIL: Date | null = new Date("2026-01-07T23:59:59Z"); // Change to actual early bird deadline or null if not applicable
+export const EARLY_BIRD_UNTIL: Date | null = new Date("2026-01-10T22:00:00Z"); // Change to actual early bird deadline or null if not applicable
 
 export const EVENT_DATE = new Date("2026-02-13T23:59:59Z"); // Change to event date end
 export const HOST = "https://tedxbedayia.com";
 
-export const EVENT_DESC = "TESTING PHASE. ANY QR CODE TICKETS ARE INVALID."; // Change to event description
+export const EVENT_DESC =
+  "The event will be held on Friday, 13th of February, 2026 from 3 P.M. to 10 P.M. at Bedayia International School. Entry will be from Gate #2."; // Change to event description
 
 export const YEAR = 26; // Increment for each event
 
