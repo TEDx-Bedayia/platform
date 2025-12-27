@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
               UPDATE attendees
               SET paid = true, uuid = data.uuid${
                 EARLY_BIRD_UNTIL && new Date(date) < EARLY_BIRD_UNTIL
-                  ? ", type = " + TicketType.GROUP_EARLY_BIRD
+                  ? `, type = '${TicketType.GROUP_EARLY_BIRD}'`
                   : ""
               }
               FROM (
