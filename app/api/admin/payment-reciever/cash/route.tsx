@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     let toBePaid = price.getPrice(
       res.rows[0].type,
-      new Date(),
+      new Date(date),
       res.rows[0].payment_method
     );
     if (res.rows[0].type == TicketType.GROUP) toBePaid = toBePaid * 4;
