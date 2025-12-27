@@ -9,15 +9,19 @@ import {
 import { TicketType } from "../../ticket-types";
 
 // Use this function to calculate the price of a ticket based on its type & payment method.
-const getPrice = (type: TicketType, method: string = "") => {
+const getPrice = (
+  type: TicketType,
+  method: string = "",
+  recieved_at: Date = new Date()
+) => {
   // return rounded price to nearest integer
   let basePrice =
-    EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
+    EARLY_BIRD_UNTIL && recieved_at < EARLY_BIRD_UNTIL
       ? INDIVIDUAL_EARLY_PRICE
       : INDIVIDUAL_TICKET_PRICE;
   if (type === TicketType.GROUP) {
     basePrice =
-      EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
+      EARLY_BIRD_UNTIL && recieved_at < EARLY_BIRD_UNTIL
         ? GROUP_EARLY_PRICE
         : GROUP_TICKET_PRICE;
   } else if (type === TicketType.DISCOUNTED) {
