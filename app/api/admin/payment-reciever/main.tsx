@@ -1,4 +1,5 @@
 import { Applicant } from "@/app/admin/types/Applicant";
+import { EARLY_BIRD_UNTIL } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
@@ -70,7 +71,7 @@ export async function pay(
   if (
     from === "CASH" &&
     query.rows[0].type == TicketType.GROUP &&
-    query.rows.length == 1
+    query.rows.length < 4
   ) {
     let xx =
       await client.sql`SELECT * FROM groups WHERE id1 = ${query.rows[0].id} OR id2 = ${query.rows[0].id} OR id3 = ${query.rows[0].id} OR id4 = ${query.rows[0].id}`;
@@ -93,7 +94,7 @@ export async function pay(
   for (let i = 0; i < query.rows.length; i++) {
     let row = query.rows[i];
     if (row.paid === false) {
-      row.price = price.getPrice(row.type, row.payment_method);
+      row.price = price.getPrice(row.type, new Date(date), row.payment_method);
       unpaid.push(row);
     }
   }
@@ -120,7 +121,7 @@ export async function pay(
 
   if (
     parseInt(amount) < total &&
-    parseInt(amount) >= price.individual &&
+    parseInt(amount) >= price.getPrice(TicketType.INDIVIDUAL, new Date(date)) &&
     containsIndv &&
     id_if_needed === ""
   ) {
@@ -202,7 +203,11 @@ export async function pay(
     for (let i = 0; i < query.rows.length; i++) {
       let row = query.rows[i];
       if (row.paid === false) {
-        row.price = price.getPrice(row.type, row.payment_method);
+        row.price = price.getPrice(
+          row.type,
+          new Date(date),
+          row.payment_method
+        );
         unpaid.push(row);
       }
     }
@@ -244,7 +249,11 @@ export async function pay(
         for (let i = 0; i < query.rows.length; i++) {
           let row = query.rows[i];
           if (row.paid === false) {
-            row.price = price.getPrice(row.type, row.payment_method);
+            row.price = price.getPrice(
+              row.type,
+              new Date(date),
+              row.payment_method
+            );
             unpaid.push(row);
           }
         }
@@ -278,7 +287,11 @@ export async function pay(
       if (paid <= parseInt(amount)) {
         let randUUID = await safeRandUUID();
         try {
-          await client.sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
+          if (EARLY_BIRD_UNTIL && new Date(date) < EARLY_BIRD_UNTIL) {
+            await client.sql`UPDATE attendees SET paid = true, uuid = ${randUUID}, type = ${TicketType.INDIVIDUAL_EARLY_BIRD} WHERE id = ${unpaid[i].id}`;
+          } else {
+            await client.sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
+          }
         } catch (e) {
           paid -= unpaid[i].price;
           client.release();
@@ -326,8 +339,10 @@ export async function pay(
       const groupIDs = Object.keys(uniqueGroupsToPayForData);
 
       if (
-        groupIDs.length * price.group * 4 > parseInt(amount) &&
-        parseInt(amount) >= price.individual &&
+        groupIDs.length * price.getPrice(TicketType.GROUP, new Date(date)) * 4 >
+          parseInt(amount) &&
+        parseInt(amount) >=
+          price.getPrice(TicketType.INDIVIDUAL, new Date(date)) &&
         groupIDs.length != 1
       ) {
         let found: any[] = [];
@@ -361,7 +376,7 @@ export async function pay(
       for (let i = 0; i < groupIDs.length; i++) {
         const groupID = groupIDs[i];
         const groupMembers = uniqueGroupsToPayForData[groupID];
-        paid += price.group * 4;
+        paid += price.getPrice(TicketType.GROUP, new Date(date)) * 4;
 
         if (paid <= parseInt(amount)) {
           // Collect all rows to update
@@ -389,7 +404,11 @@ export async function pay(
             await client.query(
               `
               UPDATE attendees
-              SET paid = true, uuid = data.uuid
+              SET paid = true, uuid = data.uuid${
+                EARLY_BIRD_UNTIL && new Date(date) < EARLY_BIRD_UNTIL
+                  ? `, type = '${TicketType.GROUP_EARLY_BIRD}'`
+                  : ""
+              }
               FROM (
                 SELECT unnest($1::int[]) AS id, unnest($2::uuid[]) AS uuid
               ) AS data
@@ -407,7 +426,7 @@ export async function pay(
               }
             });
           } catch (e) {
-            paid -= price.group * 4;
+            paid -= price.getPrice(TicketType.GROUP, new Date(date)) * 4;
             console.error(e);
             client.release();
             return NextResponse.json(
@@ -416,7 +435,7 @@ export async function pay(
             );
           }
         } else {
-          paid -= price.group * 4;
+          paid -= price.getPrice(TicketType.GROUP, new Date(date)) * 4;
         }
       }
     }

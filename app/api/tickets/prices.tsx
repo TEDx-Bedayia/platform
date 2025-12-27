@@ -14,24 +14,25 @@ const getPrice = (
   recieved_at: Date = new Date(),
   method: string = ""
 ) => {
+  if (recieved_at > new Date()) recieved_at = new Date();
   // return rounded price to nearest integer
   let basePrice =
     EARLY_BIRD_UNTIL && recieved_at < EARLY_BIRD_UNTIL
-      ? INDIVIDUAL_EARLY_PRICE
-      : INDIVIDUAL_TICKET_PRICE;
+      ? price.individual_early_bird
+      : price.individual;
   if (type === TicketType.GROUP) {
     basePrice =
       EARLY_BIRD_UNTIL && recieved_at < EARLY_BIRD_UNTIL
-        ? GROUP_EARLY_PRICE
-        : GROUP_TICKET_PRICE;
+        ? price.group_early_bird
+        : price.group;
   } else if (type === TicketType.DISCOUNTED) {
-    basePrice = DISCOUNTED_TICKET_PRICE;
+    basePrice = price.discounted;
   } else if (type === TicketType.TEACHER) {
-    basePrice = 0.5 * INDIVIDUAL_TICKET_PRICE;
+    basePrice = price.teacher;
   } else if (type === TicketType.INDIVIDUAL_EARLY_BIRD) {
-    basePrice = INDIVIDUAL_EARLY_PRICE;
+    basePrice = price.individual_early_bird;
   } else if (type === TicketType.GROUP_EARLY_BIRD) {
-    basePrice = GROUP_EARLY_PRICE;
+    basePrice = price.group_early_bird;
   } else if (type === TicketType.SPEAKER || type === TicketType.GIVEAWAY) {
     return 0;
   }
@@ -40,17 +41,11 @@ const getPrice = (
 };
 
 export const price = {
-  get individual() {
-    return getPrice(TicketType.INDIVIDUAL);
-  },
-  get group() {
-    return getPrice(TicketType.GROUP);
-  },
-  get discounted() {
-    return getPrice(TicketType.DISCOUNTED);
-  },
-  get teacher() {
-    return getPrice(TicketType.TEACHER);
-  },
+  individual: INDIVIDUAL_TICKET_PRICE,
+  group: GROUP_TICKET_PRICE,
+  discounted: DISCOUNTED_TICKET_PRICE,
+  teacher: 0.5 * INDIVIDUAL_TICKET_PRICE,
+  individual_early_bird: INDIVIDUAL_EARLY_PRICE,
+  group_early_bird: GROUP_EARLY_PRICE,
   getPrice: getPrice,
 };
