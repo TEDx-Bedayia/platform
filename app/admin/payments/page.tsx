@@ -4,7 +4,11 @@ import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
 import { getPaymentMethods, PaymentMethod } from "@/app/payment-methods";
-import { getTicketTypeFromName, getTicketTypeName, TicketType } from "@/app/ticket-types";
+import {
+  getTicketTypeFromName,
+  getTicketTypeName,
+  TicketType,
+} from "@/app/ticket-types";
 import { UserCheck2 } from "lucide-react";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
@@ -48,7 +52,11 @@ function IDCheckPopup(
         <span style={{ fontWeight: "bold" }}>{name}</span> (ID: {id})
       </p>
       <p>
-        {toTitleCase(getTicketTypeName(getTicketTypeFromName(type) ?? TicketType.INDIVIDUAL))}{" "}
+        {toTitleCase(
+          getTicketTypeName(
+            getTicketTypeFromName(type) ?? TicketType.INDIVIDUAL
+          )
+        )}{" "}
         Ticket
       </p>
       <p>{email}</p>
@@ -335,6 +343,7 @@ export default function Payments() {
               found={found}
               groupMembers={json.groupMembers}
               amountIn={Number(amount)}
+              dateReceived={new Date(date)}
               callback={async (idList: number[]) => {
                 addLoader();
                 const response = await fetch(

@@ -1,5 +1,6 @@
 import { price } from "@/app/api/tickets/prices";
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
+import { EARLY_BIRD_UNTIL } from "@/app/metadata";
 import { TicketType } from "@/app/ticket-types";
 import { sql } from "@vercel/postgres";
 import { NextResponse, type NextRequest } from "next/server";
@@ -36,6 +37,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Date is required." }, { status: 400 });
   }
 
+  // Check if from is a number (ID)
   if (!isNaN(Number(from))) {
     let res = await sql`SELECT * FROM attendees WHERE id = ${Number(from)}`;
 
@@ -50,7 +52,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let toBePaid = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
+    let toBePaid = price.getPrice(
+      res.rows[0].type,
+      new Date(date),
+      res.rows[0].payment_method
+    );
     if (res.rows[0].type == TicketType.GROUP) toBePaid = toBePaid * 4;
     if (Number(amount) < toBePaid) {
       return NextResponse.json(
@@ -62,7 +68,11 @@ export async function GET(request: NextRequest) {
     try {
       if (res.rows[0].type != TicketType.GROUP) {
         let randUUID = await safeRandUUID();
-        await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${res.rows[0].id}`;
+        if (EARLY_BIRD_UNTIL && new Date(date) < EARLY_BIRD_UNTIL) {
+          await sql`UPDATE attendees SET paid = true, uuid = ${randUUID}, type = ${TicketType.INDIVIDUAL_EARLY_BIRD} WHERE id = ${res.rows[0].id}`;
+        } else {
+          await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${res.rows[0].id}`;
+        }
         await sendEmail(
           res.rows[0].email,
           res.rows[0].full_name,
@@ -88,7 +98,11 @@ export async function GET(request: NextRequest) {
         let accepted = await sql.query(
           `
               UPDATE attendees
-              SET paid = true, uuid = data.uuid
+              SET paid = true, uuid = data.uuid${
+                EARLY_BIRD_UNTIL && new Date(date) < EARLY_BIRD_UNTIL
+                  ? `, type = '${TicketType.GROUP_EARLY_BIRD}'`
+                  : ""
+              }
               FROM (
                 SELECT unnest($1::int[]) AS id, unnest($2::uuid[]) AS uuid
               ) AS data

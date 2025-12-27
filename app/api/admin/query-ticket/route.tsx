@@ -32,7 +32,11 @@ export async function GET(request: NextRequest) {
 
     let email = res.rows[0].email;
     let name = res.rows[0].full_name;
-    let amount = price.getPrice(res.rows[0].type, res.rows[0].payment_method);
+    let amount = price.getPrice(
+      res.rows[0].type,
+      new Date(),
+      res.rows[0].payment_method
+    );
     if (res.rows[0].type == TicketType.GROUP) amount = amount * 4;
 
     let type = res.rows[0].type;

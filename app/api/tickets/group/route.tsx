@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     let paymentUrl = "";
     if (paymentMethod === "CARD") {
-      let amount = price.getPrice(TicketType.GROUP, "CARD") * 4;
+      let amount = price.getPrice(TicketType.GROUP, new Date(), "CARD") * 4;
 
       const initiateCardPaymentResponse = await initiateCardPayment(
         name1,

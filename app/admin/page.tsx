@@ -16,7 +16,12 @@ import {
   speakerTicketIcon,
 } from "../icons";
 import { EVENT_DATE } from "../metadata";
-import { getTicketTypeName, TicketType } from "../ticket-types";
+import {
+  getTicketTypeName,
+  isGroup,
+  isGroupString,
+  TicketType,
+} from "../ticket-types";
 import { customAlert, customAlert2 } from "./custom-alert";
 import styles from "./dashboard.module.css"; // Import CSS styles
 import { Applicant } from "./types/Applicant";
@@ -121,16 +126,15 @@ export default function AdminDashboard() {
             <div
               style={{ position: "relative", width: "32px", height: "32px" }}
             >
-              {applicant.ticket_type === TicketType.GROUP ? group : onePerson}
+              {isGroupString(applicant.ticket_type) ? group : onePerson}
               <span
                 style={{
                   fontSize: ".5rem",
                   fontWeight: 700,
                   position: "absolute",
-                  width:
-                    applicant.ticket_type === TicketType.GROUP
-                      ? "71.5%"
-                      : "100%",
+                  width: isGroupString(applicant.ticket_type)
+                    ? "71.5%"
+                    : "100%",
                   textAlign: "center",
                   top: "20px",
                 }}
@@ -310,15 +314,12 @@ export default function AdminDashboard() {
               <span
                 style={{ fontWeight: "700" }}
                 className={
-                  applicant.ticket_type != TicketType.GROUP && !applicant.paid
+                  !isGroupString(applicant.ticket_type) && !applicant.paid
                     ? styles.ticketType + " cursor-pointer"
                     : ""
                 }
                 onClick={() => {
-                  if (
-                    applicant.ticket_type != TicketType.GROUP &&
-                    !applicant.paid
-                  )
+                  if (!isGroupString(applicant.ticket_type) && !applicant.paid)
                     customAlert2(
                       "",
                       async (type: string) => {
@@ -355,10 +356,7 @@ export default function AdminDashboard() {
                       },
                       applicant.ticket_type,
                       Object.values(TicketType).filter((value) => {
-                        return (
-                          value != TicketType.GROUP &&
-                          value != TicketType.SPEAKER
-                        );
+                        return !isGroup(value) && value != TicketType.SPEAKER;
                       })
                     );
                 }}
@@ -425,7 +423,7 @@ export default function AdminDashboard() {
                     `https://web.whatsapp.com/send/?phone=${
                       applicant.phone
                     }&text=${
-                      applicant.ticket_type == TicketType.GROUP
+                      isGroupString(applicant.ticket_type)
                         ? encodeURIComponent(
                             grpMsg.replace(
                               "{name}",

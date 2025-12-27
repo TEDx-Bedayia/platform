@@ -65,12 +65,12 @@ export async function POST(request: NextRequest) {
     return Response.json({ message: "Invalid ticket type." }, { status: 400 });
   }
 
-  if (ticketCount * price.getPrice(type, "CASH") !== paid) {
+  if (ticketCount * price.getPrice(type, new Date(), "CASH") !== paid) {
     return Response.json(
       {
         message:
           "Paid amount does not match ticket(s) price. Total price is " +
-          ticketCount * price.getPrice(type, "CASH") +
+          ticketCount * price.getPrice(type, new Date(), "CASH") +
           " EGP.",
       },
       { status: 400 }

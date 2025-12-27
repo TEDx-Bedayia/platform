@@ -5,12 +5,18 @@ export enum TicketType {
   GIVEAWAY = "giveaway",
   DISCOUNTED = "discounted",
   TEACHER = "teacher",
+  INDIVIDUAL_EARLY_BIRD = "individual_early_bird",
+  GROUP_EARLY_BIRD = "group_early_bird",
 }
 
 export function getTicketTypeName(type: TicketType): string {
   switch (type) {
     case TicketType.DISCOUNTED:
       return "Rush Hour";
+    case TicketType.INDIVIDUAL_EARLY_BIRD:
+      return "Individual Early Bird";
+    case TicketType.GROUP_EARLY_BIRD:
+      return "Group Early Bird";
     default:
       return type.toString();
   }
@@ -34,4 +40,12 @@ export function getTicketTypeFromName(name: string): TicketType | null {
     default:
       return null;
   }
+}
+
+export function isGroup(type: TicketType | null): boolean {
+  return type === TicketType.GROUP || type === TicketType.GROUP_EARLY_BIRD;
+}
+
+export function isGroupString(type: string): boolean {
+  return isGroup(getTicketTypeFromName(type) as TicketType | null);
 }

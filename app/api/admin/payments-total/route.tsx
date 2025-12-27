@@ -13,9 +13,11 @@ export async function GET(request: NextRequest) {
     let query = await sql.query(`SELECT SUM(
     CASE 
         WHEN type = '${TicketType.INDIVIDUAL}' THEN ${price.individual}
-        WHEN type = '${TicketType.GROUP}' THEN ${price.group} 
+        WHEN type = '${TicketType.GROUP}' THEN ${price.group}
         WHEN type = '${TicketType.DISCOUNTED}' THEN ${price.discounted}
         WHEN type = '${TicketType.TEACHER}' THEN ${price.teacher}
+        WHEN type = '${TicketType.INDIVIDUAL_EARLY_BIRD}' THEN ${price.individual_early_bird}
+        WHEN type = '${TicketType.GROUP_EARLY_BIRD}' THEN ${price.group_early_bird}
         ELSE 0
     END
     ) AS total_price
