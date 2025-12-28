@@ -16,131 +16,321 @@
     <meta name="keywords" content="TEDx, eTicket, QR Code, Bedayia, School" />
     <title>TEDx'${year} Invitation eTicket</title>
     <style>
+      /* ===== Base ===== */
       body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(160deg, #f8fafc 0%, #eef2f8 100%);
         margin: 0;
         padding: 0;
         -webkit-font-smoothing: antialiased;
-        color: #333;
+        -moz-osx-font-smoothing: grayscale;
+        color: #1e293b;
+        min-height: 100vh;
       }
 
+      /* ===== Card Container ===== */
       .email-container {
         width: 100%;
-        max-width: 600px;
-        margin: 4em auto;
+        max-width: 580px;
+        margin: 2.5em auto;
         background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+          0 20px 50px -12px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
       }
 
+      /* ===== Header ===== */
       .header {
-        background-color: #e62b1e;
-        color: white;
+        background: linear-gradient(
+          135deg,
+          #dc2626 0%,
+          #ef4444 50%,
+          #f87171 100%
+        );
+        color: #ffffff;
         text-align: center;
-        padding: 20px;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
+        padding: 40px 32px 36px;
+        position: relative;
+      }
+
+      .header::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: #ffffff;
+        border-radius: 24px 24px 0 0;
+      }
+
+      .header-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        opacity: 0.9;
+        margin-bottom: 8px;
       }
 
       .header h1 {
         margin: 0;
-        font-size: 24px;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.2;
+        letter-spacing: -0.3px;
       }
 
+      /* ===== Content ===== */
       .content {
-        padding: 20px;
+        padding: 8px 36px 28px;
         text-align: center;
       }
 
-      .content h1 {
-        color: #e62b1e;
-        font-size: 22px;
-        margin-bottom: 15px;
+      .ticket-title {
+        display: inline-block;
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        color: #dc2626;
+        font-size: 18px;
+        font-weight: 700;
+        padding: 10px 24px;
+        border-radius: 50px;
+        margin: 0 0 20px;
+        border: 1px solid #fecaca;
       }
 
-      .content p {
-        font-size: 16px;
-        line-height: 1.6;
-        margin-bottom: 15px;
+      .intro-text {
+        font-size: 15px;
+        line-height: 1.75;
+        color: #475569;
+        margin: 0 0 8px;
       }
 
-      .qr-code {
-        margin: 20px 0;
+      .highlight-text {
+        color: #0f172a;
+        font-weight: 600;
+      }
+
+      /* ===== QR Section ===== */
+      .qr-section {
+        margin: 28px 0;
+        padding: 28px 24px;
+        background: linear-gradient(180deg, #fafbfc 0%, #f1f5f9 100%);
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .qr-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 16px;
       }
 
       .qr-code img {
-        width: 400px;
-        max-width: 90%;
+        width: 280px;
+        max-width: 100%;
         height: auto;
+        display: block;
+        margin: 0 auto;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
       }
 
-      .button {
-        display: inline-block;
-        background-color: #e62b1e;
-        color: white;
-        padding: 12px 24px;
+      .qr-fallback {
+        margin-top: 16px;
+        font-size: 13px;
+        color: #64748b;
+      }
+
+      .qr-fallback a {
+        color: #dc2626;
+        font-weight: 600;
         text-decoration: none;
+        padding: 2px 8px;
+        background: #fef2f2;
         border-radius: 4px;
-        margin: 20px 0;
+        border-bottom: 1px solid #fecaca;
       }
 
+      /* ===== Info Cards ===== */
+      .info-section {
+        text-align: left;
+        margin: 24px 0 0;
+      }
+
+      .info-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 18px 20px;
+        margin-bottom: 14px;
+      }
+
+      .info-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .info-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        opacity: 0.7;
+      }
+
+      .info-card-title {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        margin: 0;
+      }
+
+      .info-card p {
+        font-size: 14px;
+        line-height: 1.65;
+        color: #334155;
+        margin: 0;
+      }
+
+      .info-card a {
+        color: #dc2626;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .info-card strong {
+        color: #0f172a;
+        font-weight: 700;
+      }
+
+      .ticket-id {
+        display: inline-block;
+        font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 12px;
+        background: #f1f5f9;
+        padding: 4px 10px;
+        border-radius: 6px;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+      }
+
+      /* ===== Sign-off ===== */
+      .signoff {
+        text-align: center;
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .signoff p {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #475569;
+        margin: 0;
+      }
+
+      .signoff .team-name {
+        font-weight: 700;
+        color: #dc2626;
+        margin-top: 12px;
+        display: block;
+      }
+
+      /* ===== Footer ===== */
       .footer {
         text-align: center;
-        padding: 20px;
-        font-size: 12px;
-        color: #777;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-        background-color: #f9f9f9;
+        padding: 24px 28px 28px;
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+        border-top: 1px solid #e2e8f0;
       }
 
+      .footer-links {
+        margin-bottom: 16px;
+      }
+
+      .footer-link {
+        display: inline-block;
+        color: #dc2626 !important;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 16px;
+        background: #ffffff;
+        border-radius: 8px;
+        margin: 4px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+      }
+
+      .footer-copyright {
+        font-size: 11px;
+        color: #94a3b8;
+        margin: 0;
+      }
+
+      /* ===== Responsive ===== */
       @media (max-width: 600px) {
         .email-container {
-          width: 100%;
-        }
-
-        .content h1 {
-          font-size: 20px;
-        }
-
-        .content p {
-          font-size: 14px;
-        }
-
-        .button {
-          font-size: 14px;
-          padding: 10px 20px;
-        }
-      }
-
-      @media (prefers-color-scheme: dark) {
-        body {
-          background-color: #f4f4f4;
-          color: #333;
-        }
-
-        .email-container {
-          background-color: #ffffff;
+          width: 94%;
+          margin: 1em auto;
+          border-radius: 20px;
         }
 
         .header {
-          background-color: #e62b1e;
-          color: white;
+          padding: 32px 24px 28px;
         }
 
-        .content h1 {
-          color: #e62b1e;
+        .header h1 {
+          font-size: 24px;
         }
 
-        .button {
-          background-color: #e62b1e;
-          color: white;
+        .content {
+          padding: 8px 24px 24px;
         }
 
-        .footer {
-          color: #777;
-          background-color: #f9f9f9;
+        .ticket-title {
+          font-size: 16px;
+          padding: 8px 20px;
+        }
+
+        .intro-text {
+          font-size: 14px;
+        }
+
+        .qr-section {
+          padding: 24px 18px;
+          margin: 24px 0;
+        }
+
+        .qr-code img {
+          width: 240px;
+        }
+
+        .info-card {
+          padding: 16px 18px;
+        }
+
+        .info-card p {
+          font-size: 13px;
+        }
+      }
+
+      /* ===== Force light mode ===== */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(160deg, #f8fafc 0%, #eef2f8 100%);
+          color: #1e293b;
+        }
+        .email-container {
+          background-color: #ffffff;
         }
       }
     </style>
@@ -150,69 +340,100 @@
     <table class="email-container" cellpadding="0" cellspacing="0">
       <tr>
         <td class="header">
-          <h1>Welcome to TEDxBedayia&apos;${year}!</h1>
+          <div class="header-eyebrow">You&apos;re Invited To</div>
+          <h1>TEDxBedayia&apos;${year}</h1>
         </td>
       </tr>
       <tr>
         <td class="content">
-          <h1>${name}</h1>
+          <div class="ticket-title">${name}</div>
           <p style="color: grey">
             Thank you for being a part of this year's event! Please forward this
             email to one of your friends or family whom you want to invite to
             the event.
           </p>
-          <p>
-            We&apos;re excited to have you join us at TEDxBedayia&apos;${year}.
-            Your journey to inspiring ideas and meaningful conversations is just
-            a scan away!
-          </p>
-          <p>
-            Below is your personal eTicket QR code. Please present this code
-            when you arrive at the event for seamless entry.
+
+          <p class="intro-text">
+            Get ready for an unforgettable experience filled with
+            <span class="highlight-text">inspiring ideas</span> and
+            <span class="highlight-text">meaningful conversations</span>. Your
+            journey begins with a single scan.
           </p>
 
           <!-- QR Code Section -->
-          <div class="qr-code">
-            <img src="${qrCodeURL}" alt="Your eTicket QR Code" />
+          <div class="qr-section">
+            <div class="qr-label">Your Entry Pass</div>
+            <div class="qr-code">
+              <img src="${qrCodeURL}" alt="Your eTicket QR Code" />
+            </div>
+            <div class="qr-fallback">
+              Can&apos;t see the code?
+              <a href="${qrCodeURL}">Tap here</a> to view it directly.
+            </div>
           </div>
 
-          <p>
-            Remember, keep this code safe and handy as you&apos;ll need it to
-            enter the event! You can also print it if you prefer.
-          </p>
-          <p>{EVENT_DESC}</p>
-          <p>
-            If you have any questions or need assistance, feel free to reach out
-            to us any time on WhatsApp at <strong>{PHONE}</strong>. If asked
-            about it, your ID is: <strong>${uuid}</strong>. Please don&apos;t
-            share this code as it is unique to you and only allows one entry.
-            You are allowed to give this code to someone else if you are unable
-            to attend.
-          </p>
-          <p>
-            We&apos;re looking forward to seeing you there! <br />
-            Warm regards, <br />
-            The TEDxYouth@BedayiaSchool&apos;${year} Team
-          </p>
+          <!-- Info Cards -->
+          <div class="info-section">
+            <div class="info-card">
+              <div class="info-card-header">
+                <span class="info-card-title">📍 Event Details</span>
+              </div>
+              <p>
+                {EVENT_DESC}
+                <a href="https://maps.app.goo.gl/8z8VZanEjNgRXzZcA"
+                  >Open in Google Maps →</a
+                >
+              </p>
+            </div>
+
+            <div class="info-card">
+              <div class="info-card-header">
+                <span class="info-card-title">💬 Need Help?</span>
+              </div>
+              <p>
+                Reach us anytime on WhatsApp at <strong>{PHONE}</strong>. Your
+                ticket ID: <span class="ticket-id">${uuid}</span>
+              </p>
+            </div>
+
+            <div class="info-card">
+              <div class="info-card-header">
+                <span class="info-card-title">⚠️ Important</span>
+              </div>
+              <p>
+                This QR code is unique to you and grants
+                <strong>one entry only</strong>. Keep it safe! You may transfer
+                it to someone else if you can&apos;t attend.
+              </p>
+            </div>
+          </div>
+
+          <!-- Sign-off -->
+          <div class="signoff">
+            <p>
+              We can&apos;t wait to see you there! ✨
+              <span class="team-name"
+                >— The TEDxYouth@BedayiaSchool&apos;${year} Team</span
+              >
+            </p>
+          </div>
         </td>
       </tr>
       <tr>
         <td class="footer">
-          <p>
-            &copy; 2024 - 20${year} TEDxYouthBedayiaSchool&apos;${year}.
-            Developed by Aly Mohamed Salah.
-          </p>
-          <p>
-            <a href="https://www.tedxbedayia.com" style="color: #e62b1e"
-              >Visit our website</a
+          <div class="footer-links">
+            <a href="https://www.tedxbedayia.com" class="footer-link"
+              >🌐 Website</a
             >
-            <br />
-
             <a
               href="https://www.instagram.com/tedxyouthbedayiaschool/"
-              style="color: #e62b1e"
-              >Follow Us On Instagram</a
+              class="footer-link"
+              >📸 Instagram</a
             >
+          </div>
+          <p class="footer-copyright">
+            © 2024-20${year} TEDxYouth@BedayiaSchool · Crafted by Aly Mohamed
+            Salah
           </p>
         </td>
       </tr>
