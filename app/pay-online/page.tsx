@@ -150,6 +150,12 @@ export default function Page() {
             e.preventDefault();
 
             addLoader();
+            const redirectLink = currentOption.redirectLinks?.[customer.type];
+            if (redirectLink) {
+              router.push(redirectLink);
+              removeLoader();
+              return;
+            }
             const response =
               customer.type !== TicketType.GROUP ||
               !customer.extraNames ||
@@ -219,7 +225,15 @@ export default function Page() {
           <h2 className={styles.payment_area_h2}>Payment Method</h2>
           <div className={styles.payment_options_list}>
             {Object.keys(paymentOptions)
-              .filter((key) => key !== "CASH")
+              .filter((key) => {
+                if (key === "CASH") return false;
+                const option = paymentOptions[key as PaymentMethodKey];
+                // If method has redirectLinks, only show if there's a link for this ticket type
+                if (option.redirectLinks) {
+                  return !!option.redirectLinks[customer.type];
+                }
+                return true;
+              })
               .map((key) => {
                 const methodKey = key as PaymentMethodKey;
                 const option = paymentOptions[methodKey];
@@ -290,7 +304,9 @@ export default function Page() {
             )}
 
             <button type="submit" className={styles.pay_button}>
-              Confirm EGP {customer.price.toFixed(2)} Payment
+              {currentOption.redirectLinks?.[customer.type]
+                ? `Pay with ${currentOption.displayName}`
+                : `Confirm EGP ${customer.price.toFixed(2)} Payment`}
             </button>
           </div>
         </form>

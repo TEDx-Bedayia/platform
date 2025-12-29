@@ -94,7 +94,7 @@
   flex-direction: row;
   width: 100%;
   gap: 0.75rem;
-  overflow-y: scroll;
+  overflow-x: auto;
 }
 
 .payment_option {

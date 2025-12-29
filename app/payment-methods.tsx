@@ -1,8 +1,9 @@
 import { IPN, PHONE, TELDA, VFCASH } from "@/app/metadata";
 import { ArrowRight, CreditCard, Phone, Wallet } from "lucide-react";
 import { FC } from "react";
+import { TicketType } from "./ticket-types";
 
-export type PaymentMethodKey = "TLDA" | "IPN" | "VFCASH" | "CASH";
+export type PaymentMethodKey = "TLDA" | "IPN" | "VFCASH" | "CASH" | "CARD";
 
 export interface PaymentOptionProps {
   methodKey: PaymentMethodKey;
@@ -18,6 +19,7 @@ export interface PaymentMethod {
   instructions?: FC<{ price: number }>;
   field?: Field;
   icon: FC;
+  redirectLinks?: Partial<Record<TicketType, string>>;
 }
 
 export interface Field {
@@ -115,6 +117,21 @@ const EWallet: FC<{ price: number }> = ({ price }) => {
   );
 };
 
+const Card: FC<{ price: number }> = ({ price }) => {
+  return (
+    <>
+      <li>
+        Go to the <strong>Payment Section</strong> of your mobile E-Wallet app
+        (e.g., Vodafone Cash, Fawry).
+      </li>
+      <li>
+        Once transferred, send a <strong>screenshot</strong> to the following
+        WhatsApp number <strong>{PHONE}</strong>.
+      </li>
+    </>
+  );
+};
+
 export const paymentOptions: Record<PaymentMethodKey, PaymentMethod> = {
   CASH: {
     displayName: "Bedayia High School Office (Cash)",
@@ -169,5 +186,17 @@ export const paymentOptions: Record<PaymentMethodKey, PaymentMethod> = {
     },
 
     icon: Phone,
+  },
+  CARD: {
+    displayName: "Credit/Debit Card",
+    identifier: "CARD",
+    to: "Online Payment Gateway",
+    instructions: Card,
+    redirectLinks: {
+      [TicketType.INDIVIDUAL]: "https://admission.bedayia.com/events",
+      [TicketType.GROUP]: "https://admission.bedayia.com/events",
+      // Add more ticket types and their links as needed
+    },
+    icon: CreditCard,
   },
 };
