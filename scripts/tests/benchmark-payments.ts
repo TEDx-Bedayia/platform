@@ -128,10 +128,9 @@ async function createBenchmarkGroup(suffix: string): Promise<number[]> {
     ids.push(result.rows[0].id);
   }
 
-  const grpid = 900000 + Math.floor(Math.random() * 100000);
   await sql`
-    INSERT INTO groups (grpid, id1, id2, id3, id4)
-    VALUES (${grpid}, ${ids[0]}, ${ids[1]}, ${ids[2]}, ${ids[3]})
+    INSERT INTO groups (id1, id2, id3, id4)
+    VALUES (${ids[0]}, ${ids[1]}, ${ids[2]}, ${ids[3]})
   `;
 
   return ids;
