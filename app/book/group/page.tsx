@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../book.module.css";
 
 import { verifyEmail } from "@/app/api/utils/input-sanitization";
@@ -29,6 +29,37 @@ export default function GroupTickets() {
   });
 
   const [useSameEmail, setUseSameEmail] = useState(true);
+
+  // Check for prefill data from pay-online back navigation
+  useEffect(() => {
+    const prefillData = sessionStorage.getItem("booking_prefill");
+    if (prefillData) {
+      try {
+        const data = JSON.parse(prefillData);
+        if (data.type === TicketType.GROUP) {
+          const names = [data.name || "", ...(data.extraNames || ["", "", ""])];
+          const emails = [
+            data.email || "",
+            ...(data.extraEmails || ["", "", ""]),
+          ];
+          setFormData({
+            names,
+            emails,
+            phone: data.phone || "",
+            paymentMethod: "",
+          });
+          // Check if emails are different to set useSameEmail correctly
+          const uniqueEmails = new Set(emails.filter((e) => e !== ""));
+          if (uniqueEmails.size > 1) {
+            setUseSameEmail(false);
+          }
+        }
+        sessionStorage.removeItem("booking_prefill");
+      } catch (err) {
+        console.error("Failed to parse prefill data:", err);
+      }
+    }
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>

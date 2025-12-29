@@ -142,6 +142,30 @@ export default function Page() {
       </div>
 
       <div className={styles.payment_area}>
+        <button
+          type="button"
+          className={styles.back_button}
+          onClick={() => {
+            // Store data for back-sync to pre-fill the booking form
+            sessionStorage.setItem(
+              "booking_prefill",
+              JSON.stringify({
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone,
+                type: customer.type,
+                extraNames: customer.extraNames,
+                extraEmails: customer.extraEmails,
+              })
+            );
+            sessionStorage.removeItem("checkout");
+            router.push(
+              customer.type === TicketType.GROUP ? "/book/group" : "/book"
+            );
+          }}
+        >
+          ← Edit details
+        </button>
         <h1 className={styles.payment_area_h1}>Checkout</h1>
         <hr className={styles.payment_area_hr} />
 
@@ -184,12 +208,12 @@ export default function Page() {
                     body: JSON.stringify({
                       name1: customer.name,
                       email1: customer.email,
-                      name2: customer.extraNames[0],
-                      email2: customer.extraEmails[0],
-                      name3: customer.extraNames[1],
-                      email3: customer.extraEmails[1],
-                      name4: customer.extraNames[2],
-                      email4: customer.extraEmails[2],
+                      name2: customer.extraNames[0] ?? customer.name,
+                      email2: customer.extraEmails[0] ?? customer.email,
+                      name3: customer.extraNames[1] ?? customer.name,
+                      email3: customer.extraEmails[1] ?? customer.email,
+                      name4: customer.extraNames[2] ?? customer.name,
+                      email4: customer.extraEmails[2] ?? customer.email,
                       phone: customer.phone,
                       paymentMethod: customer.additionalInfo
                         ? `${customer.paymentMethod}@${customer.additionalInfo}`

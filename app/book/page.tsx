@@ -283,6 +283,25 @@ export default function SingleTickets() {
     if (new URLSearchParams(window.location.search).get("rush") !== null) {
       setAskForCode(true);
     }
+
+    // Check for prefill data from pay-online back navigation
+    const prefillData = sessionStorage.getItem("booking_prefill");
+    if (prefillData) {
+      try {
+        const data = JSON.parse(prefillData);
+        if (data.type === TicketType.INDIVIDUAL || !data.type) {
+          setFormData({
+            email: data.email || "",
+            name: data.name || "",
+            phone: data.phone || "",
+            paymentMethod: "",
+          });
+        }
+        sessionStorage.removeItem("booking_prefill");
+      } catch (err) {
+        console.error("Failed to parse prefill data:", err);
+      }
+    }
   }, [askForCode]);
 
   const handleChange = (
