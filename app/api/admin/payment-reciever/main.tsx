@@ -116,7 +116,7 @@ async function generateBatchUUIDs(
 }
 
 /**
- * Fetches unpaid attendees by payment method, with optional email filter for CASH.
+ * Fetches all unpaid attendees by payment method, with optional email filter for CASH.
  * Uses parameterized queries and row-level locking.
  *
  * NOTE: payment_method column stores the full format (e.g., "TLDA@username", "VFCASH@phonenumber")
@@ -160,6 +160,7 @@ async function fetchUnpaidAttendees(
 /**
  * Fetches unpaid attendees by specific IDs.
  * Uses parameterized queries and row-level locking.
+ * CASH can't reach this stage.
  */
 async function fetchUnpaidByIds(
   client: VercelPoolClient,
@@ -224,6 +225,7 @@ async function expandGroupMembers(
   fullPaymentMethod: string,
   paymentDate: Date
 ): Promise<UnpaidAttendee[]> {
+  if (!fullPaymentMethod.startsWith("CASH")) return attendees;
   const groupAttendeeIds = attendees
     .filter((a) => a.type === TicketType.GROUP)
     .map((a) => a.id);
