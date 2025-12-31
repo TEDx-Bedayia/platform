@@ -231,19 +231,18 @@ async function submitTickets(
     return Response.json({ message: "Invalid Phone Number." }, { status: 400 });
   }
 
-  let q = "";
-  for (let i = 0; i < emails.length; i++) {
-    q += `('${emails[i]}', '${names[i]}', '${paymentMethod}', '${phone}', '${TicketType.GROUP}')`;
-    if (i != emails.length - 1) {
-      q += ", ";
-    }
-  }
-
   try {
-    let res = await sql.query(
-      `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ${q} RETURNING *;`
-    );
-    let ids = res.rows.map((row: any) => row.id);
+    // Use parameterized query to prevent SQL injection
+    const res = await sql`
+      INSERT INTO attendees (email, full_name, payment_method, phone, type) 
+      VALUES 
+        (${emails[0]}, ${names[0]}, ${paymentMethod}, ${phone}, ${TicketType.GROUP}),
+        (${emails[1]}, ${names[1]}, ${paymentMethod}, ${phone}, ${TicketType.GROUP}),
+        (${emails[2]}, ${names[2]}, ${paymentMethod}, ${phone}, ${TicketType.GROUP}),
+        (${emails[3]}, ${names[3]}, ${paymentMethod}, ${phone}, ${TicketType.GROUP})
+      RETURNING *
+    `;
+    const ids = res.rows.map((row: any) => row.id);
 
     return Response.json({ success: true, ids });
   } catch (err: any) {

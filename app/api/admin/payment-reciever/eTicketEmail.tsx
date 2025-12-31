@@ -47,9 +47,8 @@ export async function sendEmail(
     });
 
     if (id) {
-      let qq = await sql.query(
-        "UPDATE attendees SET sent = true WHERE id = '" + id + "' RETURNING *"
-      );
+      const qq =
+        await sql`UPDATE attendees SET sent = true WHERE id = ${id} RETURNING *`;
 
       if (qq.rowCount === 0) {
         console.error("SQL ERROR; sent = false but it's sent.");
