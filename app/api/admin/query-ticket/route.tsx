@@ -3,8 +3,12 @@ import { NextRequest } from "next/server";
 import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/prices";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
+import { validateCsrf } from "../../utils/csrf";
 
 export async function GET(request: NextRequest) {
+  const csrfError = validateCsrf(request);
+  if (csrfError) return csrfError;
+
   let params = request.nextUrl.searchParams;
 
   if (!canUserAccess(request, ProtectedResource.QUERY_TICKETS)) {

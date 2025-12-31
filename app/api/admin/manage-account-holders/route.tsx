@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
+import { validateCsrf } from "../../utils/csrf";
 import {
   createAccountHolder,
   getAllAccountHolders,
@@ -8,6 +9,9 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
+    const csrfError = validateCsrf(request);
+    if (csrfError) return csrfError;
+
     if (!canUserAccess(request, ProtectedResource.MANAGE_ACCOUNT_HOLDERS)) {
       return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
     }

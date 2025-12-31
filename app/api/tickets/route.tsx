@@ -5,6 +5,7 @@ import { TicketType } from "../../ticket-types";
 import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../admin/payment-reciever/main";
 import { initiateCardPayment } from "../utils/card-payment";
+import { validateCsrfLenient } from "../utils/csrf";
 import { sendBookingConfirmation } from "../utils/email-helper";
 import {
   checkPhone,
@@ -17,6 +18,9 @@ import { price } from "./prices";
 
 // email, name, phone, paymentMethod
 export async function POST(request: NextRequest) {
+  const csrfError = validateCsrfLenient(request);
+  if (csrfError) return csrfError;
+
   if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
     if (process.env.PAYMOB_TEST_MODE !== "true")
       return Response.json(

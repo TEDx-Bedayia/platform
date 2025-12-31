@@ -1,10 +1,14 @@
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
+import { validateCsrf } from "../../utils/csrf";
 import { sendEmail } from "../payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function GET(request: NextRequest) {
+  const csrfError = validateCsrf(request);
+  if (csrfError) return csrfError;
+
   let params = request.nextUrl.searchParams;
 
   if (!canUserAccess(request, ProtectedResource.TICKET_DASHBOARD)) {

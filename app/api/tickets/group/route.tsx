@@ -3,6 +3,7 @@ import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { TicketType } from "../../../ticket-types";
 import { initiateCardPayment } from "../../utils/card-payment";
+import { validateCsrfLenient } from "../../utils/csrf";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import {
   checkSafety,
@@ -15,6 +16,9 @@ import { price } from "../prices";
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod
 export async function POST(request: NextRequest) {
+  const csrfError = validateCsrfLenient(request);
+  if (csrfError) return csrfError;
+
   if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
     if (process.env.PAYMOB_TEST_MODE !== "true")
       return Response.json(
