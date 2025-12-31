@@ -6,7 +6,6 @@ import "./styles/globals.css";
 import "./styles/hero.css";
 import "./styles/info.css";
 import "./styles/navigation.css";
-import "./styles/testimonials.css";
 import "./styles/theme.css";
 
 import { Bungee, Ubuntu } from "next/font/google";
