@@ -17,20 +17,24 @@ const ubuntu = Ubuntu({ weight: "400", subsets: ["latin"] });
 
 import React, { useState } from "react";
 
+// Import the ImageSlider component
+import ImageSlider from "./components/ImageSlider";
+
 const FAQComponent = () => {
   const faqData = [
     {
       question: "What is the date of the next event?",
-      answer: "The next event date is still to be released. Await us!",
+      answer: "13th of February 2026",
     },
     {
       question: "How can I buy tickets?",
-      answer: "Tickets can be purchased online through our website.",
+      answer:
+        "You can buy the tickets through our website link either through telda, instapay, vodafone cash or Cash at our Bedayia High School Office",
     },
     {
       question: "How can I contact support?",
       answer:
-        "Email us at tedxyouth@bedayia.com for event-related inquiries, or send us a WhatsApp message at +201055782533 for technical support.",
+        "For any support or inquiries, you can contact +20 10 13389776 or +20 10 08527016. Or you can send an email to tedxyouth@bedayia.com",
     },
   ];
 
@@ -251,7 +255,7 @@ export default function Home() {
               style={ubuntu.style}
             >
               Step into a day packed with inspiring talks, powerful
-              performances, and fresh perspectives. Together, we’ll uncover
+              performances, and fresh perspectives. Together, we'll uncover
               ideas worth spreading, spark meaningful conversations, and
               celebrate the power of innovation. Join a community of curious
               minds hungry for change &ndash; this is where inspiration begins.{" "}
@@ -293,11 +297,9 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section>
-          <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">
-            4/2/2026
-          </div>
-        </section>
+
+        {/* Image Slider Section */}
+        <ImageSlider />
       </center>
 
       {/* <section>
@@ -411,7 +413,7 @@ export default function Home() {
 
       <section
         id="info"
-        className="max-phone:pt-[2'rem] mx-0 mb-[4.5rem] mt-4 w-[100%] max-w-[100vw]"
+        className="max-phone:pt-[2rem] mx-0 mb-[4.5rem] mt-4 w-[100%] max-w-[100vw]"
       >
         <div
           id="info-title"
@@ -422,7 +424,7 @@ export default function Home() {
         <center className="flex w-screen shrink-0 flex-row justify-center gap-5 text-start max-phone:flex-col">
           <div className="flex w-full flex-col gap-4 text-center">
             {infoItem(
-              "Await US!",
+              "13th of February, 2026",
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"
@@ -466,7 +468,7 @@ export default function Home() {
               </svg>
             )}
             {infoItem(
-              "??:?? PM",
+              "3:00 PM",
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"

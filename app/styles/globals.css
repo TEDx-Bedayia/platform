@@ -3,9 +3,103 @@
 @tailwind utilities;
 
 :root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 226;
+  --background-end-rgb: 255, 255, 255;
+
   /* Colors */
   background-image: url("/asfalt-dark.png");
   --background: rgba(249, 249, 249, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+/* Swiper Custom Styles */
+.swiper {
+  width: 100%;
+  padding: 20px 0;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  border-radius: 0.75rem; /* rounded-xl equivalent */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.swiper-slide img:hover {
+  transform: scale(1.02);
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #e0e0e0 !important; /* Use the site's color scheme */
+  background: rgba(0, 0, 0, 0.3);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: rgba(238, 238, 238, 0.5);
+  color: #333333 !important;
+}
+
+.swiper-pagination-bullet {
+  background: #e0e0e0;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1;
+  background: #fbed0e; /* Use the site's accent color */
+  transform: scale(1.2);
+}
+
+/* Additional styles for the gallery section */
+.w-full.max-w-6xl.mx-auto.mb-12.px-4 {
+  margin: 0 auto;
+  padding: 0 1rem;
+  margin-bottom: 3rem;
+  max-width: 72rem;
+}
+
+/* Custom scrollbar for the site */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .fixed {
@@ -113,7 +207,7 @@
 }
 
 .btnColor {
-  background-color: #FE0000;
+  background-color: #fe0000;
 }
 
 .btnColor:hover {
