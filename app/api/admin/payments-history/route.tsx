@@ -2,8 +2,12 @@ import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { getPaymentMethods } from "../../../payment-methods";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
+import { validateCsrf } from "../../utils/csrf";
 
 export async function GET(request: NextRequest) {
+  const csrfError = validateCsrf(request);
+  if (csrfError) return csrfError;
+
   if (!canUserAccess(request, ProtectedResource.PAYMENT_LOGS)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }

@@ -106,7 +106,7 @@ export default function Footer() {
           letterSpacing: "0.05em",
         }}
       >
-        &copy; {new Date().getFullYear()} TEDxBedayia. All rights reserved.
+        &copy; 2024-{new Date().getFullYear()} TEDxBedayia. All rights reserved.
       </p>
     </footer>
   );

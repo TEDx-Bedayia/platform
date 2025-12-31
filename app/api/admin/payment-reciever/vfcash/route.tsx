@@ -1,10 +1,14 @@
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
+import { validateCsrf } from "@/app/api/utils/csrf";
 import { type NextRequest } from "next/server";
 import { pay } from "../main";
 
 export const maxDuration = 15;
 
 export async function GET(request: NextRequest) {
+  const csrfError = validateCsrf(request);
+  if (csrfError) return csrfError;
+
   let params = request.nextUrl.searchParams;
 
   if (!canUserAccess(request, ProtectedResource.PAYMENT_DASHBOARD, "VFCASH")) {

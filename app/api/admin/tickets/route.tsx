@@ -1,6 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
+import { validateCsrf } from "../../utils/csrf";
 
 export async function POST() {
   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -8,6 +9,9 @@ export async function POST() {
 
 // Custom GET to fetch all unpaid tickets' emails for marketing purposes
 export async function GET(request: NextRequest) {
+  const csrfError = validateCsrf(request);
+  if (csrfError) return csrfError;
+
   // Check Admin Perms
   if (!canUserAccess(request, ProtectedResource.SUPER_ADMIN)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });

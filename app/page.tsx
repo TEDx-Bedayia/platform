@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import "../mohamed/style.css";
 import "./styles/globals.css";
 import "./styles/hero.css";
 import "./styles/info.css";
@@ -24,92 +23,89 @@ const FAQComponent = () => {
   const faqData = [
     {
       question: "What is the date of the next event?",
-      answer: "13th of February 2026",
+      answer: "13th of February, 2026.",
     },
     {
       question: "How can I buy tickets?",
       answer:
-        "You can buy the tickets through our website link either through telda, instapay, vodafone cash or Cash at our Bedayia High School Office",
+        "You can buy the tickets through our website using Telda, Instapay, Vodafone Cash, Credit/Debit Card through Bedayia's Portal or Cash at our Bedayia High School Office.",
     },
     {
       question: "How can I contact support?",
       answer:
-        "For any support or inquiries, you can contact +20 10 13389776 or +20 10 08527016. Or you can send an email to tedxyouth@bedayia.com",
+        "For any support or inquiries, you can contact +20 10 13389776 or +20 10 08527016. Or you can send an email to tedxyouth@bedayia.com.",
     },
   ];
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {
-    // If clicking the one currently open, close it (set to null).
-    // Otherwise, open the new one (set to index).
     setActiveIndex(activeIndex === index ? null : index);
   };
 
   return (
     <section
       id="faq"
-      className="faq-container"
-      style={{ padding: "2rem", maxWidth: "800px", margin: "auto" }}
+      className="mx-auto w-full max-w-3xl px-6 py-16 max-phone:px-4 max-phone:py-12"
     >
-      <h2 style={{ textAlign: "center", marginBottom: "2rem" }}>
+      <h2
+        className="mb-10 text-center font-title text-4xl font-bold text-white max-phone:text-3xl"
+        style={{ letterSpacing: "0.5px" }}
+      >
         Frequently Asked Questions
       </h2>
-      {faqData.map((item, index) => {
-        const isOpen = activeIndex === index;
 
-        return (
-          <div
-            key={index}
-            className="faq-item"
-            style={{ borderBottom: "1px solid #ddd", padding: "1rem 0" }}
-          >
-            {/* The Question Header */}
-            <div
-              className="faq-question"
-              onClick={() => toggleFAQ(index)}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                outline: "none",
-                border: "none",
-                background: "none",
-                fontSize: "1.1rem",
-                textAlign: "left",
-                width: "100%",
-              }}
+      <div className="flex flex-col gap-3">
+        {faqData.map((item, index) => {
+          const isOpen = activeIndex === index;
+
+          return (
+            <motion.div
+              key={index}
+              className="overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm transition-colors hover:border-white/20 hover:bg-white/[0.07]"
+              initial={false}
             >
-              {item.question}
-
-              {/* The Icon */}
-              <span
-                className="faq-icon"
-                style={{
-                  transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
-                  transition: "transform 0.3s ease", // Added for smooth rotation
-                }}
+              <button
+                className="flex w-full cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left max-phone:px-4 max-phone:py-4"
+                onClick={() => toggleFAQ(index)}
+                aria-expanded={isOpen}
               >
-                +
-              </span>
-            </div>
+                <span
+                  className="font-body text-lg font-medium text-white/90 max-phone:text-base"
+                  style={ubuntu.style}
+                >
+                  {item.question}
+                </span>
 
-            {isOpen && (
-              <div
-                className="faq-answer"
-                style={{
-                  display: "block",
-                  paddingTop: "0.5rem",
-                  color: "#555",
+                <motion.span
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full  text-xl font-bold text-white"
+                  animate={{ rotate: isOpen ? 45 : 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                >
+                  +
+                </motion.span>
+              </button>
+
+              <motion.div
+                initial={false}
+                animate={{
+                  height: isOpen ? "auto" : 0,
+                  opacity: isOpen ? 1 : 0,
                 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="overflow-hidden"
               >
-                {item.answer}
-              </div>
-            )}
-          </div>
-        );
-      })}
+                <p
+                  className="px-6 pb-5 font-body text-base leading-relaxed text-white/70 max-phone:px-4 max-phone:pb-4 max-phone:text-sm"
+                  style={ubuntu.style}
+                >
+                  {item.answer}
+                </p>
+              </motion.div>
+            </motion.div>
+          );
+        })}
+      </div>
     </section>
   );
 };
@@ -302,52 +298,70 @@ export default function Home() {
         <ImageSlider />
       </center>
 
-      {/* <section>
-        <div className="mb-6 font-title font-bold max-phone:text-[2.5em]">
-          Total attendee count: 40000+
-        </div>
-      </section> */}
+      <section className="mx-auto w-full max-w-6xl px-6 py-16 max-phone:px-4 max-phone:py-12">
+        <h2
+          className="mb-10 text-center font-title text-4xl font-bold text-white max-phone:text-3xl"
+          style={{ letterSpacing: "0.5px" }}
+        >
+          What People Say
+        </h2>
 
-      <section className="testimonials">
-        <div className="testimonial-slider">
-          <div className="testimonial">
-            <p className="testimonialText">
-              &quot;TEDx hosts a beautiful culmination of knowledge and
-              entertainment, curated to ensure you have the best of times&quot;
-            </p>
-            <p>- Kareem</p>
-          </div>
-          <div className="testimonial">
-            <p className="testimonialText">
-              &quot;I liked how TEDx had a diverse genre of topics that the
-              speakers spoke about&quot;
-            </p>
-            <p>- Abdelrahman El-Kalla</p>
-          </div>
-          <div className="testimonial">
-            <p className="testimonialText">
-              &quot;The food tasted well and the speakers were fun&quot;
-            </p>
-            <p>- Ibrahim Dawood</p>
-          </div>
-          <div className="testimonial">
-            <p className="testimonialText">
-              &quot;The speaker lounge was perfect&quot;
-            </p>
-            <p>- Omar Emara</p>
-          </div>
-          <div className="testimonial">
-            <p className="testimonialText">
-              &quot;Very interactive audience, making the talks relatable&quot;
-            </p>
-            <p>- Jude Ahmed</p>
-          </div>
-          <div className="testimonial">
-            <p className="testimonialText">
-              &quot;Best event you&apos;ll ever go to&quot;
-            </p>
-            <p>- Omar Mohamed El-Mandooh</p>
-          </div>
+        <div className="grid grid-cols-3 gap-4 max-tablet:grid-cols-2 max-phone:grid-cols-1">
+          {[
+            {
+              quote:
+                "TEDx hosts a beautiful culmination of knowledge and entertainment, curated to ensure you have the best of times",
+              author: "Kareem",
+            },
+            {
+              quote:
+                "I liked how TEDx had a diverse genre of topics that the speakers spoke about",
+              author: "Abdelrahman El-Kalla",
+            },
+            {
+              quote: "I recommend y'all go. You'll have fun",
+              author: "Aly Kotb",
+            },
+            {
+              quote: "The speaker lounge was perfect",
+              author: "Omar Emara",
+            },
+            {
+              quote: "Very interactive audience, making the talks relatable",
+              author: "Jude Ahmed",
+            },
+            {
+              quote: "Best event you'll ever go to",
+              author: "Omar Mohamed El-Mandooh",
+            },
+          ].map((testimonial, index) => (
+            <motion.div
+              key={index}
+              className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/[0.07]"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              viewport={{ once: true }}
+            >
+              <div className="absolute -right-4 -top-4 text-[6rem] font-bold leading-none text-white/5 transition-colors group-hover:text-[#FE0000]/10">
+                &quot;
+              </div>
+
+              <p
+                className="relative z-10 mb-4 text-base leading-relaxed text-white/80 max-phone:text-sm"
+                style={ubuntu.style}
+              >
+                &quot;{testimonial.quote}&quot;
+              </p>
+
+              <p
+                className="mt-auto text-sm font-semibold text-[#FFFFFF]/70"
+                style={ubuntu.style}
+              >
+                ~ {testimonial.author}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </section>
 

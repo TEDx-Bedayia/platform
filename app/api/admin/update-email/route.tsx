@@ -1,11 +1,15 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
+import { validateCsrf } from "../../utils/csrf";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import { sendEmail } from "../payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function POST(request: NextRequest) {
+  const csrfError = validateCsrf(request);
+  if (csrfError) return csrfError;
+
   if (!canUserAccess(request, ProtectedResource.TICKET_DASHBOARD)) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }

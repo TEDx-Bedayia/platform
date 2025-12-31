@@ -6,7 +6,6 @@ import {
   YEAR,
 } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
-import { UUID } from "crypto";
 import { promises } from "fs";
 import { type NextRequest } from "next/server";
 import nodemailer from "nodemailer";
@@ -14,9 +13,14 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import path from "path";
 import { TicketType } from "../../../ticket-types";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
+import { validateCsrf } from "../../utils/csrf";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function GET(request: NextRequest) {
+  // This GET endpoint creates tickets, so it needs CSRF protection
+  const csrfError = validateCsrf(request);
+  if (csrfError) return csrfError;
+
   let params = request.nextUrl.searchParams;
 
   if (!canUserAccess(request, ProtectedResource.INVITATIONS)) {

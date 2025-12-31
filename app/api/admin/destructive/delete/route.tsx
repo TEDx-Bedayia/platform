@@ -1,10 +1,14 @@
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
+import { validateCsrf } from "@/app/api/utils/csrf";
 import { SQLSettings } from "@/app/api/utils/sql-settings";
 import { EVENT_DATE } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+  const csrfError = validateCsrf(req);
+  if (csrfError) return csrfError;
+
   if (!canUserAccess(req, ProtectedResource.SUPER_ADMIN)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

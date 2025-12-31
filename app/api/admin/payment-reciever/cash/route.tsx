@@ -1,5 +1,6 @@
 import { price } from "@/app/api/tickets/prices";
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
+import { validateCsrf } from "@/app/api/utils/csrf";
 import { EARLY_BIRD_UNTIL } from "@/app/metadata";
 import { TicketType } from "@/app/ticket-types";
 import { sql } from "@vercel/postgres";
@@ -10,6 +11,9 @@ import { pay, safeRandUUID } from "../main";
 export const maxDuration = 15;
 
 export async function GET(request: NextRequest) {
+  const csrfError = validateCsrf(request);
+  if (csrfError) return csrfError;
+
   let params = request.nextUrl.searchParams;
 
   if (!canUserAccess(request, ProtectedResource.PAYMENT_DASHBOARD, "CASH")) {

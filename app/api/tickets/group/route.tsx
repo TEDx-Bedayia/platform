@@ -3,6 +3,7 @@ import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { TicketType } from "../../../ticket-types";
 import { initiateCardPayment } from "../../utils/card-payment";
+import { validateCsrfLenient } from "../../utils/csrf";
 import { sendBookingConfirmation } from "../../utils/email-helper";
 import {
   checkSafety,
@@ -15,6 +16,9 @@ import { price } from "../prices";
 // email1, name1, email2, name2, email3, name3, email4, name4,
 // phone, paymentMethod
 export async function POST(request: NextRequest) {
+  const csrfError = validateCsrfLenient(request);
+  if (csrfError) return csrfError;
+
   if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
     if (process.env.PAYMOB_TEST_MODE !== "true")
       return Response.json(
@@ -231,19 +235,18 @@ async function submitTickets(
     return Response.json({ message: "Invalid Phone Number." }, { status: 400 });
   }
 
-  let q = "";
-  for (let i = 0; i < emails.length; i++) {
-    q += `('${emails[i]}', '${names[i]}', '${paymentMethod}', '${phone}', '${TicketType.GROUP}')`;
-    if (i != emails.length - 1) {
-      q += ", ";
-    }
-  }
-
   try {
-    let res = await sql.query(
-      `INSERT INTO attendees (email, full_name, payment_method, phone, type) VALUES ${q} RETURNING *;`
-    );
-    let ids = res.rows.map((row: any) => row.id);
+    // Use parameterized query to prevent SQL injection
+    const res = await sql`
+      INSERT INTO attendees (email, full_name, payment_method, phone, type) 
+      VALUES 
+        (${emails[0]}, ${names[0]}, ${paymentMethod}, ${phone}, ${TicketType.GROUP}),
+        (${emails[1]}, ${names[1]}, ${paymentMethod}, ${phone}, ${TicketType.GROUP}),
+        (${emails[2]}, ${names[2]}, ${paymentMethod}, ${phone}, ${TicketType.GROUP}),
+        (${emails[3]}, ${names[3]}, ${paymentMethod}, ${phone}, ${TicketType.GROUP})
+      RETURNING *
+    `;
+    const ids = res.rows.map((row: any) => row.id);
 
     return Response.json({ success: true, ids });
   } catch (err: any) {
