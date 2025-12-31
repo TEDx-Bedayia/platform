@@ -228,7 +228,6 @@ async function expandGroupMembers(
   fullPaymentMethod: string,
   paymentDate: Date
 ): Promise<UnpaidAttendee[]> {
-  if (!fullPaymentMethod.startsWith("CASH")) return attendees;
   const groupAttendeeIds = attendees
     .filter((a) => a.type === TicketType.GROUP)
     .map((a) => a.id);
