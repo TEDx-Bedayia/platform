@@ -13,6 +13,7 @@ import {
   EARLY_BIRD_UNTIL,
   INDIVIDUAL_EARLY_PRICE,
   INDIVIDUAL_TICKET_PRICE,
+  TICKET_WINDOW,
 } from "../metadata";
 import { TicketType } from "../ticket-types";
 const title = Poppins({ weight: ["100", "400", "700"], subsets: ["latin"] });
@@ -334,6 +335,11 @@ export default function SingleTickets() {
   async function submitTicket(type: string) {
     addLoader();
     formData.paymentMethod = type;
+    if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
+      customAlert("Ticket booking is currently closed.");
+      removeLoader();
+      return;
+    }
     if (
       formData.phone.length < 11 ||
       (formData.phone.includes("+") && formData.phone.length != 13)
@@ -493,7 +499,13 @@ export default function SingleTickets() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "tween", ease: "anticipate", duration: 2 }}
           >
-            <button type="submit" style={{ ...title.style, width: "100%" }}>
+            <button
+              type="submit"
+              style={{ ...title.style, width: "100%" }}
+              onClick={() => {
+                formData.paymentMethod = code ? "CASH" : "ONLINE";
+              }}
+            >
               {code !== "" ? <span>Submit</span> : <span>Pay Online</span>}
             </button>
           </motion.div>
