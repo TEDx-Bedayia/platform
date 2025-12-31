@@ -169,6 +169,9 @@ async function fetchUnpaidByIds(
   paymentDate: Date
 ): Promise<UnpaidAttendee[]> {
   if (ids.length === 0) return [];
+  if (fullPaymentMethod.startsWith("CASH")) {
+    fullPaymentMethod = "CASH";
+  }
 
   const query = await client.query(
     `SELECT * FROM attendees 
@@ -582,9 +585,6 @@ export async function pay(
       );
     }
 
-    // Expand to include all group members if dealing with groups
-    unpaid = await expandGroupMembers(client, unpaid, from, paymentDate);
-
     // If specific IDs were provided, filter to those (plus their group members)
     if (id_if_needed !== "") {
       const requestedIds = id_if_needed
@@ -604,6 +604,9 @@ export async function pay(
           { status: 400 }
         );
       }
+    } else {
+      // Expand to include all group members if dealing with groups
+      unpaid = await expandGroupMembers(client, unpaid, from, paymentDate);
     }
 
     // Analyze what we have
