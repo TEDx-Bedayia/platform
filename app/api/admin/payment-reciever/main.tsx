@@ -1,6 +1,6 @@
 import { Applicant } from "@/app/admin/types/Applicant";
 import { EARLY_BIRD_UNTIL } from "@/app/metadata";
-import { sql } from "@vercel/postgres";
+import { sql, VercelPoolClient } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { TicketType } from "../../../ticket-types";
@@ -8,75 +8,573 @@ import { price } from "../../tickets/prices";
 import { ResponseCode } from "../../utils/response-codes";
 import { sendEmail } from "./eTicketEmail";
 
-export async function safeRandUUID() {
-  let uuid = randomUUID();
-  let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
-  while (query.rows.length !== 0) {
-    uuid = randomUUID();
-    query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
-  }
-  return uuid;
+// ============================================================================
+// Constants
+// ============================================================================
+
+const GROUP_SIZE = 4;
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface PaymentSource {
+  method: string;
+  identifier: string | null;
 }
 
+interface UnpaidAttendee {
+  id: number;
+  full_name: string;
+  email: string;
+  phone: string;
+  type: TicketType;
+  payment_method: string;
+  paid: boolean;
+  uuid?: string;
+  price: number;
+  ticket_type?: string;
+}
+
+interface GroupInfo {
+  grpid: number;
+  memberIds: number[];
+}
+
+interface AmbiguityResult {
+  ambiguous: true;
+  found: UnpaidAttendee[];
+  groupMembers: Record<string, Applicant[]>;
+}
+
+interface ProcessedPayment {
+  paidAmount: number;
+  paidAttendees: UnpaidAttendee[];
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Parses payment source string into method and identifier.
+ * Examples: "TLDA@username" -> { method: "TLDA", identifier: "username" }
+ *           "CASH@email@domain.com" -> { method: "CASH", identifier: "email@domain.com" }
+ */
+function parsePaymentSource(from: string): PaymentSource {
+  const [method, ...rest] = from.split("@");
+  return {
+    method,
+    identifier: rest.length > 0 ? rest.join("@") : null,
+  };
+}
+
+/**
+ * Formats payment source for storage in pay_backup.
+ * Replaces @ with space in identifier to avoid parsing issues.
+ */
+function formatPaymentSourceForStorage(source: PaymentSource): string {
+  if (source.identifier) {
+    return `${source.method}@${source.identifier.replaceAll("@", " ")}`;
+  }
+  return source.method;
+}
+
+/**
+ * Batch-generates unique UUIDs, checking against existing ones in DB.
+ * Much faster than generating one at a time.
+ */
+async function generateBatchUUIDs(
+  client: VercelPoolClient,
+  count: number
+): Promise<string[]> {
+  if (count === 0) return [];
+
+  const uuids: string[] = [];
+
+  while (uuids.length < count) {
+    const needed = count - uuids.length;
+    const candidates: string[] = [];
+
+    for (let i = 0; i < needed; i++) {
+      candidates.push(randomUUID());
+    }
+
+    // Check which UUIDs already exist (should be extremely rare)
+    // Cast both sides to text to avoid type mismatch issues
+    const existing = await client.query(
+      `SELECT uuid FROM attendees WHERE uuid::text = ANY($1::text[])`,
+      [candidates]
+    );
+
+    const existingSet = new Set(existing.rows.map((r) => r.uuid));
+    const valid = candidates.filter((u) => !existingSet.has(u));
+    uuids.push(...valid);
+  }
+
+  return uuids;
+}
+
+/**
+ * Fetches all unpaid attendees by payment method, with optional email filter for CASH.
+ * Uses parameterized queries and row-level locking.
+ *
+ * NOTE: payment_method column stores the full format (e.g., "TLDA@username", "VFCASH@phonenumber")
+ * For CASH payments, we additionally filter by email since CASH doesn't have a unique identifier.
+ */
+async function fetchUnpaidAttendees(
+  client: VercelPoolClient,
+  fullPaymentMethod: string,
+  method: string,
+  identifier: string | null,
+  paymentDate: Date
+): Promise<UnpaidAttendee[]> {
+  let query;
+
+  if (method === "CASH" && identifier) {
+    // CASH payments filter by method AND email
+    query = await client.query(
+      `SELECT * FROM attendees 
+       WHERE payment_method = $1 AND paid = false AND email = $2
+       FOR UPDATE`,
+      [method, identifier]
+    );
+  } else {
+    // Other payments query by full payment_method (e.g., "TLDA@username")
+    query = await client.query(
+      `SELECT * FROM attendees 
+       WHERE payment_method = $1 AND paid = false
+       FOR UPDATE`,
+      [fullPaymentMethod]
+    );
+  }
+
+  return query.rows
+    .filter((row) => row.paid === false)
+    .map((row) => ({
+      ...row,
+      price: price.getPrice(row.type, paymentDate, row.payment_method),
+    }));
+}
+
+/**
+ * Fetches unpaid attendees by specific IDs.
+ * Uses parameterized queries and row-level locking.
+ * CASH can't reach this stage.
+ */
+async function fetchUnpaidByIds(
+  client: VercelPoolClient,
+  ids: number[],
+  fullPaymentMethod: string,
+  paymentDate: Date
+): Promise<UnpaidAttendee[]> {
+  if (ids.length === 0) return [];
+  if (fullPaymentMethod.startsWith("CASH")) {
+    fullPaymentMethod = "CASH";
+  }
+
+  const query = await client.query(
+    `SELECT * FROM attendees 
+     WHERE id = ANY($1::int[]) AND payment_method = $2 AND paid = false
+     FOR UPDATE`,
+    [ids, fullPaymentMethod]
+  );
+
+  return query.rows
+    .filter((row) => row.paid === false)
+    .map((row) => ({
+      ...row,
+      price: price.getPrice(row.type, paymentDate, row.payment_method),
+    }));
+}
+
+/**
+ * Fetches group info for given attendee IDs.
+ * Returns a map of attendee ID -> group info.
+ */
+async function fetchGroupsForAttendees(
+  client: VercelPoolClient,
+  attendeeIds: number[]
+): Promise<Map<number, GroupInfo>> {
+  if (attendeeIds.length === 0) return new Map();
+
+  const query = await client.query(
+    `SELECT grpid, id1, id2, id3, id4 FROM groups 
+     WHERE id1 = ANY($1::int[]) OR id2 = ANY($1::int[]) 
+        OR id3 = ANY($1::int[]) OR id4 = ANY($1::int[])`,
+    [attendeeIds]
+  );
+
+  const groupMap = new Map<number, GroupInfo>();
+
+  for (const row of query.rows) {
+    const memberIds = [row.id1, row.id2, row.id3, row.id4];
+    const groupInfo: GroupInfo = { grpid: row.grpid, memberIds };
+
+    for (const id of memberIds) {
+      groupMap.set(id, groupInfo);
+    }
+  }
+
+  return groupMap;
+}
+
+/**
+ * Expands attendee list to include all group members for GROUP tickets.
+ */
+async function expandGroupMembers(
+  client: VercelPoolClient,
+  attendees: UnpaidAttendee[],
+  fullPaymentMethod: string,
+  paymentDate: Date
+): Promise<UnpaidAttendee[]> {
+  const groupAttendeeIds = attendees
+    .filter((a) => a.type === TicketType.GROUP)
+    .map((a) => a.id);
+
+  if (groupAttendeeIds.length === 0) return attendees;
+
+  const groupMap = await fetchGroupsForAttendees(client, groupAttendeeIds);
+
+  // Collect all member IDs we need to fetch
+  const allMemberIds = new Set<number>();
+  for (const attendee of attendees) {
+    allMemberIds.add(attendee.id);
+    const groupInfo = groupMap.get(attendee.id);
+    if (groupInfo) {
+      groupInfo.memberIds.forEach((id) => allMemberIds.add(id));
+    }
+  }
+
+  // Fetch all members we don't already have
+  const existingIds = new Set(attendees.map((a) => a.id));
+  const missingIds = [...allMemberIds].filter((id) => !existingIds.has(id));
+
+  if (missingIds.length === 0) return attendees;
+
+  const additionalMembers = await fetchUnpaidByIds(
+    client,
+    missingIds,
+    fullPaymentMethod,
+    paymentDate
+  );
+
+  return [...attendees, ...additionalMembers];
+}
+
+/**
+ * Calculates total price and categorizes attendees by type.
+ */
+function analyzeUnpaidAttendees(attendees: UnpaidAttendee[]): {
+  total: number;
+  containsIndividual: boolean;
+  containsGroup: boolean;
+  individuals: UnpaidAttendee[];
+  groupAttendees: UnpaidAttendee[];
+} {
+  let total = 0;
+  let containsIndividual = false;
+  let containsGroup = false;
+  const individuals: UnpaidAttendee[] = [];
+  const groupAttendees: UnpaidAttendee[] = [];
+
+  for (const attendee of attendees) {
+    total += attendee.price;
+    if (attendee.type === TicketType.GROUP) {
+      containsGroup = true;
+      groupAttendees.push(attendee);
+    } else {
+      containsIndividual = true;
+      individuals.push(attendee);
+    }
+  }
+
+  return {
+    total,
+    containsIndividual,
+    containsGroup,
+    individuals,
+    groupAttendees,
+  };
+}
+
+/**
+ * Checks if payment amount creates an ambiguity that requires user selection.
+ * Returns ambiguity data for 431 response if needed.
+ */
+async function checkForAmbiguity(
+  client: VercelPoolClient,
+  unpaid: UnpaidAttendee[],
+  amount: number,
+  total: number,
+  containsIndividual: boolean,
+  containsGroup: boolean,
+  paymentDate: Date,
+  fullPaymentMethod: string
+): Promise<AmbiguityResult | null> {
+  const individualPrice = price.getPrice(TicketType.INDIVIDUAL, paymentDate);
+
+  // No ambiguity if we can pay for everything or amount is less than one ticket
+  if (amount >= total || amount < individualPrice || !containsIndividual) {
+    return null;
+  }
+
+  // Build the ambiguity response with backward-compatible structure
+  let found = [...unpaid];
+  const groupMembers: Record<string, Applicant[]> = {};
+  const processedIds = new Set<number>();
+
+  if (containsGroup) {
+    const groupAttendeeIds = unpaid
+      .filter((a) => a.type === TicketType.GROUP)
+      .map((a) => a.id);
+
+    const groupMap = await fetchGroupsForAttendees(client, groupAttendeeIds);
+
+    for (const attendee of unpaid) {
+      if (
+        attendee.type === TicketType.GROUP &&
+        !processedIds.has(attendee.id)
+      ) {
+        const groupInfo = groupMap.get(attendee.id);
+        if (!groupInfo) {
+          throw new Error("Group not found for attendee #" + attendee.id);
+        }
+
+        // Mark all group members as processed
+        groupInfo.memberIds.forEach((id) => processedIds.add(id));
+
+        // Get other group member IDs (excluding current attendee)
+        const otherMemberIds = groupInfo.memberIds.filter(
+          (id) => id !== attendee.id
+        );
+
+        // Remove other group members from found list (show only one rep per group)
+        found = found.filter((x) => !otherMemberIds.includes(x.id));
+
+        // Fetch other group members for the groupMembers map
+        const otherMembers = await fetchUnpaidByIds(
+          client,
+          otherMemberIds,
+          fullPaymentMethod,
+          paymentDate
+        );
+
+        groupMembers[attendee.id] = otherMembers as unknown as Applicant[];
+      }
+    }
+  }
+
+  // Add ticket_type field for backward compatibility
+  found = found.map((x) => ({ ...x, ticket_type: x.type }));
+
+  return { ambiguous: true, found, groupMembers };
+}
+
+/**
+ * Collects unique groups from attendees and returns grouped data.
+ */
+async function collectUniqueGroups(
+  client: VercelPoolClient,
+  groupAttendees: UnpaidAttendee[]
+): Promise<Map<number, number[]>> {
+  if (groupAttendees.length === 0) return new Map();
+
+  const attendeeIds = groupAttendees.map((a) => a.id);
+  const groupMap = await fetchGroupsForAttendees(client, attendeeIds);
+
+  // Deduplicate by grpid
+  const uniqueGroups = new Map<number, number[]>();
+  for (const [, groupInfo] of groupMap) {
+    if (!uniqueGroups.has(groupInfo.grpid)) {
+      uniqueGroups.set(groupInfo.grpid, groupInfo.memberIds);
+    }
+  }
+
+  return uniqueGroups;
+}
+
+/**
+ * Processes payments: updates DB, assigns UUIDs, returns paid attendees.
+ * Uses bulk operations for efficiency.
+ */
+async function processPayments(
+  client: VercelPoolClient,
+  unpaid: UnpaidAttendee[],
+  amount: number,
+  paymentDate: Date
+): Promise<ProcessedPayment> {
+  const { individuals, groupAttendees } = analyzeUnpaidAttendees(unpaid);
+  const isEarlyBird = EARLY_BIRD_UNTIL && paymentDate < EARLY_BIRD_UNTIL;
+  const groupPrice = price.getPrice(TicketType.GROUP, paymentDate) * GROUP_SIZE;
+
+  let paidAmount = 0;
+  const paidAttendees: UnpaidAttendee[] = [];
+  const attendeesToUpdate: { id: number; uuid: string; type: TicketType }[] =
+    [];
+
+  // Process individuals first
+  for (const attendee of individuals) {
+    if (paidAmount + attendee.price <= amount) {
+      paidAmount += attendee.price;
+      attendeesToUpdate.push({
+        id: attendee.id,
+        uuid: "", // Will be filled in batch
+        type: isEarlyBird ? TicketType.INDIVIDUAL_EARLY_BIRD : attendee.type,
+      });
+      paidAttendees.push(attendee);
+    }
+  }
+
+  // Process groups
+  const uniqueGroups = await collectUniqueGroups(client, groupAttendees);
+
+  for (const [, memberIds] of uniqueGroups) {
+    if (paidAmount + groupPrice <= amount) {
+      paidAmount += groupPrice;
+      const groupMembers = unpaid.filter((a) => memberIds.includes(a.id));
+
+      for (const member of groupMembers) {
+        attendeesToUpdate.push({
+          id: member.id,
+          uuid: "", // Will be filled in batch
+          type: isEarlyBird ? TicketType.GROUP_EARLY_BIRD : member.type,
+        });
+        paidAttendees.push(member);
+      }
+    }
+  }
+
+  if (attendeesToUpdate.length === 0) {
+    return { paidAmount: 0, paidAttendees: [] };
+  }
+
+  // Generate UUIDs in batch
+  const uuids = await generateBatchUUIDs(client, attendeesToUpdate.length);
+  for (let i = 0; i < attendeesToUpdate.length; i++) {
+    attendeesToUpdate[i].uuid = uuids[i];
+  }
+
+  // Bulk update attendees
+  const ids = attendeesToUpdate.map((a) => a.id);
+  const uuidList = attendeesToUpdate.map((a) => a.uuid);
+  const types = attendeesToUpdate.map((a) => a.type);
+
+  await client.query(
+    `UPDATE attendees
+     SET paid = true, 
+         uuid = data.uuid::uuid,
+         type = data.type
+     FROM (
+       SELECT unnest($1::int[]) AS id, 
+              unnest($2::text[]) AS uuid,
+              unnest($3::text[]) AS type
+     ) AS data
+     WHERE attendees.id = data.id`,
+    [ids, uuidList, types]
+  );
+
+  // Assign UUIDs to paidAttendees for response
+  for (let i = 0; i < paidAttendees.length; i++) {
+    paidAttendees[i].uuid = attendeesToUpdate[i].uuid;
+  }
+
+  return { paidAmount, paidAttendees };
+}
+
+/**
+ * Sends emails to paid attendees, collecting any failures.
+ */
+async function sendEmailsWithFailureTracking(
+  paidAttendees: UnpaidAttendee[]
+): Promise<string[]> {
+  const failures: string[] = [];
+
+  for (const attendee of paidAttendees) {
+    try {
+      await sendEmail(
+        attendee.email,
+        attendee.full_name,
+        attendee.uuid!,
+        String(attendee.id)
+      );
+    } catch (e) {
+      console.error(`Failed to send email to ${attendee.email}:`, e);
+      failures.push(attendee.email);
+    }
+  }
+
+  return failures;
+}
+
+// ============================================================================
+// Main Function
+// ============================================================================
+
+/**
+ * Processes a payment for ticket(s).
+ *
+ * @param from - Payment method with identifier (e.g., "TLDA@username", "CASH@email")
+ * @param amount - Amount received as string
+ * @param date - Date payment was received (for early bird calculation)
+ * @param id_if_needed - Comma-separated attendee IDs for disambiguation
+ */
 export async function pay(
   from: string,
   amount: string,
   date: string,
   id_if_needed: string
-) {
-  if (process.env.JWT_SECRET === undefined) {
+): Promise<NextResponse> {
+  // Validate environment
+  if (!process.env.JWT_SECRET) {
     return NextResponse.json(
       { message: "Key is not set. Contact the maintainer." },
       { status: 500 }
     );
   }
 
-  const client = await sql.connect();
+  // Parse inputs once
+  const paymentSource = parsePaymentSource(from);
+  const amountNum = parseInt(amount, 10);
+  const paymentDate = new Date(date);
 
-  if (parseInt(amount) < 0) {
-    const [first, ...rest] = from.split("@");
-    const parsedFrom = first + "@" + rest.join(" ");
-
-    await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${parsedFrom}, 0, ${amount}, ${date})`;
-    client.release();
+  if (isNaN(amountNum)) {
     return NextResponse.json(
-      { refund: true, message: "Refund Inserted." },
-      { status: 200 }
-    );
-  }
-  let identification = "";
-  let toAdd = "";
-  if (from.split("@")[0] === "CASH") {
-    identification = from.split("@").splice(1).join("@");
-    from = "CASH";
-
-    toAdd = ` AND email = '${identification}'`;
-  }
-  let query = await client.query(
-    `SELECT * FROM attendees WHERE payment_method = '${from}' AND paid = false` +
-      toAdd
-  );
-
-  if (query.rows.length === 0) {
-    client.release();
-    return NextResponse.json(
-      {
-        message:
-          "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
-      },
+      { message: "Invalid amount provided." },
       { status: 400 }
     );
   }
 
-  if (
-    from === "CASH" &&
-    query.rows[0].type == TicketType.GROUP &&
-    query.rows.length < 4
-  ) {
-    let xx =
-      await client.sql`SELECT * FROM groups WHERE id1 = ${query.rows[0].id} OR id2 = ${query.rows[0].id} OR id3 = ${query.rows[0].id} OR id4 = ${query.rows[0].id}`;
-    if (xx.rows.length === 0) {
-      client.release();
+  const client = await sql.connect();
+
+  try {
+    // Handle refunds (negative amounts)
+    if (amountNum < 0) {
+      const streamName = formatPaymentSourceForStorage(paymentSource);
+      await client.sql`
+        INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) 
+        VALUES (${streamName}, 0, ${amount}, ${date})
+      `;
+      return NextResponse.json(
+        { refund: true, message: "Refund Inserted." },
+        { status: 200 }
+      );
+    }
+
+    // Start transaction for payment processing
+    await client.query("BEGIN");
+
+    // Fetch unpaid attendees
+    let unpaid = await fetchUnpaidAttendees(
+      client,
+      from, // Full payment method string (e.g., "TLDA@username")
+      paymentSource.method,
+      paymentSource.identifier,
+      paymentDate
+    );
+
+    if (unpaid.length === 0) {
+      await client.query("ROLLBACK");
       return NextResponse.json(
         {
           message:
@@ -85,283 +583,90 @@ export async function pay(
         { status: 400 }
       );
     }
-    query = await client.query(
-      `SELECT * FROM attendees WHERE payment_method = 'CASH' AND paid = false AND id = '${xx.rows[0].id1}' OR id = '${xx.rows[0].id2}' OR id = '${xx.rows[0].id3}' OR id = '${xx.rows[0].id4}'`
-    );
-  }
 
-  let unpaid: any[] = [];
-  for (let i = 0; i < query.rows.length; i++) {
-    let row = query.rows[i];
-    if (row.paid === false) {
-      row.price = price.getPrice(row.type, new Date(date), row.payment_method);
-      unpaid.push(row);
-    }
-  }
+    // If specific IDs were provided, filter to those (plus their group members)
+    if (id_if_needed !== "") {
+      const requestedIds = id_if_needed
+        .split(",")
+        .map((id) => parseInt(id, 10));
+      let filtered = unpaid.filter((a) => requestedIds.includes(a.id));
 
-  if (unpaid.length === 0) {
-    client.release();
-    return NextResponse.json(
-      { message: "Nobody to pay for." },
-      { status: 400 }
-    );
-  }
+      // Expand groups for requested IDs
+      filtered = await expandGroupMembers(client, filtered, from, paymentDate);
 
-  let total = 0;
-  let containsIndv = false;
-  let containsGroup = false;
-  for (let i = 0; i < unpaid.length; i++) {
-    total += unpaid[i].price;
-    if (unpaid[i].type != TicketType.GROUP) {
-      containsIndv = true;
+      unpaid = filtered;
+
+      if (unpaid.length === 0) {
+        await client.query("ROLLBACK");
+        return NextResponse.json(
+          { message: "Nobody to pay for." },
+          { status: 400 }
+        );
+      }
     } else {
-      containsGroup = true;
-    }
-  }
-
-  if (
-    parseInt(amount) < total &&
-    parseInt(amount) >= price.getPrice(TicketType.INDIVIDUAL, new Date(date)) &&
-    containsIndv &&
-    id_if_needed === ""
-  ) {
-    let found = unpaid;
-    let groupMembers = {} as { [key: string]: Applicant[] };
-    let processedIDs = new Set<string>();
-
-    if (containsGroup) {
-      for (let i = 0; i < unpaid.length; i++) {
-        if (
-          unpaid[i].type === TicketType.GROUP &&
-          !processedIDs.has(unpaid[i].id)
-        ) {
-          const group =
-            await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
-          if (group.rows.length === 0) {
-            client.release();
-            return NextResponse.json(
-              {
-                message:
-                  "Not found. Try Again or Refund (Ticket isn't marked as paid yet). #3687",
-              },
-              { status: 400 }
-            );
-          }
-          let grpMemberIDs = [
-            group.rows[0].id1,
-            group.rows[0].id2,
-            group.rows[0].id3,
-            group.rows[0].id4,
-          ].filter((id) => id !== unpaid[i].id);
-
-          processedIDs.add(group.rows[0].id1);
-          processedIDs.add(group.rows[0].id2);
-          processedIDs.add(group.rows[0].id3);
-          processedIDs.add(group.rows[0].id4);
-
-          found = found.filter((x) => !grpMemberIDs.includes(x.id));
-
-          const grpMembersQuery = await client.query(
-            `SELECT * FROM attendees WHERE id IN (${grpMemberIDs.join(
-              ","
-            )}) AND payment_method = '${from}' AND paid = false`
-          );
-
-          groupMembers[unpaid[i].id] = [];
-          grpMembersQuery.rows.forEach((member) => {
-            groupMembers[unpaid[i].id].push(member as Applicant);
-          });
-        }
-      }
-    }
-    found = found.map((x) => {
-      x.ticket_type = x.type;
-      return x;
-    });
-    client.release();
-    return NextResponse.json(
-      {
-        message: "Not enough money to pay for all tickets. Identify using IDs.",
-        found,
-        groupMembers,
-      },
-      { status: ResponseCode.TICKET_AMBIGUITY }
-    );
-  }
-
-  if (id_if_needed !== "") {
-    let queryio = "";
-    id_if_needed.split(",").forEach((id) => {
-      queryio += `id = '${id}' OR `;
-    });
-    queryio = queryio.slice(0, -4);
-    query = await client.query(
-      `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio} AND paid = false`
-    );
-
-    unpaid = [];
-    for (let i = 0; i < query.rows.length; i++) {
-      let row = query.rows[i];
-      if (row.paid === false) {
-        row.price = price.getPrice(
-          row.type,
-          new Date(date),
-          row.payment_method
-        );
-        unpaid.push(row);
-      }
+      // Expand to include all group members if dealing with groups
+      unpaid = await expandGroupMembers(client, unpaid, from, paymentDate);
     }
 
-    let originalUnpaidLength = unpaid.length;
+    // Analyze what we have
+    const analysis = analyzeUnpaidAttendees(unpaid);
 
-    for (let i = 0; i < originalUnpaidLength; i++) {
-      let row = unpaid[i];
-      // If the row is a group ticket get the other emails as well
-      if (row.type === TicketType.GROUP) {
-        const group =
-          await client.sql`SELECT * FROM groups WHERE id1 = ${row.id} OR id2 = ${row.id} OR id3 = ${row.id} OR id4 = ${row.id}`;
-        if (group.rows.length === 0) {
-          client.release();
-          return NextResponse.json(
-            {
-              message:
-                "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
-            },
-            { status: 400 }
-          );
-        }
-        const groupMembers = [
-          group.rows[0].id1,
-          group.rows[0].id2,
-          group.rows[0].id3,
-          group.rows[0].id4,
-        ];
-
-        queryio = "";
-        groupMembers.forEach((id) => {
-          if (id != row.id) queryio += `id = '${id}' OR `;
-        });
-        queryio = queryio.slice(0, -4);
-        query = await client.query(
-          `SELECT * FROM attendees WHERE payment_method = '${from}' AND ${queryio} AND paid = false`
-        );
-
-        for (let i = 0; i < query.rows.length; i++) {
-          let row = query.rows[i];
-          if (row.paid === false) {
-            row.price = price.getPrice(
-              row.type,
-              new Date(date),
-              row.payment_method
-            );
-            unpaid.push(row);
-          }
-        }
-      }
-    }
-
-    if (unpaid.length === 0) {
-      client.release();
-      return NextResponse.json(
-        { message: "Nobody to pay for." },
-        { status: 400 }
+    // Check for ambiguity (partial payment that could apply to multiple tickets)
+    if (id_if_needed === "") {
+      const ambiguity = await checkForAmbiguity(
+        client,
+        unpaid,
+        amountNum,
+        analysis.total,
+        analysis.containsIndividual,
+        analysis.containsGroup,
+        paymentDate,
+        from
       );
-    }
 
-    total = 0;
-    for (let i = 0; i < unpaid.length; i++) {
-      total += unpaid[i].price;
-    }
-  }
-
-  let paid = 0;
-  let paidFor = [];
-  let uniqueGroupsToPayFor = [];
-  let uniqueGroupsToPayForData: { [key: string]: string[] } = {};
-
-  try {
-    for (let i = 0; i < unpaid.length; i++) {
-      if (unpaid[i].type == TicketType.GROUP) continue;
-
-      paid += unpaid[i].price;
-      if (paid <= parseInt(amount)) {
-        let randUUID = await safeRandUUID();
-        try {
-          if (EARLY_BIRD_UNTIL && new Date(date) < EARLY_BIRD_UNTIL) {
-            await client.sql`UPDATE attendees SET paid = true, uuid = ${randUUID}, type = ${TicketType.INDIVIDUAL_EARLY_BIRD} WHERE id = ${unpaid[i].id}`;
-          } else {
-            await client.sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${unpaid[i].id}`;
-          }
-        } catch (e) {
-          paid -= unpaid[i].price;
-          client.release();
-          return NextResponse.json(
-            { message: "Err #7109. Contact Support or Try Again." },
-            { status: 500 }
-          );
-        }
-        unpaid[i].uuid = randUUID;
-        paidFor.push(unpaid[i]);
-      } else {
-        paid -= unpaid[i].price;
-        break;
+      if (ambiguity) {
+        await client.query("ROLLBACK");
+        return NextResponse.json(
+          {
+            message:
+              "Not enough money to pay for all tickets. Identify using IDs.",
+            found: ambiguity.found,
+            groupMembers: ambiguity.groupMembers,
+          },
+          { status: ResponseCode.TICKET_AMBIGUITY }
+        );
       }
     }
 
-    // If there are group tickets to pay for
-    if (paidFor.length !== unpaid.length) {
-      for (let i = 0; i < unpaid.length; i++) {
-        if (unpaid[i].type == TicketType.GROUP) {
-          let group =
-            await client.sql`SELECT * FROM groups WHERE id1 = ${unpaid[i].id} OR id2 = ${unpaid[i].id} OR id3 = ${unpaid[i].id} OR id4 = ${unpaid[i].id}`;
-          if (group.rows.length === 0) {
-            client.release();
-            return NextResponse.json(
-              {
-                message:
-                  "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
-              },
-              { status: 400 }
-            );
-          }
-          if (uniqueGroupsToPayFor.indexOf(group.rows[0].grpid) === -1) {
-            uniqueGroupsToPayFor.push(group.rows[0].grpid);
-            uniqueGroupsToPayForData[group.rows[0].grpid as string] = [
-              group.rows[0].id1 as string,
-              group.rows[0].id2 as string,
-              group.rows[0].id3 as string,
-              group.rows[0].id4 as string,
-            ];
-          }
-        }
-      }
-
-      const groupIDs = Object.keys(uniqueGroupsToPayForData);
+    // Check for group-only ambiguity (multiple groups, can't pay for all)
+    if (analysis.containsGroup && !analysis.containsIndividual) {
+      const uniqueGroups = await collectUniqueGroups(
+        client,
+        analysis.groupAttendees
+      );
+      const groupPrice =
+        price.getPrice(TicketType.GROUP, paymentDate) * GROUP_SIZE;
 
       if (
-        groupIDs.length * price.getPrice(TicketType.GROUP, new Date(date)) * 4 >
-          parseInt(amount) &&
-        parseInt(amount) >=
-          price.getPrice(TicketType.INDIVIDUAL, new Date(date)) &&
-        groupIDs.length != 1
+        uniqueGroups.size > 1 &&
+        amountNum < uniqueGroups.size * groupPrice &&
+        amountNum >= groupPrice
       ) {
-        let found: any[] = [];
-        let groupMembers: { [key: string]: Applicant[] } = {};
-        groupIDs.forEach((id) => {
-          found.push(
-            ...unpaid.filter((x) => uniqueGroupsToPayForData[id][0] === x.id)
-          );
-          groupMembers[uniqueGroupsToPayForData[id][0]] = unpaid.filter(
-            (x) =>
-              uniqueGroupsToPayForData[id].includes(x.id) &&
-              !found.includes(x.id)
-          );
-        });
-        found = found.map((x) => {
-          x.ticket_type = x.type;
-          return x;
-        });
-        client.release();
+        // Build ambiguity response for groups
+        const found: UnpaidAttendee[] = [];
+        const groupMembers: Record<string, Applicant[]> = {};
+
+        for (const [, memberIds] of uniqueGroups) {
+          const rep = unpaid.find((a) => a.id === memberIds[0]);
+          if (rep) {
+            found.push({ ...rep, ticket_type: rep.type });
+            groupMembers[rep.id] = unpaid.filter(
+              (a) => memberIds.includes(a.id) && a.id !== rep.id
+            ) as unknown as Applicant[];
+          }
+        }
+
+        await client.query("ROLLBACK");
         return NextResponse.json(
           {
             message:
@@ -372,131 +677,86 @@ export async function pay(
           { status: ResponseCode.TICKET_AMBIGUITY }
         );
       }
-
-      for (let i = 0; i < groupIDs.length; i++) {
-        const groupID = groupIDs[i];
-        const groupMembers = uniqueGroupsToPayForData[groupID];
-        paid += price.getPrice(TicketType.GROUP, new Date(date)) * 4;
-
-        if (paid <= parseInt(amount)) {
-          // Collect all rows to update
-          const rowsToUpdate = unpaid.filter((x) =>
-            groupMembers.includes(x.id)
-          );
-
-          let safeUUIDs: { [key: number]: string } = {};
-          for (let j = 0; j < rowsToUpdate.length; j++) {
-            safeUUIDs[rowsToUpdate[j].id as number] = await safeRandUUID();
-          }
-
-          // Generate UUIDs and prepare the data for bulk update
-          const updates = rowsToUpdate.map((row) => ({
-            id: row.id as number,
-            uuid: safeUUIDs[row.id as number],
-          }));
-
-          // Extract ids and uuids from updates for use in the SQL query
-          const ids = updates.map((u) => u.id);
-          const uuids = updates.map((u) => u.uuid);
-
-          // Batch SQL Update
-          try {
-            await client.query(
-              `
-              UPDATE attendees
-              SET paid = true, uuid = data.uuid${
-                EARLY_BIRD_UNTIL && new Date(date) < EARLY_BIRD_UNTIL
-                  ? `, type = '${TicketType.GROUP_EARLY_BIRD}'`
-                  : ""
-              }
-              FROM (
-                SELECT unnest($1::int[]) AS id, unnest($2::uuid[]) AS uuid
-              ) AS data
-              WHERE attendees.id = data.id
-              `,
-              [ids, uuids] // Parameters passed as arrays
-            );
-
-            // Assign new UUIDs to the paidFor array
-            updates.forEach((update) => {
-              const row = rowsToUpdate.find((r) => r.id === update.id);
-              if (row) {
-                row.uuid = update.uuid;
-                paidFor.push(row);
-              }
-            });
-          } catch (e) {
-            paid -= price.getPrice(TicketType.GROUP, new Date(date)) * 4;
-            console.error(e);
-            client.release();
-            return NextResponse.json(
-              { message: "Err #7109. Contact Support or Try Again." },
-              { status: 500 }
-            );
-          }
-        } else {
-          paid -= price.getPrice(TicketType.GROUP, new Date(date)) * 4;
-        }
-      }
     }
 
-    if (from == "CASH") {
-      from = "CASH@" + identification.replaceAll("@", " ");
-    }
-    if (paid != 0 && paid <= total && paid <= parseInt(amount)) {
-      if (parseInt(amount) != 0) {
-        await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${from}, ${paid}, ${amount}, ${date})`;
-      }
-    } else if (paid == 0) {
-      client.release();
+    // Process payments
+    const { paidAmount, paidAttendees } = await processPayments(
+      client,
+      unpaid,
+      amountNum,
+      paymentDate
+    );
+
+    if (paidAmount === 0) {
+      await client.query("ROLLBACK");
       return NextResponse.json(
         {
-          message:
-            "Nothing was paid. To pay for all tickets: " +
-            total +
-            " EGP. Paying for only one ticket (or an entire group ticket) is accepted as well.",
+          message: `Nothing was paid. To pay for all tickets: ${analysis.total} EGP. Paying for only one ticket (or an entire group ticket) is accepted as well.`,
         },
         { status: 400 }
       );
     }
 
-    try {
-      for (let i = 0; i < paidFor.length; i++) {
-        await sendEmail(
-          paidFor[i].email,
-          paidFor[i].full_name,
-          paidFor[i].uuid,
-          paidFor[i].id
-        );
-      }
-    } catch (e) {
-      client.release();
-      return NextResponse.json(
-        { message: "Err #9194. Contact Support or Try Again." },
-        { status: 500 }
+    // Log to pay_backup BEFORE sending emails (ensures payment is recorded)
+    const streamName = formatPaymentSourceForStorage(paymentSource);
+    if (amountNum !== 0) {
+      await client.sql`
+        INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) 
+        VALUES (${streamName}, ${paidAmount}, ${amount}, ${date})
+      `;
+    }
+
+    // Commit transaction - payment is now final
+    await client.query("COMMIT");
+
+    // Send emails (after commit, so payment is safe even if emails fail)
+    const emailFailures = await sendEmailsWithFailureTracking(paidAttendees);
+
+    // Build response
+    const response: {
+      refund: boolean;
+      paid: number;
+      accepted: UnpaidAttendee[];
+      emailFailures?: string[];
+    } = {
+      refund: false,
+      paid: paidAmount,
+      accepted: paidAttendees,
+    };
+
+    if (emailFailures.length > 0) {
+      response.emailFailures = emailFailures;
+      console.warn(
+        `Payment processed but ${emailFailures.length} email(s) failed:`,
+        emailFailures
       );
     }
-    const totalPrice = paidFor.reduce((sum, item) => sum + item.price, 0);
-    if (totalPrice != paid) {
-      console.error(
-        "OH NO! INSANE ERROR! HUGE ERROR! MASSIVE ERROR! main.tsx line 282"
-      );
-      client.release();
-      return NextResponse.json(
-        {
-          message:
-            "Err #9184. Contact Support or Try Again. (Total price doesn't match paid amount)",
-        },
-        { status: 500 }
-      );
-    }
-    client.release();
-    return NextResponse.json(
-      { refund: false, paid, accepted: paidFor },
-      { status: 200 }
-    );
+
+    return NextResponse.json(response, { status: 200 });
   } catch (e) {
+    await client.query("ROLLBACK").catch(() => {});
+    console.error("Payment processing error:", e);
+    return NextResponse.json(
+      {
+        message: "An error occurred processing the payment. Please try again.",
+      },
+      { status: 500 }
+    );
+  } finally {
     client.release();
-    return NextResponse.json(e, { status: 500 });
   }
+}
+
+// ============================================================================
+// Legacy Export (for backward compatibility)
+// ============================================================================
+
+export async function safeRandUUID(): Promise<string> {
+  let uuid = randomUUID();
+  let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
+  while (query.rows.length !== 0) {
+    uuid = randomUUID();
+    query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
+  }
+  return uuid;
 }

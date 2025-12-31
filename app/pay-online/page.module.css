@@ -70,7 +70,25 @@
   color: #333333;
 }
 
-.payment_area > h1 {
+.back_button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out;
+  margin-bottom: 0.25rem;
+}
+
+.back_button:hover {
+  color: #4f46e5;
+}
+
+.payment_area_h1 {
   font-size: 2rem;
   font-weight: 700;
   color: #1f2937;
@@ -94,7 +112,7 @@
   flex-direction: row;
   width: 100%;
   gap: 0.75rem;
-  overflow-y: scroll;
+  overflow-x: auto;
 }
 
 .payment_option {

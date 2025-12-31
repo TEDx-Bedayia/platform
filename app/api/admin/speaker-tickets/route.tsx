@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
   try {
     // Create an entry with type speaker and rotating emails (invitation1, invitation2, etc.)
     let values: string[] = [];
-    let uuids: UUID[] = [];
+    let uuids: string[] = [];
     for (let i = 0; i < number; i++) {
       let rotatingEmail = `${speakerEmail.split("@")[0]}+invitation${i + 1}@${
         speakerEmail.split("@")[1]
@@ -118,7 +118,7 @@ async function sendSpeakerTicket(
     SMTPTransport.Options
   >,
   speakerEmail: string,
-  uuid: UUID,
+  uuid: string,
   ticketName: string,
   speakerName: string
 ) {

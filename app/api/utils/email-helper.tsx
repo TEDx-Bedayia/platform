@@ -36,12 +36,14 @@ export async function sendBookingConfirmation(
       )} EGP</strong>. Make sure to pay the exact due amount at once to avoid delays or confusion.`;
 
   if (EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL) {
-    pricingDesc += `<br/><br/>Note: You are eligible for the Early Bird discount (${price.getPrice(
-      ticketType,
-      new Date(),
-      paymentMethod.split("@")[0].toLowerCase()
-    )} EGP) if you pay before ${EARLY_BIRD_UNTIL.toLocaleDateString()}! Otherwise, please pay the full amount (${
-      isGroup(ticketType) ? price.group : price.individual
+    pricingDesc += `<br/><br/>Note: You are eligible for the Early Bird discount (${
+      price.getPrice(
+        ticketType,
+        new Date(),
+        paymentMethod.split("@")[0].toLowerCase()
+      ) * (isGroup(ticketType) ? 4 : 1)
+    } EGP) if you pay before ${EARLY_BIRD_UNTIL.toLocaleDateString()}! Otherwise, please pay the full amount (${
+      isGroup(ticketType) ? price.group * 4 : price.individual
     } EGP). Thank you for booking early.`;
   }
 

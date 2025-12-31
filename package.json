@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test:payment": "npx tsx scripts/tests/test-payments.ts",
+    "test:payment:concurrent": "npx tsx scripts/tests/test-concurrency.ts",
+    "test:payment:bench": "npx tsx scripts/tests/benchmark-payments.ts",
+    "test:payment:all": "npm run test:payment && npm run test:payment:concurrent"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.16",
@@ -30,10 +34,12 @@
     "@types/react-dom": "19.2.3",
     "autoprefixer": "^10.4.21",
     "baseline-browser-mapping": "^2.9.11",
+    "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
     "eslint-config-next": "16.1.1",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   },
   "overrides": {
