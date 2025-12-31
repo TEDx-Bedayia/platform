@@ -50,7 +50,7 @@ const Telda: FC<{ price: number }> = ({ price }) => {
         Select the <strong>Transfer</strong> option.
       </li>
       <li>
-        Send <strong>{price.toFixed(2)} EGP</strong> to the username{" "}
+        Send <strong>EGP {price.toFixed(2)}</strong> to the username{" "}
         <strong>{TELDA}</strong>, with your email address as a note.
       </li>
       <li>
@@ -76,7 +76,7 @@ const Instapay: FC<{ price: number }> = ({ price }) => {
         <strong>IPA (Instapay Address)</strong> option.
       </li>
       <li>
-        Send <strong>{price.toFixed(2)} EGP</strong> to the IPA{" "}
+        Send <strong>EGP {price.toFixed(2)}</strong> to the IPA{" "}
         <strong>{IPN}</strong>.
       </li>
       <li>
@@ -103,7 +103,7 @@ const EWallet: FC<{ price: number }> = ({ price }) => {
         <strong>{VFCASH}</strong>.
       </li>
       <li>
-        Send <strong>{price.toFixed(2)} EGP</strong>.
+        Send <strong>EGP {price.toFixed(2)}</strong>.
       </li>
       <li>
         Send a <strong>screenshot</strong> to the following WhatsApp number{" "}
@@ -122,7 +122,8 @@ const Card: FC<{ price: number }> = ({ price }) => {
     <>
       <li>
         Click the <strong>Pay</strong> button below to get redirected to the
-        online payment gateway and pay the amount due {price.toFixed(2)} EGP.
+        online payment gateway and pay the amount due{" "}
+        <strong>EGP {price.toFixed(2)}</strong>.
       </li>
       <li>
         Once transferred, send a <strong>screenshot</strong> of the confirmation
