@@ -121,13 +121,18 @@ const Card: FC<{ price: number }> = ({ price }) => {
   return (
     <>
       <li>
-        Click the <strong>Pay</strong> button below to get redirected to the
-        online payment gateway and pay the amount due{" "}
+        Click the <strong>Pay</strong> button below to get redirected to
+        Bedayia&apos;s online payment gateway and pay the amount due{" "}
         <strong>EGP {price.toFixed(2)}</strong>.
       </li>
       <li>
+        <strong>Verify</strong> your name, email, and phone number on the
+        payment page.
+      </li>
+      <li>
         Once transferred, send a <strong>screenshot</strong> of the confirmation
-        page to the following WhatsApp number <strong>{PHONE}</strong>.
+        page to the following WhatsApp number <strong>{PHONE}</strong>. Note: it
+        may take us around 48 hours to verify your payment.
       </li>
     </>
   );

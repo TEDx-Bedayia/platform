@@ -333,11 +333,9 @@ export default function SingleTickets() {
   };
 
   async function submitTicket(type: string) {
-    addLoader();
     formData.paymentMethod = type;
     if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
       customAlert("Ticket booking is currently closed.");
-      removeLoader();
       return;
     }
     if (
@@ -345,9 +343,16 @@ export default function SingleTickets() {
       (formData.phone.includes("+") && formData.phone.length != 13)
     ) {
       customAlert("Please enter a valid phone number");
-      removeLoader();
       return;
     }
+    const alphaNumericAndSymbols =
+      /^[a-zA-Z0-9 \u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]*$/;
+    if (alphaNumericAndSymbols.test(formData.name) === false) {
+      customAlert("Please enter a valid name.");
+      return;
+    }
+
+    addLoader();
 
     if (type === "ONLINE") {
       const dataToSendOver = {
