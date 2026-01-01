@@ -123,9 +123,24 @@ function getAllowedOrigins(): string[] {
 
   // Add production host
   if (HOST) {
+    const hostWithoutSlash = HOST.replace(/\/$/, "");
     origins.push(HOST);
-    // Also allow without trailing slash
-    origins.push(HOST.replace(/\/$/, ""));
+    origins.push(hostWithoutSlash);
+
+    // Add www variant (e.g., https://tedxbedayia.com -> https://www.tedxbedayia.com)
+    try {
+      const hostUrl = new URL(hostWithoutSlash);
+      if (!hostUrl.hostname.startsWith("www.")) {
+        origins.push(`${hostUrl.protocol}//www.${hostUrl.hostname}`);
+      } else {
+        // If HOST has www, also allow without www
+        origins.push(
+          `${hostUrl.protocol}//${hostUrl.hostname.replace(/^www\./, "")}`
+        );
+      }
+    } catch {
+      // Invalid URL, skip www variant
+    }
   }
 
   // Add localhost variants for development
