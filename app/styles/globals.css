@@ -199,8 +199,9 @@
 
 .font-title {
   text-align: center;
-  font-size: 4em;
-  line-height: 5.25rem;
+  font-size: 3rem /* 60px */;
+  line-height: 1;
+
   font-style: normal;
   font-weight: 700;
   letter-spacing: -1.6px;

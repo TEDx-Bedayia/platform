@@ -49,7 +49,7 @@ const FAQComponent = () => {
       className="mx-auto w-full max-w-3xl px-6 py-16 max-phone:px-4 max-phone:py-12"
     >
       <h2
-        className="mb-10 text-center font-title text-4xl font-bold text-white max-phone:text-3xl"
+        className="mb-10 text-center font-title font-bold text-white max-phone:text-3xl"
         style={{ letterSpacing: "0.5px" }}
       >
         Frequently Asked Questions
@@ -300,7 +300,7 @@ export default function Home() {
 
       <section className="mx-auto w-full max-w-6xl px-6 py-16 max-phone:px-4 max-phone:py-12">
         <h2
-          className="mb-10 text-center font-title text-4xl font-bold text-white max-phone:text-3xl"
+          className="mb-10 text-center font-title font-bold text-white max-phone:text-3xl"
           style={{ letterSpacing: "0.5px" }}
         >
           What People Say
