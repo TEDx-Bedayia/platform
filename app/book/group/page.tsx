@@ -10,6 +10,7 @@ import {
   EARLY_BIRD_UNTIL,
   GROUP_EARLY_PRICE,
   GROUP_TICKET_PRICE,
+  TICKET_WINDOW,
 } from "@/app/metadata";
 import { TicketType } from "@/app/ticket-types";
 import { Poppins, Ubuntu } from "next/font/google";
@@ -112,7 +113,10 @@ export default function GroupTickets() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     document.body.focus();
-    addLoader();
+    if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
+      customAlert("Ticket booking is currently closed.");
+      return;
+    }
 
     if (
       formData.phone.length < 11 ||
@@ -120,7 +124,6 @@ export default function GroupTickets() {
     ) {
       customAlert("Please enter a valid phone number.");
       setCurrentPerson(0);
-      removeLoader();
       return;
     }
 
@@ -143,6 +146,19 @@ export default function GroupTickets() {
       formData.names[2] = formData.names[0];
       formData.names[3] = formData.names[0];
     }
+
+    const alphaNumericAndSymbols =
+      /^[a-zA-Z0-9 \u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]*$/;
+    for (let i = 0; i < 4; i++) {
+      if (formData.names[i] != "") {
+        if (alphaNumericAndSymbols.test(formData.names[i]) === false) {
+          customAlert(`Please enter a valid name for ${formData.names[i]}.`);
+          return;
+        }
+      }
+    }
+
+    addLoader();
 
     if (formData.paymentMethod === "ONLINE") {
       const dataToSendOver = {
