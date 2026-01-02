@@ -440,6 +440,18 @@ export default function SingleTickets() {
             `${INDIVIDUAL_TICKET_PRICE.toLocaleString()} EGP`
           )}
         </h2>
+        <span
+          style={{
+            ...title.style,
+            fontWeight: 100,
+            color: "#F9F9F9",
+            marginBottom: "1.5rem",
+            display: "block",
+            textAlign: "center",
+          }}
+        >
+          All Tickets Are Non-Refundable.
+        </span>
       </motion.div>
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}

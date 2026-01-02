@@ -5,13 +5,13 @@ export const VFCASH = "01003993559"; // Change to Vodafone Cash number
 export const TELDA = "@alykotb"; // Change to Telda username
 export const IPN = "reemabdulghaffar@instapay"; // Change to Instapay details
 
-export const INDIVIDUAL_TICKET_PRICE = 400; // Change to individual ticket price
-export const GROUP_TICKET_PRICE = 350; // Change to group ticket price per person
+export const INDIVIDUAL_TICKET_PRICE = 450; // Change to individual ticket price
+export const GROUP_TICKET_PRICE = 375; // Change to group ticket price per person
 
-export const DISCOUNTED_TICKET_PRICE = 300; // Change to rush hour ticket price
+export const DISCOUNTED_TICKET_PRICE = 400; // Change to rush hour ticket price
 
-export const INDIVIDUAL_EARLY_PRICE = 350; // Change to early bird individual ticket price
-export const GROUP_EARLY_PRICE = 300; // Change to early bird group ticket price per person
+export const INDIVIDUAL_EARLY_PRICE = 400; // Change to early bird individual ticket price
+export const GROUP_EARLY_PRICE = 375; // Change to early bird group ticket price per person
 
 export const TICKET_WINDOW = [
   new Date("2026-01-03T22:00:00Z"), // 2026-01-04 00:00 GMT+2
