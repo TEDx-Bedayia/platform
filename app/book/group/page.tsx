@@ -241,7 +241,9 @@ export default function GroupTickets() {
             marginBottom: ".5rem",
           }}
         >
-          {EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL ? (
+          {EARLY_BIRD_UNTIL &&
+          new Date() < EARLY_BIRD_UNTIL &&
+          GROUP_EARLY_PRICE != GROUP_TICKET_PRICE ? (
             <>
               <s>{`${(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP`}</s>{" "}
               {`${(
@@ -255,11 +257,18 @@ export default function GroupTickets() {
             `${(GROUP_TICKET_PRICE * 4).toLocaleString()} EGP`
           )}
         </h2>
-        <h2 style={{ ...title.style, fontWeight: 100, fontSize: ".75em" }}>
+        <h2
+          style={{
+            ...title.style,
+            fontWeight: 100,
+            marginBottom: "1.5rem",
+            textAlign: "center",
+          }}
+        >
           {EARLY_BIRD_UNTIL && new Date() < EARLY_BIRD_UNTIL
             ? GROUP_EARLY_PRICE.toLocaleString()
             : GROUP_TICKET_PRICE.toLocaleString()}{" "}
-          EGP/Person
+          EGP/Person, All Tickets Are Non-Refundable.
         </h2>
       </motion.div>
       <motion.div
