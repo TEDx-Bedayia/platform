@@ -14,10 +14,10 @@ export const INDIVIDUAL_EARLY_PRICE = 400; // Change to early bird individual ti
 export const GROUP_EARLY_PRICE = 375; // Change to early bird group ticket price per person
 
 export const TICKET_WINDOW = [
-  new Date("2026-01-03T22:00:00Z"), // 2026-01-04 00:00 GMT+2
-  new Date("2026-02-03T22:00:00Z"), // 2026-02-04 00:00 GMT+2
+  new Date("2026-01-04T22:00:00Z"), // 2026-01-05 00:00 GMT+2
+  new Date("2026-02-04T22:00:00Z"), // 2026-02-05 00:00 GMT+2
 ]; // Change to actual ticket window
-export const EARLY_BIRD_UNTIL: Date | null = new Date("2026-01-10T22:00:00Z"); // Change to actual early bird deadline or null if not applicable
+export const EARLY_BIRD_UNTIL: Date | null = new Date("2026-01-12T22:00:00Z"); // Change to actual early bird deadline or null if not applicable
 
 export const EVENT_DATE = new Date("2026-02-13T23:59:59Z"); // Change to event date end
 export const HOST = "https://tedxbedayia.com";
