@@ -252,6 +252,7 @@ export default function Page() {
               .filter((key) => {
                 if (key === "CASH") return false;
                 const option = paymentOptions[key as PaymentMethodKey];
+                if (option.hidden) return false;
                 // If method has redirectLinks, only show if there's a link for this ticket type
                 if (option.redirectLinks) {
                   return !!option.redirectLinks[customer.type];

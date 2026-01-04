@@ -20,6 +20,7 @@ export interface PaymentMethod {
   field?: Field;
   icon: FC;
   redirectLinks?: Partial<Record<TicketType, string>>;
+  hidden?: boolean;
 }
 
 export interface Field {
@@ -162,7 +163,7 @@ export const paymentOptions: Record<PaymentMethodKey, PaymentMethod> = {
     icon: Wallet,
   },
   IPN: {
-    displayName: "Instapay",
+    displayName: "InstaPay",
     identifier: "IPN",
     to: IPN,
     instructions: Instapay,
@@ -203,5 +204,6 @@ export const paymentOptions: Record<PaymentMethodKey, PaymentMethod> = {
       [TicketType.GROUP]: "https://admission.bedayia.com/events",
     },
     icon: CreditCard,
+    hidden: true,
   },
 };
