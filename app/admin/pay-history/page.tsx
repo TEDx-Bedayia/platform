@@ -170,23 +170,17 @@ export default function History() {
           (acc, curr) => acc + curr.recieved - curr.incurred,
           0
         )}{" "}
-        EGP. <br /> Office:{" "}
-        {data
-          .filter((x) => x.stream.startsWith("Office"))
-          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. Telda:{" "}
-        {data
-          .filter((x) => x.stream.startsWith("Telda"))
-          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. Instapay:{" "}
-        {data
-          .filter((x) => x.stream.startsWith("Instapay"))
-          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP. eWallet:{" "}
-        {data
-          .filter((x) => x.stream.startsWith("eWallet"))
-          .reduce((acc, curr) => acc + curr.recieved, 0)}{" "}
-        EGP.
+        EGP. <br />
+        {Object.entries(
+          data.reduce((acc, curr) => {
+            const prefix = curr.stream.split(" ")[0];
+            acc[prefix] = (acc[prefix] || 0) + curr.recieved;
+            return acc;
+          }, {} as Record<string, number>)
+        )
+          .map(([method, amount]) => `${method}: ${amount} EGP`)
+          .join(". ")}
+        {data.length > 0 && "."}
       </p>
       <div className={styles.transactionList}>
         <div
