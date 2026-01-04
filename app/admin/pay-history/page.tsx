@@ -173,7 +173,12 @@ export default function History() {
         EGP. <br />
         {Object.entries(
           data.reduce((acc, curr) => {
-            const prefix = curr.stream.split(" ")[0];
+            const delimiter = " — ";
+            const delimiterIndex = curr.stream.indexOf(delimiter);
+            const prefix =
+              delimiterIndex !== -1
+                ? curr.stream.slice(0, delimiterIndex).trim()
+                : curr.stream.trim();
             acc[prefix] = (acc[prefix] || 0) + curr.recieved;
             return acc;
           }, {} as Record<string, number>)
