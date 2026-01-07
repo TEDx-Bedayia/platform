@@ -252,7 +252,7 @@ export async function GET() {
   let query = await sql`SELECT COUNT(*) FROM attendees;`;
   let query2 = await sql`SELECT COUNT(*) FROM attendees WHERE paid = true;`;
   let query3 =
-    await sql`SELECT COUNT(*) FROM attendees WHERE paid = true AND type IN ('individual', 'group', 'teacher', 'discounted');`;
+    await sql`SELECT COUNT(*) FROM attendees WHERE paid = true AND type NOT IN ('speaker', 'giveaway');`;
   return Response.json(
     {
       total: query.rows[0].count,
