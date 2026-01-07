@@ -74,10 +74,11 @@ const Instapay: FC<{ price: number }> = ({ price }) => {
       </li>
       <li>
         Select <strong>Send Money</strong> and choose the{" "}
-        <strong>IPA (Instapay Address)</strong> option.
+        <strong>Mobile Number</strong> option. Then, make sure the{" "}
+        <strong>Account</strong> tab is selected.
       </li>
       <li>
-        Send <strong>EGP {price.toFixed(2)}</strong> to the IPA{" "}
+        Send <strong>EGP {price.toFixed(2)}</strong> to the following number:{" "}
         <strong>{IPN}</strong>.
       </li>
       <li>

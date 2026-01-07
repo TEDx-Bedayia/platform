@@ -3,7 +3,7 @@ import type { Author } from "next/dist/lib/metadata/types/metadata-types";
 export const PHONE = "+20 105 578 2533"; // Leave as is
 export const VFCASH = "01003993559"; // Change to Vodafone Cash number
 export const TELDA = "@alykotb"; // Change to Telda username
-export const IPN = "reemabdulghaffar@instapay"; // Change to Instapay details
+export const IPN = "01012988103"; // Change to Instapay details
 
 export const INDIVIDUAL_TICKET_PRICE = 450; // Change to individual ticket price
 export const GROUP_TICKET_PRICE = 375; // Change to group ticket price per person
