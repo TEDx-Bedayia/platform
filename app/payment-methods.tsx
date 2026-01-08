@@ -1,5 +1,5 @@
 import { IPN, PHONE, TELDA, VFCASH } from "@/app/metadata";
-import { ArrowRight, CreditCard, Phone, Wallet } from "lucide-react";
+import { ArrowRight, Building2, CreditCard, Phone, Wallet } from "lucide-react";
 import { FC } from "react";
 import { TicketType } from "./ticket-types";
 
@@ -145,7 +145,7 @@ export const paymentOptions: Record<PaymentMethodKey, PaymentMethod> = {
     displayName: "Bedayia High School Office (Cash)",
     to: "School Office",
     identifier: "CASH",
-    icon: Wallet,
+    icon: Building2,
   },
   TLDA: {
     displayName: "Telda",

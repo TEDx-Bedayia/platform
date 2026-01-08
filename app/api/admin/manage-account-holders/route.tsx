@@ -55,6 +55,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const csrfError = validateCsrf(request);
+    if (csrfError) return csrfError;
+
     if (!canUserAccess(request, ProtectedResource.MANAGE_ACCOUNT_HOLDERS)) {
       return new Response(JSON.stringify({ message: "Unauthorized" }), {
         status: 401,
@@ -75,6 +78,9 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    const csrfError = validateCsrf(request);
+    if (csrfError) return csrfError;
+
     if (!canUserAccess(request, ProtectedResource.MANAGE_ACCOUNT_HOLDERS)) {
       return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
     }
