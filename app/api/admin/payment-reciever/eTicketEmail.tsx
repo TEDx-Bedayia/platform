@@ -41,7 +41,7 @@ export async function sendEmail(
       from: '"TEDxBedayia eTickets" <tickets@tedxbedayia.com>',
       to: email,
       subject: "Your TEDxBedayia ticket is here!",
-      react: await TicketEmail({ name, uuid }),
+      react: <TicketEmail name={name} uuid={uuid} />,
       attachments: [
         {
           contentType: "image/png",
