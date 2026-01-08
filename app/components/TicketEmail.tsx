@@ -58,17 +58,22 @@ export const TicketEmail: React.FC<TicketEmailProps> = ({ name, uuid }) => {
               . Your journey begins with a single scan.
             </Text>
 
-            {/* QR Section */}
-            <Section style={styles.qrSection}>
+            {/* QR Section - Added align="center" here */}
+            <Section style={styles.qrSection} align="center">
               <Text style={styles.qrLabel}>YOUR ENTRY PASS</Text>
-              <Img
-                src={`cid:ticket-qr`}
-                width="280"
-                height="280"
-                alt="Your eTicket QR Code"
-                style={styles.qrImage}
-                className="responsive-img"
-              />
+
+              {/* Wrapped in a column to force centering in strict clients */}
+              <Column align="center">
+                <Img
+                  src={`cid:ticket-qr`}
+                  width="280"
+                  height="280"
+                  alt="Your eTicket QR Code"
+                  style={styles.qrImage}
+                  className="responsive-img"
+                />
+              </Column>
+
               <Text style={styles.qrFallback}>
                 Can't see the code?{" "}
                 <Link
@@ -156,10 +161,10 @@ export const TicketEmail: React.FC<TicketEmailProps> = ({ name, uuid }) => {
   );
 };
 
-// Styles Object
+// Styles Object - UPDATED: All fontWeights are now 'bold'
 const styles = {
   body: {
-    backgroundColor: "#eef2f8", // Fallback
+    backgroundColor: "#eef2f8",
     fontFamily:
       '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif',
     margin: "0",
@@ -187,7 +192,7 @@ const styles = {
   },
   headerEyebrow: {
     fontSize: "11px",
-    fontWeight: "700",
+    fontWeight: "bold", // Changed from 700
     letterSpacing: "2.5px",
     textTransform: "uppercase" as const,
     opacity: "0.9",
@@ -197,18 +202,9 @@ const styles = {
   headerTitle: {
     margin: "0 0 24px",
     fontSize: "28px",
-    fontWeight: "800",
+    fontWeight: "bold", // Changed from 800
     lineHeight: "1.2",
     letterSpacing: "-0.3px",
-  },
-  // Simulating the ::after pseudo element
-  headerCurve: {
-    backgroundColor: "#ffffff",
-    height: "24px",
-    width: "100%",
-    borderTopLeftRadius: "24px",
-    borderTopRightRadius: "24px",
-    marginBottom: "-1px", // Fixes sub-pixel rendering gaps
   },
   content: {
     padding: "8px 36px 28px",
@@ -216,10 +212,10 @@ const styles = {
   },
   ticketTitle: {
     display: "inline-block",
-    background: "#fef2f2", // Fallback for gradient
+    background: "#fef2f2",
     color: "#dc2626",
     fontSize: "18px",
-    fontWeight: "700",
+    fontWeight: "bold", // Changed from 700
     padding: "10px 24px",
     borderRadius: "50px",
     margin: "0 0 20px",
@@ -233,7 +229,7 @@ const styles = {
   },
   highlightText: {
     color: "#0f172a",
-    fontWeight: "600",
+    fontWeight: "bold", // Changed from 600
   },
   qrSection: {
     margin: "28px 0",
@@ -241,10 +237,11 @@ const styles = {
     backgroundColor: "#f8fafc",
     borderRadius: "20px",
     border: "1px solid #e2e8f0",
+    textAlign: "center" as const, // Added explicit text align
   },
   qrLabel: {
     fontSize: "11px",
-    fontWeight: "700",
+    fontWeight: "bold", // Changed from 700
     letterSpacing: "1.5px",
     textTransform: "uppercase" as const,
     color: "#64748b",
@@ -253,7 +250,7 @@ const styles = {
   },
   qrImage: {
     display: "block",
-    margin: "0 auto",
+    margin: "0 auto", // Kept for web clients
     borderRadius: "16px",
     boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
   },
@@ -265,7 +262,7 @@ const styles = {
   },
   qrFallbackLink: {
     color: "#dc2626",
-    fontWeight: "600",
+    fontWeight: "bold", // Changed from 600
     textDecoration: "none",
     padding: "2px 8px",
     backgroundColor: "#fef2f2",
@@ -285,7 +282,7 @@ const styles = {
   },
   infoCardTitle: {
     fontSize: "12px",
-    fontWeight: "700",
+    fontWeight: "bold", // Changed from 700
     letterSpacing: "0.5px",
     textTransform: "uppercase" as const,
     color: "#64748b",
@@ -300,7 +297,7 @@ const styles = {
   },
   linkRed: {
     color: "#dc2626",
-    fontWeight: "600",
+    fontWeight: "bold", // Changed from 600
     textDecoration: "none",
   },
   ticketId: {
@@ -325,7 +322,7 @@ const styles = {
     margin: "0",
   },
   teamName: {
-    fontWeight: "700",
+    fontWeight: "bold", // Changed from 700
     color: "#dc2626",
     marginTop: "12px",
     display: "block",
@@ -340,7 +337,7 @@ const styles = {
     color: "#dc2626",
     textDecoration: "none",
     fontSize: "13px",
-    fontWeight: "600",
+    fontWeight: "bold", // Changed from 600
     padding: "8px 16px",
     backgroundColor: "#ffffff",
     borderRadius: "8px",
