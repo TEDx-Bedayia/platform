@@ -69,10 +69,7 @@ function MethodSelector({
 export default function ManageAccountHolders() {
   const router = useRouter();
   const paymentMethods = useMemo(
-    () =>
-      getPaymentMethods().filter(
-        (method) => !method.automatic && method.identifier !== "CASH"
-      ),
+    () => getPaymentMethods().filter((method) => !method.automatic),
     []
   );
   const allowedKeys = useMemo(
