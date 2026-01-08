@@ -46,7 +46,7 @@ export async function sendEmail(
         {
           contentType: "image/png",
           filename: "ticket-qr.png",
-          contentId: "ticket-qr",
+          contentId: `ticket-qr-${uuid}`,
           content: qrBuffer,
         },
       ],

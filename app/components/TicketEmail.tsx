@@ -58,21 +58,20 @@ export const TicketEmail: React.FC<TicketEmailProps> = ({ name, uuid }) => {
               . Your journey begins with a single scan.
             </Text>
 
-            {/* QR Section - Added align="center" here */}
+            {/* QR Section */}
             <Section style={styles.qrSection} align="center">
               <Text style={styles.qrLabel}>YOUR ENTRY PASS</Text>
 
-              {/* Wrapped in a column to force centering in strict clients */}
-              <Column align="center">
+              <center>
                 <Img
-                  src={`cid:ticket-qr`}
+                  src={`cid:ticket-qr-${uuid}`}
                   width="280"
                   height="280"
                   alt="Your eTicket QR Code"
                   style={styles.qrImage}
                   className="responsive-img"
                 />
-              </Column>
+              </center>
 
               <Text style={styles.qrFallback}>
                 Can't see the code?{" "}
@@ -161,7 +160,7 @@ export const TicketEmail: React.FC<TicketEmailProps> = ({ name, uuid }) => {
   );
 };
 
-// Styles Object - UPDATED: All fontWeights are now 'bold'
+// Styles Object
 const styles = {
   body: {
     backgroundColor: "#eef2f8",
@@ -237,7 +236,7 @@ const styles = {
     backgroundColor: "#f8fafc",
     borderRadius: "20px",
     border: "1px solid #e2e8f0",
-    textAlign: "center" as const, // Added explicit text align
+    textAlign: "center" as const,
   },
   qrLabel: {
     fontSize: "11px",
@@ -246,6 +245,7 @@ const styles = {
     textTransform: "uppercase" as const,
     color: "#64748b",
     marginBottom: "16px",
+    marginTop: "0",
     display: "block",
   },
   qrImage: {
