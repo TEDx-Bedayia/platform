@@ -89,7 +89,8 @@ export async function POST(request: NextRequest) {
             await sendEmail(
               attendee.rows[0].email,
               attendee.rows[0].full_name,
-              attendee.rows[0].uuid
+              attendee.rows[0].uuid,
+              attendeeId
             );
           }
         } catch (error) {

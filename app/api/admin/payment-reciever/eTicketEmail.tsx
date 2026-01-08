@@ -3,6 +3,26 @@ import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
+import QRCode from "qrcode";
+import { Resend } from "resend";
+import { TicketEmail } from "../../../components/TicketEmail";
+const resend = new Resend(process.env.RESEND_API_KEY!);
+
+// Set the 'sent' status of the attendee to true in the database
+// If no id is provided, simply return true
+async function setSentStatus(id?: string) {
+  if (!id) return true;
+
+  const query =
+    await sql`UPDATE attendees SET sent = true WHERE id = ${id} RETURNING *`;
+
+  if (query.rowCount === 0) {
+    console.error("SQL ERROR; sent = false but it's sent.");
+    return false;
+  }
+
+  return true;
+}
 
 export async function sendEmail(
   email: string,
@@ -10,6 +30,34 @@ export async function sendEmail(
   uuid: string,
   id?: string
 ) {
+  try {
+    const qrBuffer = await QRCode.toBuffer(uuid, {
+      errorCorrectionLevel: "H", // High error correction
+      margin: 2,
+      width: 300,
+    });
+
+    const res = await resend.emails.send({
+      from: '"TEDxBedayia eTickets" <tickets@tedxbedayia.com>',
+      to: email,
+      subject: "Your TEDxBedayia ticket is here!",
+      react: <TicketEmail name={name} uuid={uuid} />,
+      attachments: [
+        {
+          contentType: "image/png",
+          filename: "ticket-qr.png",
+          contentId: `ticket-qr-${uuid}`,
+          content: qrBuffer,
+        },
+      ],
+    });
+
+    if (!res.error) return setSentStatus(id);
+    else console.error("Resend Error: ", res.error);
+  } catch (e) {
+    console.error("Resend Failed, trying Gmail: ", e);
+  }
+
   const filePath = path.join(process.cwd(), "public/eTicket-template.html");
   const htmlContent = await promises.readFile(filePath, "utf8");
 
@@ -37,7 +85,7 @@ export async function sendEmail(
     });
 
     await transporter.sendMail({
-      from: `"TEDxBedayia'${YEAR} eTicket System" <tedxyouth@bedayia.com>`,
+      from: `"TEDxBedayia eTickets" <tedxyouth@bedayia.com>`,
       to: email,
       attachDataUrls: true,
       subject: `${
@@ -46,17 +94,7 @@ export async function sendEmail(
       html: personalizedHtml,
     });
 
-    if (id) {
-      const qq =
-        await sql`UPDATE attendees SET sent = true WHERE id = ${id} RETURNING *`;
-
-      if (qq.rowCount === 0) {
-        console.error("SQL ERROR; sent = false but it's sent.");
-        return false;
-      }
-    }
-
-    return true;
+    return setSentStatus(id);
   } catch (e) {
     console.error("GMAIL OR SQL ERROR: ", e);
     return false;

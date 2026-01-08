@@ -72,7 +72,11 @@ export async function GET(request: NextRequest) {
     try {
       if (res.rows[0].type != TicketType.GROUP) {
         let randUUID = await safeRandUUID();
-        if (EARLY_BIRD_UNTIL && new Date(date) < EARLY_BIRD_UNTIL) {
+        if (
+          EARLY_BIRD_UNTIL &&
+          new Date(date) < EARLY_BIRD_UNTIL &&
+          res.rows[0].type == TicketType.INDIVIDUAL
+        ) {
           await sql`UPDATE attendees SET paid = true, uuid = ${randUUID}, type = ${TicketType.INDIVIDUAL_EARLY_BIRD} WHERE id = ${res.rows[0].id}`;
         } else {
           await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${res.rows[0].id}`;
@@ -121,9 +125,11 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${
-        "CASH@" + from
-      }, ${toBePaid}, ${amount}, ${date})`;
+      if (toBePaid != 0 || Number(amount) != 0) {
+        await sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${
+          "CASH@" + from
+        }, ${toBePaid}, ${amount}, ${date})`;
+      }
     } catch (e) {
       console.error(e);
       await sql`UPDATE attendees SET paid = false, uuid = NULL WHERE id = ${from}`;
