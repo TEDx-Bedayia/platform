@@ -37,7 +37,7 @@ async function batchSetSentStatus(ids?: string[]) {
 
   if (query.rowCount !== numericIds.length) {
     console.error(
-      `SQL ERROR; expected to update ${ids.length} attendees, but updated ${query.rowCount}.`
+      `SQL ERROR; expected to update ${numericIds.length} attendees, but updated ${query.rowCount}.`
     );
     return false;
   }
