@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/prices";
 import { ResponseCode } from "../../utils/response-codes";
-import { sendEmail } from "./eTicketEmail";
+import { sendBatchEmail } from "./eTicketEmail";
 
 // ============================================================================
 // Constants
@@ -490,19 +490,14 @@ async function sendEmailsWithFailureTracking(
 ): Promise<string[]> {
   const failures: string[] = [];
 
-  for (const attendee of paidAttendees) {
-    try {
-      await sendEmail(
-        attendee.email,
-        attendee.full_name,
-        attendee.uuid!,
-        String(attendee.id)
-      );
-    } catch (e) {
-      console.error(`Failed to send email to ${attendee.email}:`, e);
-      failures.push(attendee.email);
-    }
-  }
+  await sendBatchEmail(
+    paidAttendees.map((attendee) => ({
+      fullName: attendee.full_name,
+      email: attendee.email,
+      id: String(attendee.id),
+      uuid: attendee.uuid!,
+    }))
+  );
 
   return failures;
 }
