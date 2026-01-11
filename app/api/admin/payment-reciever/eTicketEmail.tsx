@@ -42,29 +42,29 @@ async function batchSetSentStatus(ids?: string[]) {
 }
 
 export async function sendBatchEmail(
-  receipients: EmailRecipient[]
+  recipients: EmailRecipient[]
 ): Promise<boolean> {
   try {
-    receipients = await Promise.all(
-      receipients.map(async (receipient) => {
-        const qrBuffer = await QRCode.toBuffer(receipient.uuid, {
+    recipients = await Promise.all(
+      recipients.map(async (recipient) => {
+        const qrBuffer = await QRCode.toBuffer(recipient.uuid, {
           errorCorrectionLevel: "H",
           margin: 2,
           width: 300,
         });
 
         return {
-          fullName: receipient.fullName,
-          email: receipient.email,
-          id: receipient.id,
-          uuid: receipient.uuid,
+          fullName: recipient.fullName,
+          email: recipient.email,
+          id: recipient.id,
+          uuid: recipient.uuid,
           qrBuffer,
         };
       })
     );
 
     const res = await resend.batch.send(
-      receipients.map((r) => ({
+      recipients.map((r) => ({
         from: '"TEDxBedayia eTickets" <tickets@tedxbedayia.com>',
         to: r.email,
         subject: "Your TEDxBedayia ticket is here!",
@@ -81,7 +81,7 @@ export async function sendBatchEmail(
     );
 
     if (!res.error)
-      return await batchSetSentStatus(receipients.map((r) => r.id));
+      return await batchSetSentStatus(recipients.map((r) => r.id));
     else console.error("Resend Error: ", res.error);
   } catch (e) {
     console.error("Resend Failed, trying Gmail: ", e);
@@ -106,12 +106,12 @@ export async function sendBatchEmail(
     const htmlContent = await promises.readFile(filePath, "utf8");
 
     let success = true;
-    for (const receipient of receipients) {
+    for (const recipient of recipients) {
       // Replace placeholders in the HTML
       const personalizedHtml = htmlContent
-        .replaceAll("${name}", receipient.fullName)
-        .replaceAll("${qrCodeURL}", `${HOST}/api/qr?uuid=${receipient.uuid}`)
-        .replaceAll("${uuid}", receipient.uuid)
+        .replaceAll("${name}", recipient.fullName)
+        .replaceAll("${qrCodeURL}", `${HOST}/api/qr?uuid=${recipient.uuid}`)
+        .replaceAll("${uuid}", recipient.uuid)
         .replaceAll("{EVENT_DESC}", EVENT_DESC)
         .replaceAll("{PHONE}", PHONE)
         .replaceAll("${year}", YEAR.toString());
@@ -119,15 +119,15 @@ export async function sendBatchEmail(
       try {
         await transporter.sendMail({
           from: `"TEDxBedayia eTickets" <tedxyouth@bedayia.com>`,
-          to: receipient.email,
+          to: recipient.email,
           attachDataUrls: true,
           subject: `${
-            receipient.fullName.split(" ")[0]
+            recipient.fullName.split(" ")[0]
           }, your TEDxBedayia'${YEAR} eTicket has Arrived!`,
           html: personalizedHtml,
         });
 
-        const status = await setSentStatus(receipient.id);
+        const status = await setSentStatus(recipient.id);
         if (!status) success = false;
       } catch (e) {
         console.error("GMAIL OR SQL ERROR: ", e);
