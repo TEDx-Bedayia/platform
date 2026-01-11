@@ -26,15 +26,19 @@ async function setSentStatus(id?: string) {
 }
 
 async function batchSetSentStatus(ids?: string[]) {
-  if (!ids) return true;
+  if (!ids || ids.length === 0) return true;
+  const numericIds = ids.map((id) => Number(id)).filter((id) => !isNaN(id));
+  if (numericIds.length === 0) return true;
 
   const query = await sql.query(
     "UPDATE attendees SET sent = true WHERE id = ANY($1::int[]) RETURNING *",
-    [ids]
+    [numericIds]
   );
 
-  if (query.rowCount === 0) {
-    console.error("SQL ERROR; sent = false but it's sent.");
+  if (query.rowCount !== numericIds.length) {
+    console.error(
+      `SQL ERROR; expected to update ${ids.length} attendees, but updated ${query.rowCount}.`
+    );
     return false;
   }
 
