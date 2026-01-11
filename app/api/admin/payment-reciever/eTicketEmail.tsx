@@ -87,50 +87,56 @@ export async function sendBatchEmail(
     console.error("Resend Failed, trying Gmail: ", e);
   }
 
-  const filePath = path.join(process.cwd(), "public/eTicket-template.html");
-  const htmlContent = await promises.readFile(filePath, "utf8");
+  // Fallback to Gmail if Resend fails
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+      },
+    });
 
-  let success = true;
-  for (const receipient of receipients) {
-    // Replace placeholders in the HTML
-    const personalizedHtml = htmlContent
-      .replaceAll("${name}", receipient.fullName)
-      .replaceAll("${qrCodeURL}", `${HOST}/api/qr?uuid=${receipient.uuid}`)
-      .replaceAll("${uuid}", receipient.uuid)
-      .replaceAll("{EVENT_DESC}", EVENT_DESC)
-      .replaceAll("{PHONE}", PHONE)
-      .replaceAll("${year}", YEAR.toString());
+    const filePath = path.join(process.cwd(), "public/eTicket-template.html");
+    const htmlContent = await promises.readFile(filePath, "utf8");
 
-    try {
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: {
-          type: "OAuth2",
-          user: process.env.EMAIL,
-          clientId: process.env.CLIENT_ID,
-          clientSecret: process.env.CLIENT_SECRET,
-          refreshToken: process.env.REFRESH_TOKEN,
-        },
-      });
+    let success = true;
+    for (const receipient of receipients) {
+      // Replace placeholders in the HTML
+      const personalizedHtml = htmlContent
+        .replaceAll("${name}", receipient.fullName)
+        .replaceAll("${qrCodeURL}", `${HOST}/api/qr?uuid=${receipient.uuid}`)
+        .replaceAll("${uuid}", receipient.uuid)
+        .replaceAll("{EVENT_DESC}", EVENT_DESC)
+        .replaceAll("{PHONE}", PHONE)
+        .replaceAll("${year}", YEAR.toString());
 
-      await transporter.sendMail({
-        from: `"TEDxBedayia eTickets" <tedxyouth@bedayia.com>`,
-        to: receipient.email,
-        attachDataUrls: true,
-        subject: `${
-          receipient.fullName.split(" ")[0]
-        }, your TEDxBedayia'${YEAR} eTicket has Arrived!`,
-        html: personalizedHtml,
-      });
+      try {
+        await transporter.sendMail({
+          from: `"TEDxBedayia eTickets" <tedxyouth@bedayia.com>`,
+          to: receipient.email,
+          attachDataUrls: true,
+          subject: `${
+            receipient.fullName.split(" ")[0]
+          }, your TEDxBedayia'${YEAR} eTicket has Arrived!`,
+          html: personalizedHtml,
+        });
 
-      const status = await setSentStatus(receipient.id);
-      if (!status) success = false;
-    } catch (e) {
-      console.error("GMAIL OR SQL ERROR: ", e);
-      success = false;
+        const status = await setSentStatus(receipient.id);
+        if (!status) success = false;
+      } catch (e) {
+        console.error("GMAIL OR SQL ERROR: ", e);
+        success = false;
+      }
     }
+    return success;
+  } catch (e) {
+    console.error("GMAIL FAILED: ", e);
+    return false;
   }
-  return success;
 }
