@@ -5,6 +5,14 @@ import { EARLY_BIRD_UNTIL, EVENT_DATE, PHONE, YEAR } from "../../metadata";
 import { isGroup, TicketType } from "../../ticket-types";
 import { price } from "../tickets/prices";
 
+export type EmailRecipient = {
+  fullName: string;
+  email: string;
+  id: string;
+  uuid: string;
+  qrBuffer?: Buffer;
+};
+
 export async function sendBookingConfirmation(
   paymentMethod: string,
   name: string,

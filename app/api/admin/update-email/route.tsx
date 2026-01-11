@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
 import { validateCsrf } from "../../utils/csrf";
 import { sendBookingConfirmation } from "../../utils/email-helper";
-import { sendEmail } from "../payment-reciever/eTicketEmail";
+import { sendBatchEmail } from "../payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function POST(request: NextRequest) {
@@ -47,12 +47,14 @@ export async function POST(request: NextRequest) {
         SET uuid = ${newUUID}
         WHERE id = ${id} AND paid = true`;
 
-      await sendEmail(
-        email,
-        result.rows[0].full_name,
-        newUUID,
-        result.rows[0].id
-      );
+      await sendBatchEmail([
+        {
+          email,
+          fullName: result.rows[0].full_name,
+          uuid: newUUID,
+          id: String(result.rows[0].id),
+        },
+      ]);
     }
 
     return NextResponse.json(

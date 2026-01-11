@@ -2,7 +2,7 @@ import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { canUserAccess, ProtectedResource } from "../../utils/auth";
 import { validateCsrf } from "../../utils/csrf";
-import { sendEmail } from "../payment-reciever/eTicketEmail";
+import { sendBatchEmail } from "../payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../payment-reciever/main";
 
 export async function GET(request: NextRequest) {
@@ -32,12 +32,14 @@ export async function GET(request: NextRequest) {
       q.rows[0].uuid = uuid;
     }
 
-    await sendEmail(
-      q.rows[0].email,
-      q.rows[0].full_name,
-      q.rows[0].uuid,
-      q.rows[0].id
-    );
+    await sendBatchEmail([
+      {
+        email: q.rows[0].email,
+        fullName: q.rows[0].full_name,
+        uuid: q.rows[0].uuid,
+        id: String(q.rows[0].id),
+      },
+    ]);
     return Response.json(
       { message: `Email sent to ${q.rows[0].email}.` },
       { status: 200 }

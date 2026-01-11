@@ -5,7 +5,7 @@ import { EARLY_BIRD_UNTIL } from "@/app/metadata";
 import { TicketType } from "@/app/ticket-types";
 import { sql } from "@vercel/postgres";
 import { NextResponse, type NextRequest } from "next/server";
-import { sendEmail } from "../eTicketEmail";
+import { sendBatchEmail } from "../eTicketEmail";
 import { pay, safeRandUUID } from "../main";
 
 export const maxDuration = 15;
@@ -81,12 +81,14 @@ export async function GET(request: NextRequest) {
         } else {
           await sql`UPDATE attendees SET paid = true, uuid = ${randUUID} WHERE id = ${res.rows[0].id}`;
         }
-        await sendEmail(
-          res.rows[0].email,
-          res.rows[0].full_name,
-          randUUID,
-          res.rows[0].id
-        );
+        await sendBatchEmail([
+          {
+            email: res.rows[0].email,
+            fullName: res.rows[0].full_name,
+            uuid: randUUID,
+            id: String(res.rows[0].id),
+          },
+        ]);
       } else {
         let groupMembersIDs =
           await sql`SELECT id1, id2, id3, id4 FROM groups WHERE id1 = ${res.rows[0].id} OR id2 = ${res.rows[0].id} OR id3 = ${res.rows[0].id} OR id4 = ${res.rows[0].id}`;
@@ -120,9 +122,14 @@ export async function GET(request: NextRequest) {
           [ids, randUUIDs] // Parameters passed as arrays
         );
 
-        for (const row of accepted.rows) {
-          await sendEmail(row.email, row.full_name, row.uuid, row.id);
-        }
+        await sendBatchEmail(
+          accepted.rows.map((row) => ({
+            email: row.email,
+            fullName: row.full_name,
+            uuid: row.uuid,
+            id: String(row.id),
+          }))
+        );
       }
 
       if (toBePaid != 0 || Number(amount) != 0) {

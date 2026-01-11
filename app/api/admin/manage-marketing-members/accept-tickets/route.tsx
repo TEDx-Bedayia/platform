@@ -7,7 +7,7 @@ import {
 import { sql } from "@vercel/postgres";
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { sendEmail } from "../../payment-reciever/eTicketEmail";
+import { sendBatchEmail } from "../../payment-reciever/eTicketEmail";
 
 export async function POST(request: NextRequest) {
   if (!canUserAccess(request, ProtectedResource.MARKETING_DASHBOARD)) {
@@ -86,12 +86,14 @@ export async function POST(request: NextRequest) {
               [randomUUID(), attendeeId]
             );
 
-            await sendEmail(
-              attendee.rows[0].email,
-              attendee.rows[0].full_name,
-              attendee.rows[0].uuid,
-              attendeeId
-            );
+            await sendBatchEmail([
+              {
+                fullName: attendee.rows[0].full_name,
+                email: attendee.rows[0].email,
+                id: attendeeId,
+                uuid: attendee.rows[0].uuid,
+              },
+            ]);
           }
         } catch (error) {
           console.error(

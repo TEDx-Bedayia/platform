@@ -1,6 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
-import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
+import { sendBatchEmail } from "../admin/payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../admin/payment-reciever/main";
 
 type Primitive = string | number | boolean | null | undefined;
@@ -140,15 +140,14 @@ export async function POST(request: NextRequest) {
         const updated = result.rowCount === ids.length;
 
         if (updated) {
-          for (let member of result.rows) {
-            // send email to each member
-            await sendEmail(
-              member.email,
-              member.full_name,
-              member.uuid,
-              member.id
-            );
-          }
+          await sendBatchEmail(
+            result.rows.map((row) => ({
+              email: row.email,
+              fullName: row.full_name,
+              uuid: row.uuid,
+              id: String(row.id),
+            }))
+          );
 
           await client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${
             "CARD@" + orderId

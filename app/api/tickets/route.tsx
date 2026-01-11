@@ -2,7 +2,7 @@ import { TICKET_WINDOW } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { type NextRequest } from "next/server";
 import { TicketType } from "../../ticket-types";
-import { sendEmail } from "../admin/payment-reciever/eTicketEmail";
+import { sendBatchEmail } from "../admin/payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../admin/payment-reciever/main";
 import { initiateCardPayment } from "../utils/card-payment";
 import { validateCsrfLenient } from "../utils/csrf";
@@ -161,7 +161,7 @@ async function submitOneTicket(
     if (result.rows[0].processed === true) {
       let uuid = await safeRandUUID();
       await sql`UPDATE attendees SET paid = TRUE, uuid = ${uuid} WHERE id = ${id} AND paid = FALSE RETURNING *`;
-      await sendEmail(email, name, uuid, id);
+      await sendBatchEmail([{ email, fullName: name, uuid, id }]);
     }
 
     return Response.json(

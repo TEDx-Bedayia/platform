@@ -6,6 +6,7 @@ import path from "path";
 import QRCode from "qrcode";
 import { Resend } from "resend";
 import { TicketEmail } from "../../../components/TicketEmail";
+import { EmailRecipient } from "../../utils/email-helper";
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
 // Set the 'sent' status of the attendee to true in the database
@@ -24,52 +25,73 @@ async function setSentStatus(id?: string) {
   return true;
 }
 
-export async function sendEmail(
-  email: string,
-  name: string,
-  uuid: string,
-  id?: string
-) {
+async function batchSetSentStatus(ids?: string[]) {
+  if (!ids || ids.length === 0) return true;
+  const numericIds = ids.map((id) => Number(id)).filter((id) => !isNaN(id));
+  if (numericIds.length === 0) return true;
+
+  const query = await sql.query(
+    "UPDATE attendees SET sent = true WHERE id = ANY($1::int[]) RETURNING *",
+    [numericIds]
+  );
+
+  if (query.rowCount !== numericIds.length) {
+    console.error(
+      `SQL ERROR; expected to update ${numericIds.length} attendees, but updated ${query.rowCount}.`
+    );
+    return false;
+  }
+
+  return true;
+}
+
+export async function sendBatchEmail(
+  recipients: EmailRecipient[]
+): Promise<boolean> {
   try {
-    const qrBuffer = await QRCode.toBuffer(uuid, {
-      errorCorrectionLevel: "H", // High error correction
-      margin: 2,
-      width: 300,
-    });
+    recipients = await Promise.all(
+      recipients.map(async (recipient) => {
+        const qrBuffer = await QRCode.toBuffer(recipient.uuid, {
+          errorCorrectionLevel: "H",
+          margin: 2,
+          width: 300,
+        });
 
-    const res = await resend.emails.send({
-      from: '"TEDxBedayia eTickets" <tickets@tedxbedayia.com>',
-      to: email,
-      subject: "Your TEDxBedayia ticket is here!",
-      react: <TicketEmail name={name} uuid={uuid} />,
-      attachments: [
-        {
-          contentType: "image/png",
-          filename: "ticket-qr.png",
-          contentId: `ticket-qr-${uuid}`,
-          content: qrBuffer,
-        },
-      ],
-    });
+        return {
+          fullName: recipient.fullName,
+          email: recipient.email,
+          id: recipient.id,
+          uuid: recipient.uuid,
+          qrBuffer,
+        };
+      })
+    );
 
-    if (!res.error) return setSentStatus(id);
+    const res = await resend.batch.send(
+      recipients.map((r) => ({
+        from: '"TEDxBedayia eTickets" <tickets@tedxbedayia.com>',
+        to: r.email,
+        subject: "Your TEDxBedayia ticket is here!",
+        react: <TicketEmail name={r.fullName} uuid={r.uuid} />,
+        attachments: [
+          {
+            contentType: "image/png",
+            filename: "ticket-qr.png",
+            contentId: `ticket-qr-${r.uuid}`,
+            content: r.qrBuffer,
+          },
+        ],
+      }))
+    );
+
+    if (!res.error)
+      return await batchSetSentStatus(recipients.map((r) => r.id));
     else console.error("Resend Error: ", res.error);
   } catch (e) {
     console.error("Resend Failed, trying Gmail: ", e);
   }
 
-  const filePath = path.join(process.cwd(), "public/eTicket-template.html");
-  const htmlContent = await promises.readFile(filePath, "utf8");
-
-  // Replace placeholders in the HTML
-  const personalizedHtml = htmlContent
-    .replaceAll("${name}", name)
-    .replaceAll("${qrCodeURL}", `${HOST}/api/qr?uuid=${uuid}`)
-    .replaceAll("${uuid}", uuid)
-    .replaceAll("{EVENT_DESC}", EVENT_DESC)
-    .replaceAll("{PHONE}", PHONE)
-    .replaceAll("${year}", YEAR.toString());
-
+  // Fallback to Gmail if Resend fails
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -84,19 +106,41 @@ export async function sendEmail(
       },
     });
 
-    await transporter.sendMail({
-      from: `"TEDxBedayia eTickets" <tedxyouth@bedayia.com>`,
-      to: email,
-      attachDataUrls: true,
-      subject: `${
-        name.split(" ")[0]
-      }, your TEDxBedayia'${YEAR} eTicket has Arrived!`,
-      html: personalizedHtml,
-    });
+    const filePath = path.join(process.cwd(), "public/eTicket-template.html");
+    const htmlContent = await promises.readFile(filePath, "utf8");
 
-    return setSentStatus(id);
+    let success = true;
+    for (const recipient of recipients) {
+      // Replace placeholders in the HTML
+      const personalizedHtml = htmlContent
+        .replaceAll("${name}", recipient.fullName)
+        .replaceAll("${qrCodeURL}", `${HOST}/api/qr?uuid=${recipient.uuid}`)
+        .replaceAll("${uuid}", recipient.uuid)
+        .replaceAll("{EVENT_DESC}", EVENT_DESC)
+        .replaceAll("{PHONE}", PHONE)
+        .replaceAll("${year}", YEAR.toString());
+
+      try {
+        await transporter.sendMail({
+          from: `"TEDxBedayia eTickets" <tedxyouth@bedayia.com>`,
+          to: recipient.email,
+          attachDataUrls: true,
+          subject: `${
+            recipient.fullName.split(" ")[0]
+          }, your TEDxBedayia'${YEAR} eTicket has Arrived!`,
+          html: personalizedHtml,
+        });
+
+        const status = await setSentStatus(recipient.id);
+        if (!status) success = false;
+      } catch (e) {
+        console.error("GMAIL OR SQL ERROR: ", e);
+        success = false;
+      }
+    }
+    return success;
   } catch (e) {
-    console.error("GMAIL OR SQL ERROR: ", e);
+    console.error("GMAIL FAILED: ", e);
     return false;
   }
 }
