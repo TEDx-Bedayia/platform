@@ -154,3 +154,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({}, { status: 401 });
   }
 }
+
+export async function DELETE() {
+  const cookieStore = await cookies();
+  cookieStore.delete("token");
+  return NextResponse.json({ message: "Logged out" }, { status: 200 });
+}

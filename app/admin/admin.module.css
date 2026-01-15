@@ -9,48 +9,118 @@
 
 .nav {
   display: flex;
-  gap: 5rem;
-  flex-direction: row;
-  border-bottom: "1px solid #ccc";
   align-items: center;
-  justify-content: center;
-  padding: 1rem 2rem;
-  /* background-color: var(--background-start-rgb); */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: rgba(8, 12, 24, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.nav > a {
-  color: #e0e0e0;
-  /* font-weight: 500; */
+.navBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brandIcon {
+  font-size: 1.25rem;
+  opacity: 0.9;
+}
+
+.brandText {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #f8fafc;
+  letter-spacing: 0.02em;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.navLink {
+  color: rgba(226, 232, 240, 0.75);
+  font-weight: 500;
+  font-size: 0.875rem;
   text-decoration: none;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
   position: relative;
-  display: inline-block;
-  overflow-y: hidden;
-  transition: transform 0.3s ease-out;
 }
 
-/* Create the underline using ::after pseudo-element */
-.nav > a::after {
+.navLink:hover {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.navLinkActive {
+  color: #f8fafc;
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.navLinkActive::after {
   content: "";
   position: absolute;
-  width: 100%;
-  height: 2px; /* Thickness of the underline */
   bottom: 0;
-  left: 0;
-  background-color: #e0e0e0; /* Same color as the text by default */
-  border-radius: 10rem;
-  transform: scaleX(0); /* Initially hidden */
-  transform-origin: bottom right;
-  transition: transform 0.3s ease-out; /* Smooth animation */
-  color: #e0e0e0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5rem;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  border-radius: 1rem;
 }
 
-.nav > a:hover {
-  transform: translateY(-2px);
+.logoutButton {
+  background: transparent;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: rgba(248, 113, 113, 0.9);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* Animate the underline */
-.nav > a:hover::after {
-  transform: scaleX(1); /* Expand the underline */
-  transform-origin: bottom left;
+.logoutButton:hover {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.6);
+  color: #f87171;
+}
+
+@media (max-width: 900px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .navBrand {
+    order: 1;
+  }
+
+  .logoutButton {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .navLinks {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .navLink {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.65rem;
+  }
 }

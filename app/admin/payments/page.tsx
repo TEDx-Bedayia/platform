@@ -9,7 +9,6 @@ import {
   getTicketTypeName,
   TicketType,
 } from "@/app/ticket-types";
-import { UserCheck2 } from "lucide-react";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -150,7 +149,6 @@ export default function Payments() {
     date: getCurrentDate(),
   });
   const [paymentOptions, setPaymentOptions] = useState([] as PaymentMethod[]);
-  const [type, setType] = useState("school" as "admin" | "school");
   const [changingFieldTitle, setChangingFieldTitle] = useState(
     "Email Address Or ID"
   );
@@ -165,7 +163,6 @@ export default function Payments() {
           return;
         }
         const allowedMethods = (res.methods as string[]) ?? [];
-        setType(res.role === "admin" ? "admin" : "school");
 
         const paymentMethods = getPaymentMethods();
 
@@ -399,23 +396,7 @@ export default function Payments() {
 
   return (
     <section id="admin-payments">
-      {type === "admin" && (
-        <>
-          {/* Floating Button to redirect to manage account holders */}
-          <button
-            className={styles.manageAccountHoldersButton}
-            onClick={() => router.push("/admin/manage-account-holders")}
-            title="Manage Account Holders"
-          >
-            <UserCheck2 />
-            Manage Account Holders
-          </button>
-        </>
-      )}
-      <div
-        className={styles.pageContainer}
-        style={type == "school" ? { height: "100vh !important" } : {}}
-      >
+      <div className={styles.pageContainer}>
         <form onSubmit={handleSubmit} className={styles.formContainer}>
           <h2 style={{ ...title.style, fontWeight: 700 }}>Submit Payment</h2>
 
