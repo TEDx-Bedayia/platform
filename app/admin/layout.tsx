@@ -159,6 +159,7 @@ export default function RootLayout({
             type="button"
             className={styles.logoutButton}
             onClick={handleLogout}
+            aria-label="Log out"
           >
             Logout
           </button>
