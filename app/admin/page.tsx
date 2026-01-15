@@ -561,20 +561,6 @@ export default function AdminDashboard() {
         </button>
       )}
 
-      <div
-        className="absolute left-24 top-24 flex flex-row items-center gap-2 bg-green-200 transition-all cursor-pointer hover:bg-green-300 active:bg-green-400 rounded-lg p-2 pr-4"
-        onClick={() => {
-          router.push("/admin/speaker-tickets");
-        }}
-        title="Add Speaker Tickets"
-      >
-        <div className="w-9 h-9 bg-transparent overflow-hidden rounded-lg text-green-700 flex items-center justify-center scale-125 -rotate-[25deg] transition-all ">
-          {speakerTicketIcon}
-        </div>
-
-        <span className="text-green-700">Invitations</span>
-      </div>
-
       <h1 style={{ ...title.style, fontWeight: 700 }}>All Tickets</h1>
       <div
         style={{

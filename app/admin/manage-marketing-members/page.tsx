@@ -206,7 +206,7 @@ export default function MarketingMembers() {
         schedules.
       </p>
       <br />
-      <h2 className={title.className}>Rush Hour Management</h2>
+      <h2 className={title.className}>Tickets Management</h2>
       {/* Date Input w/button for next rush hour day */}
       <div className="flex items-center gap-2">
         <h3>Next Rush Hour Date:</h3>

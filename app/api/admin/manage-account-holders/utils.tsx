@@ -1,7 +1,8 @@
 import { sql } from "@vercel/postgres";
 import argon2 from "argon2";
+import { ProtectedResource } from "../../utils/auth";
 
-// To be called after verification of permissins
+// To be called after verification of permissions
 export async function createAccountHolder(
   username: string,
   password: string
@@ -47,11 +48,37 @@ export async function setPaymentMethodsToAccountHolder(
   }
 }
 
+export async function setAdditionalScopesToAccountHolder(
+  accountHolderId: number,
+  additionalScopes: ProtectedResource[]
+): Promise<boolean> {
+  try {
+    const query = `
+      UPDATE account_holders
+      SET additional_scopes = $1
+      WHERE id = $2
+    `;
+
+    await sql.query(query, [additionalScopes, accountHolderId]);
+
+    return true;
+  } catch (err) {
+    console.error("Error adding additional scopes", err);
+    return false;
+  }
+}
+
 export async function getAccountHolderInfo(
   username: string,
   password: string
 ): Promise<
-  { id: number; username: string; allowed_methods: string[] } | undefined
+  | {
+      id: number;
+      username: string;
+      allowed_methods: string[];
+      additional_scopes?: string[];
+    }
+  | undefined
 > {
   const result =
     await sql`SELECT * FROM account_holders WHERE username = ${username}`;
@@ -65,6 +92,7 @@ export async function getAccountHolderInfo(
       id: result.rows[0].id,
       username: result.rows[0].username,
       allowed_methods: result.rows[0].allowed_methods,
+      additional_scopes: result.rows[0].additional_scopes,
     };
   } else {
     return;
@@ -72,15 +100,21 @@ export async function getAccountHolderInfo(
 }
 
 export async function getAllAccountHolders(): Promise<
-  { id: number; username: string; allowed_methods: string[] }[]
+  {
+    id: number;
+    username: string;
+    allowed_methods: string[];
+    additional_scopes?: ProtectedResource[];
+  }[]
 > {
   const result =
-    await sql`SELECT id, username, allowed_methods FROM account_holders`;
+    await sql`SELECT id, username, allowed_methods, additional_scopes FROM account_holders`;
   try {
     return result.rows.map((row) => ({
       id: row.id,
       username: row.username,
       allowed_methods: row.allowed_methods,
+      additional_scopes: row.additional_scopes,
     }));
   } catch (err) {
     console.error("Error fetching account holders", err);

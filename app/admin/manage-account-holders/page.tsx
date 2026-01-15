@@ -11,6 +11,31 @@ import {
 import { Poppins, Ubuntu } from "next/font/google";
 import { useRouter } from "next/navigation";
 
+const AVAILABLE_SCOPES = [
+  {
+    key: "payment_logs",
+    label: "Payment Logs",
+    description: "View payment history",
+  },
+  {
+    key: "ticket_dashboard",
+    label: "Ticket Dashboard",
+    description: "View all tickets",
+  },
+  {
+    key: "marketing_dashboard",
+    label: "Marketing Dashboard",
+    description: "Access marketing tools",
+  },
+  {
+    key: "invitations",
+    label: "Invitations",
+    description: "Manage speaker tickets",
+  },
+] as const;
+
+type ScopeKey = (typeof AVAILABLE_SCOPES)[number]["key"];
+
 import { customAlert } from "../custom-alert";
 import styles from "./manage-account-holders.module.css";
 
@@ -21,6 +46,7 @@ type AccountHolder = {
   id: number;
   username: string;
   allowed_methods: PaymentMethodKey[];
+  additional_scopes: ScopeKey[];
 };
 
 type MethodSelectorProps = {
@@ -66,6 +92,37 @@ function MethodSelector({
   );
 }
 
+type ScopeSelectorProps = {
+  selected: ScopeKey[];
+  onToggle: (scope: ScopeKey) => void;
+  disabled?: boolean;
+};
+
+function ScopeSelector({ selected, onToggle, disabled }: ScopeSelectorProps) {
+  return (
+    <div className={styles.scopesGrid}>
+      {AVAILABLE_SCOPES.map((scope) => {
+        const active = selected.includes(scope.key);
+        return (
+          <button
+            type="button"
+            key={scope.key}
+            className={`${styles.scopeChip} ${
+              active ? styles.scopeChipActive : styles.scopeChipInactive
+            }`}
+            onClick={() => onToggle(scope.key)}
+            disabled={disabled}
+            title={scope.description}
+          >
+            <span className={styles.scopeIcon}>{active ? "✓" : "+"}</span>
+            <span className={styles.scopeLabel}>{scope.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function ManageAccountHolders() {
   const router = useRouter();
   const paymentMethods = useMemo(
@@ -82,8 +139,10 @@ export default function ManageAccountHolders() {
   const [newHolderMethods, setNewHolderMethods] = useState<PaymentMethodKey[]>(
     []
   );
+  const [newHolderScopes, setNewHolderScopes] = useState<ScopeKey[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingMethods, setEditingMethods] = useState<PaymentMethodKey[]>([]);
+  const [editingScopes, setEditingScopes] = useState<ScopeKey[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
@@ -95,6 +154,20 @@ export default function ManageAccountHolders() {
       );
     },
     [allowedKeys]
+  );
+
+  const allowedScopeKeys = useMemo(
+    () => AVAILABLE_SCOPES.map((s) => s.key) as string[],
+    []
+  );
+  const normalizeScopes = useCallback(
+    (scopes: unknown): ScopeKey[] => {
+      if (!Array.isArray(scopes)) return [];
+      return scopes.filter((scope): scope is ScopeKey =>
+        allowedScopeKeys.includes(scope as string)
+      );
+    },
+    [allowedScopeKeys]
   );
 
   const fetchAccountHolders = useCallback(async () => {
@@ -112,6 +185,7 @@ export default function ManageAccountHolders() {
             id: holder.id,
             username: holder.username,
             allowed_methods: normalizeMethods(holder.allowed_methods),
+            additional_scopes: normalizeScopes(holder.additional_scopes),
           }))
         );
       } else {
@@ -120,7 +194,7 @@ export default function ManageAccountHolders() {
     } catch (error) {
       customAlert("Failed to load account holders.");
     }
-  }, [normalizeMethods, router]);
+  }, [normalizeMethods, normalizeScopes, router]);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,12 +202,6 @@ export default function ManageAccountHolders() {
     const bootstrap = async () => {
       addLoader();
       try {
-        const authResponse = await fetch("/api/admin/auth");
-        const authData = await authResponse.json();
-        if (authResponse.status !== 200 || authData.role !== "admin") {
-          router.push("/admin/login");
-          return;
-        }
         if (!cancelled) {
           await fetchAccountHolders();
         }
@@ -151,14 +219,14 @@ export default function ManageAccountHolders() {
     };
   }, [fetchAccountHolders, router]);
 
-  const toggleSelection = (
-    method: PaymentMethodKey,
-    setter: React.Dispatch<React.SetStateAction<PaymentMethodKey[]>>
+  const toggleSelection = <T,>(
+    item: T,
+    setter: React.Dispatch<React.SetStateAction<T[]>>
   ) => {
     setter((prev) =>
-      prev.includes(method)
-        ? prev.filter((item) => item !== method)
-        : [...prev, method]
+      prev.includes(item)
+        ? prev.filter((existing) => existing !== item)
+        : [...prev, item]
     );
   };
 
@@ -192,6 +260,7 @@ export default function ManageAccountHolders() {
           username: newHolder.username.trim(),
           password: newHolder.password,
           paymentMethods: newHolderMethods,
+          additionalScopes: newHolderScopes,
         }),
       });
 
@@ -200,6 +269,7 @@ export default function ManageAccountHolders() {
         customAlert(data.message ?? "Account holder created.", true, true);
         setNewHolder({ username: "", password: "" });
         setNewHolderMethods([]);
+        setNewHolderScopes([]);
         await fetchAccountHolders();
       } else {
         customAlert(data.message || "Failed to create account holder.");
@@ -215,15 +285,17 @@ export default function ManageAccountHolders() {
   const startEditing = (holder: AccountHolder) => {
     setEditingId(holder.id);
     setEditingMethods(holder.allowed_methods ?? []);
+    setEditingScopes(holder.additional_scopes ?? []);
   };
 
   const cancelEditing = () => {
     setEditingId(null);
     setEditingMethods([]);
+    setEditingScopes([]);
     setUpdatingId(null);
   };
 
-  const handleSaveMethods = async () => {
+  const handleSave = async () => {
     if (editingId === null) return;
 
     setUpdatingId(editingId);
@@ -234,19 +306,23 @@ export default function ManageAccountHolders() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: editingId, paymentMethods: editingMethods }),
+        body: JSON.stringify({
+          id: editingId,
+          paymentMethods: editingMethods,
+          additionalScopes: editingScopes,
+        }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        customAlert(data.message ?? "Payment methods updated.", true, true);
+        customAlert(data.message ?? "Account updated.", true, true);
         cancelEditing();
         await fetchAccountHolders();
       } else {
-        customAlert(data.message || "Failed to update payment methods.");
+        customAlert(data.message || "Failed to update account.");
       }
     } catch (error) {
-      customAlert("Error updating payment methods.");
+      customAlert("Error updating account.");
     } finally {
       removeLoader();
       setUpdatingId(null);
@@ -314,6 +390,14 @@ export default function ManageAccountHolders() {
               />
             </div>
 
+            <div className={styles.inputRow}>
+              <label>Additional access scopes</label>
+              <ScopeSelector
+                selected={newHolderScopes}
+                onToggle={(scope) => toggleSelection(scope, setNewHolderScopes)}
+              />
+            </div>
+
             <div className={styles.actionsRow}>
               <button
                 type="submit"
@@ -328,6 +412,7 @@ export default function ManageAccountHolders() {
                 onClick={() => {
                   setNewHolder({ username: "", password: "" });
                   setNewHolderMethods([]);
+                  setNewHolderScopes([]);
                 }}
                 disabled={isCreating}
               >
@@ -371,19 +456,34 @@ export default function ManageAccountHolders() {
                     <div>
                       <p className={styles.username}>{holder.username}</p>
                       {!isEditing && (
-                        <div className={styles.holderMethods}>
-                          {holder.allowed_methods.length > 0 ? (
-                            holder.allowed_methods.map((method) => (
-                              <span key={method} className={styles.methodPill}>
-                                {method}
+                        <>
+                          <div className={styles.holderMethods}>
+                            {holder.allowed_methods.length > 0 ? (
+                              holder.allowed_methods.map((method) => (
+                                <span
+                                  key={method}
+                                  className={styles.methodPill}
+                                >
+                                  {method}
+                                </span>
+                              ))
+                            ) : (
+                              <span className={styles.methodMeta}>
+                                No methods assigned
                               </span>
-                            ))
-                          ) : (
-                            <span className={styles.methodMeta}>
-                              No methods assigned
-                            </span>
+                            )}
+                          </div>
+                          {holder.additional_scopes.length > 0 && (
+                            <div className={styles.holderScopes}>
+                              {holder.additional_scopes.map((scope) => (
+                                <span key={scope} className={styles.scopePill}>
+                                  {AVAILABLE_SCOPES.find((s) => s.key === scope)
+                                    ?.label ?? scope}
+                                </span>
+                              ))}
+                            </div>
                           )}
-                        </div>
+                        </>
                       )}
                     </div>
 
@@ -393,30 +493,48 @@ export default function ManageAccountHolders() {
                         className={styles.secondaryButton}
                         onClick={() => startEditing(holder)}
                       >
-                        Edit Methods
+                        Edit
                       </button>
                     ) : null}
                   </div>
 
                   {isEditing && (
                     <>
-                      <MethodSelector
-                        selected={editingMethods}
-                        onToggle={(method) =>
-                          toggleSelection(method, setEditingMethods)
-                        }
-                        methods={paymentMethods}
-                        disabled={updatingId === holder.id}
-                      />
+                      <div className={styles.editSection}>
+                        <span className={styles.editSectionLabel}>
+                          Payment Methods
+                        </span>
+                        <MethodSelector
+                          selected={editingMethods}
+                          onToggle={(method) =>
+                            toggleSelection(method, setEditingMethods)
+                          }
+                          methods={paymentMethods}
+                          disabled={updatingId === holder.id}
+                        />
+                      </div>
+
+                      <div className={styles.editSection}>
+                        <span className={styles.editSectionLabel}>
+                          Additional Scopes
+                        </span>
+                        <ScopeSelector
+                          selected={editingScopes}
+                          onToggle={(scope) =>
+                            toggleSelection(scope, setEditingScopes)
+                          }
+                          disabled={updatingId === holder.id}
+                        />
+                      </div>
 
                       <div className={styles.actionsRow}>
                         <button
                           type="button"
                           className={styles.primaryButton}
-                          onClick={handleSaveMethods}
+                          onClick={handleSave}
                           disabled={updatingId === holder.id}
                         >
-                          {updatingId === holder.id ? "Saving..." : "OK"}
+                          {updatingId === holder.id ? "Saving..." : "Save"}
                         </button>
                         <button
                           type="button"

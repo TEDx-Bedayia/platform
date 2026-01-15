@@ -4,6 +4,7 @@ import { validateCsrf } from "../../utils/csrf";
 import {
   createAccountHolder,
   getAllAccountHolders,
+  setAdditionalScopesToAccountHolder,
   setPaymentMethodsToAccountHolder,
 } from "./utils";
 
@@ -16,7 +17,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
     }
 
-    const { username, password, paymentMethods } = await request.json();
+    const { username, password, paymentMethods, additionalScopes } =
+      await request.json();
 
     // Create user
     const user = await createAccountHolder(username, password);
@@ -28,16 +30,33 @@ export async function POST(request: NextRequest) {
     }
 
     // Add payment methods
-    const addedMethods = await setPaymentMethodsToAccountHolder(
-      user.id,
-      paymentMethods
-    );
-
-    if (!addedMethods) {
-      return NextResponse.json(
-        { message: "Failed to add payment methods" },
-        { status: 500 }
+    if (Array.isArray(paymentMethods) && paymentMethods.length > 0) {
+      const addedMethods = await setPaymentMethodsToAccountHolder(
+        user.id,
+        paymentMethods
       );
+
+      if (!addedMethods) {
+        return NextResponse.json(
+          { message: "Failed to add payment methods" },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Add additional scopes
+    if (Array.isArray(additionalScopes) && additionalScopes.length > 0) {
+      const addedScopes = await setAdditionalScopesToAccountHolder(
+        user.id,
+        additionalScopes
+      );
+
+      if (!addedScopes) {
+        return NextResponse.json(
+          { message: "Failed to add additional scopes" },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json(
@@ -85,11 +104,15 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
     }
 
-    const { id, paymentMethods } = await request.json();
+    const { id, paymentMethods, additionalScopes } = await request.json();
 
-    if (!id || !Array.isArray(paymentMethods)) {
+    if (
+      !id ||
+      !Array.isArray(paymentMethods) ||
+      !Array.isArray(additionalScopes)
+    ) {
       return NextResponse.json(
-        { message: "Invalid payload. Provide id and paymentMethods." },
+        { message: "Invalid payload." },
         { status: 400 }
       );
     }
@@ -101,20 +124,42 @@ export async function PATCH(request: NextRequest) {
 
     const uniqueMethods = Array.from(new Set(sanitizedMethods));
 
-    const updated = await setPaymentMethodsToAccountHolder(
+    const validScopeValues = Object.values(ProtectedResource) as string[];
+    const sanitizedScopes = additionalScopes
+      .filter((scope: unknown): scope is string => typeof scope === "string")
+      .map((scope) => scope.trim())
+      .filter((scope): scope is ProtectedResource =>
+        validScopeValues.includes(scope)
+      );
+
+    const uniqueScopes = Array.from(new Set(sanitizedScopes));
+
+    const updatedMethods = await setPaymentMethodsToAccountHolder(
       Number(id),
       uniqueMethods
     );
 
-    if (!updated) {
+    if (!updatedMethods) {
       return NextResponse.json(
         { message: "Failed to update payment methods." },
         { status: 500 }
       );
     }
 
+    const updatedScopes = await setAdditionalScopesToAccountHolder(
+      Number(id),
+      uniqueScopes
+    );
+
+    if (!updatedScopes) {
+      return NextResponse.json(
+        { message: "Failed to update additional scopes." },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { message: "Payment methods updated." },
+      { message: "Account holder updated successfully." },
       { status: 200 }
     );
   } catch (err) {

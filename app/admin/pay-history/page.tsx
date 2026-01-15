@@ -120,12 +120,11 @@ export default function History() {
     if (response.ok) {
       const data = await response.json();
       setData(data);
-    } else {
-      if (response.status === 401) {
-        customAlert("Unauthorized");
-        router.push("/admin/login");
-      } else customAlert("Failed to fetch payments.");
-    }
+    } else if (response.status === 401) {
+      router.push("/admin/login");
+      setLoading(false);
+      return;
+    } else customAlert("Failed to fetch payments.");
 
     const response2 = await fetch(`/api/admin/payments-total`, {
       method: "GET",
@@ -134,9 +133,11 @@ export default function History() {
     if (response2.ok) {
       const data = await response2.json();
       setTotal(data.total);
-    } else {
-      customAlert("Failed to fetch total.");
-    }
+    } else if (response2.status === 401) {
+      router.push("/admin/login");
+      setLoading(false);
+      return;
+    } else customAlert("Failed to fetch total.");
 
     setLoading(false);
   };
@@ -172,16 +173,19 @@ export default function History() {
         )}{" "}
         EGP. <br />
         {Object.entries(
-          data.reduce((acc, curr) => {
-            const delimiter = " — ";
-            const delimiterIndex = curr.stream.indexOf(delimiter);
-            const prefix =
-              delimiterIndex !== -1
-                ? curr.stream.slice(0, delimiterIndex).trim()
-                : curr.stream.trim();
-            acc[prefix] = (acc[prefix] || 0) + curr.recieved;
-            return acc;
-          }, {} as Record<string, number>)
+          data.reduce(
+            (acc, curr) => {
+              const delimiter = " — ";
+              const delimiterIndex = curr.stream.indexOf(delimiter);
+              const prefix =
+                delimiterIndex !== -1
+                  ? curr.stream.slice(0, delimiterIndex).trim()
+                  : curr.stream.trim();
+              acc[prefix] = (acc[prefix] || 0) + curr.recieved;
+              return acc;
+            },
+            {} as Record<string, number>
+          )
         )
           .map(([method, amount]) => `${method}: ${amount} EGP`)
           .join(". ")}
