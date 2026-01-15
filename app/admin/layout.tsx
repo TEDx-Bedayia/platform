@@ -70,13 +70,13 @@ function canAccessNavItem(auth: AuthData, item: NavItem): boolean {
     const hasScope = auth.additionalScopes?.includes(item.requiredScope);
 
     // Some roles have implicit access to certain scopes
-    const implicitAccess: Record<string, string[]> = {
-      payment_handler: ["payment_dashboard"],
-      school_office: ["payment_dashboard", "query_tickets"],
-      marketing_head: ["marketing_dashboard"],
+    const implicitAccess: Partial<Record<UserRole, string[]>> = {
+      [UserRole.PAYMENT_HANDLER]: ["payment_dashboard"],
+      [UserRole.SCHOOL_OFFICE]: ["payment_dashboard", "query_tickets"],
+      [UserRole.MARKETING_HEAD]: ["marketing_dashboard"],
     };
 
-    const implicit = implicitAccess[auth.role] ?? [];
+    const implicit = implicitAccess[auth.role as UserRole] ?? [];
     return hasScope || implicit.includes(item.requiredScope);
   }
 
