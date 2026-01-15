@@ -93,6 +93,8 @@ export default function RootLayout({
   const [auth, setAuth] = useState<AuthData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const isLoginPage = pathname === "/admin/login";
+
   useEffect(() => {
     setLoading(true);
     fetch("/api/admin/auth")
@@ -108,7 +110,7 @@ export default function RootLayout({
         else setAuth(null);
       })
       .finally(() => setLoading(false));
-  }, [pathname]);
+  }, [isLoginPage]);
 
   const handleLogout = async () => {
     try {
@@ -127,8 +129,6 @@ export default function RootLayout({
   const visibleItems = auth
     ? NAV_ITEMS.filter((item) => canAccessNavItem(auth, item))
     : [];
-
-  const isLoginPage = pathname === "/admin/login";
 
   return (
     <div className={styles.adminContainer}>
