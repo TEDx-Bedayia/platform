@@ -2,7 +2,7 @@ import { sql } from "@vercel/postgres";
 import argon2 from "argon2";
 import { ProtectedResource } from "../../utils/auth";
 
-// To be called after verification of permissins
+// To be called after verification of permissions
 export async function createAccountHolder(
   username: string,
   password: string
