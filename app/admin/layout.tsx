@@ -111,8 +111,17 @@ export default function RootLayout({
   }, [pathname]);
 
   const handleLogout = async () => {
-    await fetch("/api/admin/auth", { method: "DELETE" });
-    router.push("/admin/login");
+    try {
+      const response = await fetch("/api/admin/auth", { method: "DELETE" });
+      if (!response.ok) {
+        console.error("Failed to log out. Status:", response.status);
+        return;
+      }
+      setAuth(null);
+      router.push("/admin/login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   const visibleItems = auth
