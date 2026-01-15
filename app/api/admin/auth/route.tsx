@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { signToken, UserRole, verifyToken } from "../../utils/auth";
+import {
+  ProtectedResource,
+  signToken,
+  UserRole,
+  verifyToken,
+} from "../../utils/auth";
 import { getAccountHolderInfo } from "../manage-account-holders/utils";
 
 const DAY = 60 * 60 * 24;
@@ -95,6 +100,7 @@ export async function POST(request: NextRequest) {
       const data = {
         role: UserRole.PAYMENT_HANDLER,
         methods: accountHolder.allowed_methods,
+        additionalScopes: accountHolder.additional_scopes,
       };
       const token = signToken(data, "14d");
       cookieStore.set("token", token, {
@@ -133,10 +139,15 @@ export async function GET(request: NextRequest) {
     const decoded = verifyToken(token) as {
       role: UserRole;
       methods?: string[];
+      additionalScopes?: ProtectedResource[];
     };
 
     return NextResponse.json(
-      { role: decoded.role, methods: decoded.methods },
+      {
+        role: decoded.role,
+        methods: decoded.methods,
+        additionalScopes: decoded.additionalScopes,
+      },
       { status: 200 }
     );
   } catch (error) {

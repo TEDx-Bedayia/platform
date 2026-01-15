@@ -81,7 +81,9 @@
   padding: 0.85rem 1rem;
   color: #f8fafc;
   font-size: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .inputRow input:focus {
@@ -106,7 +108,10 @@
   background: rgba(15, 23, 42, 0.55);
   color: #f8fafc;
   min-height: 115px;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.15s ease;
   position: relative;
 }
 
@@ -184,7 +189,9 @@
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
 }
 
 .primaryButton {
@@ -257,6 +264,78 @@
   font-size: 0.8rem;
   background: rgba(248, 250, 252, 0.08);
   border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.holderScopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.scopePill {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: rgba(199, 210, 254, 0.95);
+}
+
+.scopesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.scopeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.55);
+  color: rgba(226, 232, 240, 0.85);
+}
+
+.scopeChipInactive:hover {
+  border-color: rgba(99, 102, 241, 0.6);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.scopeChipActive {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.2);
+  color: #e0e7ff;
+}
+
+.scopeIcon {
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: 1rem;
+  text-align: center;
+}
+
+.scopeLabel {
+  font-weight: 500;
+}
+
+.editSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editSectionLabel {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(203, 213, 225, 0.7);
+  font-weight: 500;
 }
 
 .emptyState {

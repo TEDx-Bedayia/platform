@@ -95,10 +95,7 @@ function hasAccess(userRole: UserRole, resource: ProtectedResource): boolean {
       UserRole.PAYMENT_HANDLER,
       UserRole.SCHOOL_OFFICE,
     ],
-    [ProtectedResource.PAYMENT_LOGS]: [
-      UserRole.ADMIN,
-      UserRole.PAYMENT_HANDLER,
-    ],
+    [ProtectedResource.PAYMENT_LOGS]: [UserRole.ADMIN],
     [ProtectedResource.SUPER_ADMIN]: [UserRole.ADMIN],
     [ProtectedResource.QUERY_TICKETS]: [UserRole.ADMIN, UserRole.SCHOOL_OFFICE],
     [ProtectedResource.INVITATIONS]: [UserRole.ADMIN],
@@ -122,14 +119,17 @@ export function canUserAccess(
     const decoded = verifyToken(token) as {
       role: UserRole;
       methods?: string[];
+      additionalScopes?: ProtectedResource[];
     };
     if (!decoded.role) return false;
 
     if (decoded.role === UserRole.ADMIN) return true;
 
+    if (decoded.additionalScopes?.includes(resource)) return true;
+
     return (
       hasAccess(decoded.role, resource) &&
-      (method ? decoded.methods?.includes(method) ?? true : true)
+      (method ? (decoded.methods?.includes(method) ?? true) : true)
     );
   } catch (error) {
     if (process.env.NODE_ENV !== "production")
