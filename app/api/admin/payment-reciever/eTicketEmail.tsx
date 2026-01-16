@@ -154,7 +154,7 @@ export function scheduleBackgroundEmails(recipients: EmailRecipient[]): void {
       `Background: Starting to send ${recipients.length} emails with rate limiting...`
     );
     const result = await sendEmailsWithRateLimit(recipients);
-    console.log(`Background: Email sending completed. Success: ${result}`);
+    console.log("Background: Email sending completed. Result:", result);
   });
 }
 
