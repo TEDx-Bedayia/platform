@@ -10,15 +10,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "UUID is required" }, { status: 400 });
   }
   try {
-    // Generate QR code as a data URL (base64-encoded image)
-    const qrCodeImage = await QRCode.toDataURL(uuid, { width: 400 });
+    // Generate QR code directly as a buffer
+    const qrBuffer = await QRCode.toBuffer(uuid, {
+      errorCorrectionLevel: "H",
+      margin: 2,
+      width: 300,
+    });
 
-    // Convert Base64 string to Buffer for serving as an image
-    const base64Data = qrCodeImage.replace(/^data:image\/png;base64,/, "");
-    const imgBuffer = Buffer.from(base64Data, "base64");
-
-    // Return the QR code as a JSON response
-    return new NextResponse(imgBuffer, {
+    // Return the QR code as an image response
+    return new NextResponse(new Uint8Array(qrBuffer), {
       status: 200,
       headers: {
         "Content-Type": "image/png",

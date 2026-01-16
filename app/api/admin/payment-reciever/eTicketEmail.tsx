@@ -3,7 +3,6 @@ import { sql } from "@vercel/postgres";
 import { promises } from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
-import QRCode from "qrcode";
 import { Resend } from "resend";
 import { TicketEmail } from "../../../components/TicketEmail";
 import { EmailRecipient } from "../../utils/email-helper";
@@ -49,38 +48,12 @@ export async function sendBatchEmail(
   recipients: EmailRecipient[]
 ): Promise<boolean> {
   try {
-    recipients = await Promise.all(
-      recipients.map(async (recipient) => {
-        const qrBuffer = await QRCode.toBuffer(recipient.uuid, {
-          errorCorrectionLevel: "H",
-          margin: 2,
-          width: 300,
-        });
-
-        return {
-          fullName: recipient.fullName,
-          email: recipient.email,
-          id: recipient.id,
-          uuid: recipient.uuid,
-          qrBuffer,
-        };
-      })
-    );
-
     const res = await resend.batch.send(
       recipients.map((r) => ({
         from: '"TEDxBedayia eTickets" <tickets@tedxbedayia.com>',
         to: r.email,
         subject: "Your TEDxBedayia ticket is here!",
         react: <TicketEmail name={r.fullName} uuid={r.uuid} />,
-        attachments: [
-          {
-            contentType: "image/png",
-            filename: "ticket-qr.png",
-            contentId: `ticket-qr-${r.uuid}`,
-            content: r.qrBuffer,
-          },
-        ],
       }))
     );
 

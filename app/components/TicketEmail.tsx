@@ -64,7 +64,7 @@ export const TicketEmail: React.FC<TicketEmailProps> = ({ name, uuid }) => {
 
               <center>
                 <Img
-                  src={`cid:ticket-qr-${uuid}`}
+                  src={`${HOST}/api/qr?uuid=${uuid}`}
                   width="280"
                   height="280"
                   alt="Your eTicket QR Code"
