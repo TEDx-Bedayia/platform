@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { TicketType } from "../../../ticket-types";
 import { price } from "../../tickets/prices";
 import { ResponseCode } from "../../utils/response-codes";
-import { sendBatchEmail } from "./eTicketEmail";
+import { scheduleBackgroundEmails } from "./eTicketEmail";
 
 // ============================================================================
 // Constants
@@ -483,14 +483,10 @@ async function processPayments(
 }
 
 /**
- * Sends emails to paid attendees, collecting any failures.
+ * Sends emails to paid attendees.
  */
-async function sendEmailsWithFailureTracking(
-  paidAttendees: UnpaidAttendee[]
-): Promise<string[]> {
-  const failures: string[] = [];
-
-  await sendBatchEmail(
+function sendEmails(paidAttendees: UnpaidAttendee[]) {
+  scheduleBackgroundEmails(
     paidAttendees.map((attendee) => ({
       fullName: attendee.full_name,
       email: attendee.email,
@@ -498,8 +494,6 @@ async function sendEmailsWithFailureTracking(
       uuid: attendee.uuid!,
     }))
   );
-
-  return failures;
 }
 
 // ============================================================================
@@ -705,29 +699,16 @@ export async function pay(
     await client.query("COMMIT");
 
     // Send emails (after commit, so payment is safe even if emails fail)
-    const emailFailures = await sendEmailsWithFailureTracking(paidAttendees);
+    sendEmails(paidAttendees);
 
-    // Build response
-    const response: {
-      refund: boolean;
-      paid: number;
-      accepted: UnpaidAttendee[];
-      emailFailures?: string[];
-    } = {
-      refund: false,
-      paid: paidAmount,
-      accepted: paidAttendees,
-    };
-
-    if (emailFailures.length > 0) {
-      response.emailFailures = emailFailures;
-      console.warn(
-        `Payment processed but ${emailFailures.length} email(s) failed:`,
-        emailFailures
-      );
-    }
-
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(
+      {
+        refund: false,
+        paid: paidAmount,
+        accepted: paidAttendees,
+      },
+      { status: 200 }
+    );
   } catch (e) {
     await client.query("ROLLBACK").catch(() => {});
     console.error("Payment processing error:", e);

@@ -5,7 +5,7 @@ import { EARLY_BIRD_UNTIL } from "@/app/metadata";
 import { TicketType } from "@/app/ticket-types";
 import { sql } from "@vercel/postgres";
 import { NextResponse, type NextRequest } from "next/server";
-import { sendBatchEmail } from "../eTicketEmail";
+import { scheduleBackgroundEmails, sendBatchEmail } from "../eTicketEmail";
 import { pay, safeRandUUID } from "../main";
 
 export const maxDuration = 15;
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
           [ids, randUUIDs] // Parameters passed as arrays
         );
 
-        await sendBatchEmail(
+        scheduleBackgroundEmails(
           accepted.rows.map((row) => ({
             email: row.email,
             fullName: row.full_name,

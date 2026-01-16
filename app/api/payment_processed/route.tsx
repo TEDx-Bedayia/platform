@@ -1,6 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
-import { sendBatchEmail } from "../admin/payment-reciever/eTicketEmail";
+import { scheduleBackgroundEmails } from "../admin/payment-reciever/eTicketEmail";
 import { safeRandUUID } from "../admin/payment-reciever/main";
 
 type Primitive = string | number | boolean | null | undefined;
@@ -140,7 +140,8 @@ export async function POST(request: NextRequest) {
         const updated = result.rowCount === ids.length;
 
         if (updated) {
-          await sendBatchEmail(
+          // Schedule emails to be sent in background (non-blocking)
+          scheduleBackgroundEmails(
             result.rows.map((row) => ({
               email: row.email,
               fullName: row.full_name,

@@ -129,7 +129,8 @@ export function canUserAccess(
 
     if (
       resource === ProtectedResource.QUERY_TICKETS &&
-      decoded.methods?.includes("CASH")
+      decoded.methods?.includes("CASH") &&
+      decoded.role === UserRole.PAYMENT_HANDLER
     ) {
       return true;
     }
