@@ -128,8 +128,11 @@ const Card: FC<{ price: number }> = ({ price }) => {
         <strong>EGP {price.toFixed(2)}</strong>.
       </li>
       <li>
-        <strong>Verify</strong> your name, email, and phone number on the
-        payment page.
+        Click <strong>Book</strong>, choose the number of tickets, then click
+        <strong>Register</strong> and Go to Payment.
+      </li>
+      <li>
+        Enter your information and click <strong>Proceed to Payment</strong>.
       </li>
       <li>
         Once transferred, send a <strong>screenshot</strong> of the confirmation
@@ -201,8 +204,10 @@ export const paymentOptions: Record<PaymentMethodKey, PaymentMethod> = {
     to: "Online Payment Gateway",
     instructions: Card,
     redirectLinks: {
-      [TicketType.INDIVIDUAL]: "https://admission.bedayia.com/events",
-      [TicketType.GROUP]: "https://admission.bedayia.com/events",
+      [TicketType.INDIVIDUAL]:
+        "https://admission.bedayia.com/event/tedex1-2/register",
+      [TicketType.GROUP]:
+        "https://admission.bedayia.com/event/tedexg-3/register",
     },
     icon: CreditCard,
     hidden: true,
