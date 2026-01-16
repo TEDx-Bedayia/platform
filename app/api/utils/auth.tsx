@@ -127,6 +127,13 @@ export function canUserAccess(
 
     if (decoded.additionalScopes?.includes(resource)) return true;
 
+    if (
+      resource === ProtectedResource.QUERY_TICKETS &&
+      decoded.methods?.includes("CASH")
+    ) {
+      return true;
+    }
+
     return (
       hasAccess(decoded.role, resource) &&
       (method ? (decoded.methods?.includes(method) ?? true) : true)
