@@ -113,19 +113,6 @@ export default function SpeakerTickets() {
 
           <button type="submit">Send Tickets</button>
         </form>
-
-        <span
-          style={{
-            position: "absolute",
-            bottom: "3em",
-            color: "#888",
-            fontSize: "0.8rem",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          <strong>Developed by Aly with ❤️</strong>
-        </span>
       </div>
     </section>
   );
