@@ -80,7 +80,7 @@ const exportToCSV = async () => {
       a.full_name,
       a.email,
       a.phone,
-      a.ticket_type,
+      getTicketTypeName(a.ticket_type as TicketType),
       a.payment_method,
       a.paid ? "Yes" : "No",
       a.sent ? "Yes" : "No",
@@ -259,7 +259,6 @@ export default function AdminDashboard() {
                   {copyIcon}
                 </div>
 
-                <span style={{ display: "none" }}></span>
 
                 {selectedEmailEditor == applicant.id && (
                   <motion.div
