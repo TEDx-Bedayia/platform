@@ -4,11 +4,7 @@ import { ResponseCode } from "@/app/api/utils/response-codes";
 import { addLoader, removeLoader } from "@/app/global_components/loader";
 import { ticketIcon, whiteCheck, whiteCross } from "@/app/icons";
 import { getPaymentMethods, PaymentMethod } from "@/app/payment-methods";
-import {
-  getTicketTypeFromName,
-  getTicketTypeName,
-  TicketType,
-} from "@/app/ticket-types";
+import { getTicketTypeName, TicketType } from "@/app/ticket-types";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,19 +14,11 @@ import AmbiguityResolver from "./ambiguous-popup";
 import styles from "./payments.module.css";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
-function toTitleCase(str: string): string {
-  return str
-    .toLowerCase()
-    .split(/\s+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
 function IDCheckPopup(
   name: string,
   email: string,
   amount: number,
-  type: string,
+  type: TicketType,
   id: string,
   handed_amount: number
 ) {
@@ -50,14 +38,7 @@ function IDCheckPopup(
       <p>
         <span style={{ fontWeight: "bold" }}>{name}</span> (ID: {id})
       </p>
-      <p>
-        {toTitleCase(
-          getTicketTypeName(
-            getTicketTypeFromName(type) ?? TicketType.INDIVIDUAL
-          )
-        )}{" "}
-        Ticket
-      </p>
+      <p>{getTicketTypeName(type)} Ticket</p>
       <p>{email}</p>
       <p>{amount} EGP</p>
       <p style={{ marginTop: "0.5rem", fontWeight: "bold" }}>
@@ -291,7 +272,7 @@ export default function Payments() {
               ticketData.name,
               ticketData.email,
               ticketData.amount,
-              ticketData.type,
+              ticketData.type as TicketType,
               from,
               Number(amount)
             ),
