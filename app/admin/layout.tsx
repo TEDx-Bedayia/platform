@@ -18,7 +18,6 @@ type NavItem = {
   href: string;
   label: string;
   requiredScope?: string;
-  requiredRole?: string[];
 };
 
 const NAV_ITEMS: NavItem[] = [
@@ -48,6 +47,11 @@ const NAV_ITEMS: NavItem[] = [
     requiredScope: "marketing_dashboard",
   },
   {
+    href: "/admin/analytics",
+    label: "Analytics",
+    requiredScope: "analytics",
+  },
+  {
     href: "/admin/speaker-tickets",
     label: "Invitations",
     requiredScope: "invitations",
@@ -60,11 +64,6 @@ function canAccessNavItem(auth: AuthData, item: NavItem): boolean {
   // Admin can access everything
   if (auth.role === UserRole.ADMIN) return true;
 
-  // Check required role
-  if (item.requiredRole) {
-    return item.requiredRole.includes(auth.role);
-  }
-
   // Check required scope
   if (item.requiredScope) {
     const hasScope = auth.additionalScopes?.includes(item.requiredScope);
@@ -73,7 +72,7 @@ function canAccessNavItem(auth: AuthData, item: NavItem): boolean {
     const implicitAccess: Partial<Record<UserRole, string[]>> = {
       [UserRole.PAYMENT_HANDLER]: ["payment_dashboard"],
       [UserRole.SCHOOL_OFFICE]: ["payment_dashboard", "query_tickets"],
-      [UserRole.MARKETING_HEAD]: ["marketing_dashboard"],
+      [UserRole.MARKETING_HEAD]: ["marketing_dashboard", "analytics"],
     };
 
     const implicit = implicitAccess[auth.role as UserRole] ?? [];

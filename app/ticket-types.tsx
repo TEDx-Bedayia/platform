@@ -18,7 +18,10 @@ export function getTicketTypeName(type: TicketType): string {
     case TicketType.GROUP_EARLY_BIRD:
       return "Group Early Bird";
     default:
-      return type.toString();
+      return type
+        .toString()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
   }
 }
 
@@ -37,6 +40,10 @@ export function getTicketTypeFromName(name: string): TicketType | null {
       return TicketType.DISCOUNTED;
     case "teacher":
       return TicketType.TEACHER;
+    case "individual early bird":
+      return TicketType.INDIVIDUAL_EARLY_BIRD;
+    case "group early bird":
+      return TicketType.GROUP_EARLY_BIRD;
     default:
       return null;
   }
