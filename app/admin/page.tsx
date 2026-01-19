@@ -7,9 +7,11 @@ import { useRouter } from "next/navigation";
 import { addLoader, removeLoader } from "../global_components/loader";
 import {
   check,
+  copyIcon,
   cross,
   destructiveIcon,
   devSearch,
+  downloadIcon,
   group,
   onePerson,
   pencil,
@@ -29,6 +31,84 @@ import { Applicant } from "./types/Applicant";
 const title = Poppins({ weight: "700", subsets: ["latin"] });
 
 const ubuntu = Ubuntu({ weight: ["300", "400", "700"], subsets: ["latin"] });
+
+// Copy to clipboard helper
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    customAlert("Copied to clipboard!");
+  } catch (err) {
+    customAlert("Failed to copy");
+  }
+};
+
+// Export ALL applicants to CSV (fetches from API)
+const exportToCSV = async () => {
+  try {
+    addLoader();
+    const response = await fetch("/api/admin/tickets/export");
+
+    if (!response.ok) {
+      removeLoader();
+      customAlert("Failed to fetch tickets for export");
+      return;
+    }
+
+    const allApplicants: Applicant[] = await response.json();
+    removeLoader();
+
+    if (allApplicants.length === 0) {
+      customAlert("No tickets to export");
+      return;
+    }
+
+    const headers = [
+      "ID",
+      "Name",
+      "Email",
+      "Phone",
+      "Type",
+      "Payment Method",
+      "Paid",
+      "Sent",
+      "Admitted",
+      "UUID",
+      "Created At",
+    ];
+    const rows = allApplicants.map((a) => [
+      a.id,
+      a.full_name,
+      a.email,
+      a.phone,
+      a.ticket_type,
+      a.payment_method,
+      a.paid ? "Yes" : "No",
+      a.sent ? "Yes" : "No",
+      a.admitted_at ? "Yes" : "No",
+      a.uuid || "",
+      a.created_at,
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `tedx-tickets-${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    customAlert(`Exported ${allApplicants.length} tickets!`);
+  } catch (err) {
+    removeLoader();
+    customAlert("Export failed");
+  }
+};
 
 const sendTicket = async (
   id: number,
@@ -165,6 +245,21 @@ export default function AdminDashboard() {
                 >
                   {applicant.email}
                 </span>
+
+                {/* Copy email button */}
+                <div
+                  style={{ cursor: "pointer", marginLeft: "4px" }}
+                  className="hover:scale-125 transition-all duration-200 opacity-50 hover:opacity-100"
+                  title="Copy email"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboard(applicant.email);
+                  }}
+                >
+                  {copyIcon}
+                </div>
+
+                <span style={{ display: "none" }}></span>
 
                 {selectedEmailEditor == applicant.id && (
                   <motion.div
@@ -561,7 +656,38 @@ export default function AdminDashboard() {
         </button>
       )}
 
-      <h1 style={{ ...title.style, fontWeight: 700 }}>All Tickets</h1>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+          marginBottom: "0.5rem",
+        }}
+      >
+        <h1 style={{ ...title.style, fontWeight: 700, marginBottom: 0 }}>
+          All Tickets
+        </h1>
+        <button
+          onClick={() => exportToCSV()}
+          style={{
+            padding: "8px 16px",
+            borderRadius: "8px",
+            border: "none",
+            backgroundColor: "#10b981",
+            color: "#fff",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+          }}
+          title="Export to CSV"
+        >
+          {downloadIcon}
+          Export CSV
+        </button>
+      </div>
       <div
         style={{
           marginBottom: "2rem",
