@@ -32,6 +32,11 @@ const AVAILABLE_SCOPES = [
     label: "Invitations",
     description: "Manage speaker tickets",
   },
+  {
+    key: "analytics",
+    label: "Analytics",
+    description: "View analytics",
+  },
 ] as const;
 
 type ScopeKey = (typeof AVAILABLE_SCOPES)[number]["key"];
