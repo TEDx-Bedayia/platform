@@ -53,6 +53,7 @@ export enum UserRole {
 export enum ProtectedResource {
   SUPER_ADMIN = "super_admin",
   TICKET_DASHBOARD = "ticket_dashboard",
+  ANALYTICS = "analytics",
   MARKETING_DASHBOARD = "marketing_dashboard",
   PAYMENT_DASHBOARD = "payment_dashboard",
   PAYMENT_LOGS = "payment_logs",
@@ -86,6 +87,7 @@ export function verifyToken(token: string) {
 function hasAccess(userRole: UserRole, resource: ProtectedResource): boolean {
   const accessControl: Record<ProtectedResource, UserRole[]> = {
     [ProtectedResource.TICKET_DASHBOARD]: [UserRole.ADMIN],
+    [ProtectedResource.ANALYTICS]: [UserRole.ADMIN, UserRole.MARKETING_HEAD],
     [ProtectedResource.MARKETING_DASHBOARD]: [
       UserRole.ADMIN,
       UserRole.MARKETING_HEAD,

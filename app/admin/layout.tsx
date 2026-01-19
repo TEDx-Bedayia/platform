@@ -38,6 +38,11 @@ const NAV_ITEMS: NavItem[] = [
     requiredScope: "ticket_dashboard",
   },
   {
+    href: "/admin/analytics",
+    label: "Analytics",
+    requiredScope: "analytics",
+  },
+  {
     href: "/admin/pay-history",
     label: "Payment Logs",
     requiredScope: "payment_logs",
