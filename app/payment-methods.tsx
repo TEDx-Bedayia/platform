@@ -210,6 +210,5 @@ export const paymentOptions: Record<PaymentMethodKey, PaymentMethod> = {
         "https://admission.bedayia.com/event/tedexg-3/register",
     },
     icon: CreditCard,
-    hidden: true,
   },
 };
