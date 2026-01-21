@@ -599,6 +599,7 @@ export async function pay(
 
     // Analyze what we have
     const analysis = analyzeUnpaidAttendees(unpaid);
+    unpaid = unpaid.filter((a) => a.ticket_type !== TicketType.DISCOUNTED); // Account holders can't pay for discounted tickets unless it is done using IDs (explicit intent)
 
     // Check for ambiguity (partial payment that could apply to multiple tickets)
     if (id_if_needed === "") {
