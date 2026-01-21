@@ -128,17 +128,20 @@ const Card: FC<{ price: number }> = ({ price }) => {
         <strong>EGP {price.toFixed(2)}</strong>.
       </li>
       <li>
-        Click <strong>Book</strong>, choose the number of tickets, then click
-        <strong>Register</strong> and Go to Payment.
+        On the payment page, click <strong>Book</strong>, choose the number of
+        tickets, then click <strong>Register</strong> and{" "}
+        <strong>Go to Payment</strong>.
       </li>
       <li>
-        Enter your information and click <strong>Proceed to Payment</strong>.
+        Enter your name, email, and phone number then click{" "}
+        <strong>Proceed to Payment</strong>.
       </li>
       <li>
-        Once transferred, send a <strong>screenshot</strong> of the confirmation
-        page to the following WhatsApp number <strong>{PHONE}</strong>. Note: it
-        may take us around 48 hours to verify your payment.
+        Once the payment is done, send a <strong>screenshot</strong> of the
+        confirmation page to the following WhatsApp number{" "}
+        <strong>{PHONE}</strong>.
       </li>
+      <li>Note: it may take us around 48 hours to verify your payment.</li>
     </>
   );
 };
