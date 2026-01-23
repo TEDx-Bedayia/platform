@@ -67,9 +67,9 @@ export default function AddTicketPage() {
     let finalAttendees = [];
     if (isGroupTicket) {
       if (sameDetails) {
-        // Replicate first attendee 4 times
+        // Replicate first attendee GROUP_SIZE times
         const base = attendees[0];
-        finalAttendees = Array(4).fill(base);
+        finalAttendees = Array.from({ length: GROUP_SIZE }, () => ({ ...base }));
       } else {
         finalAttendees = attendees;
       }
