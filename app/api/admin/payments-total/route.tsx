@@ -23,9 +23,14 @@ export async function GET(request: NextRequest) {
     ) AS total_price
     FROM attendees WHERE paid = true;`);
 
+    let totalDiscountedCodes =
+      await sql`SELECT COUNT(code) FROM rush_hour WHERE processed = TRUE`;
+
     return Response.json({
       total:
-        query.rows[0].total_price != undefined ? query.rows[0].total_price : 0,
+        query.rows[0].total_price != undefined
+          ? query.rows[0].total_price
+          : 0 + totalDiscountedCodes.rows[0].count * price.discounted,
     });
   } catch (error) {
     return Response.json({ message: "Error occurred." }, { status: 400 });
