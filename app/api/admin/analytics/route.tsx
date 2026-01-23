@@ -98,7 +98,12 @@ export async function GET(request: NextRequest) {
         (row.ticket_type === "discounted"
           ? parseInt(totalDiscountedCodes.rows[0].count)
           : 0),
-      revenue: parseInt(row.paid_count) * (TICKET_PRICES[row.ticket_type] || 0),
+      revenue:
+        (parseInt(row.paid_count) +
+          (row.ticket_type === "discounted"
+            ? parseInt(totalDiscountedCodes.rows[0].count)
+            : 0)) *
+        (TICKET_PRICES[row.ticket_type] || 0),
     }));
 
     const totalRevenue =
@@ -107,7 +112,10 @@ export async function GET(request: NextRequest) {
         TICKET_PRICES["discounted"];
 
     // Calculate conversion rate
-    const stats = overallStats.rows[0];
+    let stats = overallStats.rows[0];
+    stats.total_bookings += parseInt(totalDiscountedCodes.rows[0].count);
+    stats.paid_tickets += parseInt(totalDiscountedCodes.rows[0].count);
+    stats.sent_tickets += parseInt(totalDiscountedCodes.rows[0].count);
     const conversionRate =
       stats.total_bookings > 0
         ? Math.round((stats.paid_tickets / stats.total_bookings) * 100)
