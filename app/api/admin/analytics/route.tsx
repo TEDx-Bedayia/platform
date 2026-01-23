@@ -113,9 +113,15 @@ export async function GET(request: NextRequest) {
 
     // Calculate conversion rate
     let stats = overallStats.rows[0];
-    stats.total_bookings += parseInt(totalDiscountedCodes.rows[0].count);
-    stats.paid_tickets += parseInt(totalDiscountedCodes.rows[0].count);
-    stats.sent_tickets += parseInt(totalDiscountedCodes.rows[0].count);
+    stats.total_bookings =
+      parseInt(stats.total_bookings) +
+      parseInt(totalDiscountedCodes.rows[0].count);
+    stats.paid_tickets =
+      parseInt(stats.paid_tickets) +
+      parseInt(totalDiscountedCodes.rows[0].count);
+    stats.sent_tickets =
+      parseInt(stats.sent_tickets) +
+      parseInt(totalDiscountedCodes.rows[0].count);
     const conversionRate =
       stats.total_bookings > 0
         ? Math.round((stats.paid_tickets / stats.total_bookings) * 100)
