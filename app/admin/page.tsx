@@ -92,7 +92,7 @@ const exportToCSV = async () => {
     const csvContent = [
       headers.join(","),
       ...rows.map((row) =>
-        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
       ),
     ].join("\n");
 
@@ -112,13 +112,13 @@ const exportToCSV = async () => {
 
 const sendTicket = async (
   id: number,
-  setApplicants: Dispatch<SetStateAction<Applicant[]>>
+  setApplicants: Dispatch<SetStateAction<Applicant[]>>,
 ) => {
   const response = await fetch(
     `/api/admin/send-ticket/?id=${encodeURIComponent(id)}`,
     {
       method: "GET",
-    }
+    },
   );
 
   let resp = await response.json();
@@ -126,8 +126,8 @@ const sendTicket = async (
   if (response.ok) {
     setApplicants((prevApplicants) =>
       prevApplicants.map((applicant) =>
-        applicant.id === id ? { ...applicant, sent: true } : applicant
-      )
+        applicant.id === id ? { ...applicant, sent: true } : applicant,
+      ),
     );
   }
 };
@@ -259,7 +259,6 @@ export default function AdminDashboard() {
                   {copyIcon}
                 </div>
 
-
                 {selectedEmailEditor == applicant.id && (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -277,7 +276,7 @@ export default function AdminDashboard() {
                         ?.classList.remove(styles.active);
 
                       document.getElementById(
-                        "email_editor" + applicant.id
+                        "email_editor" + applicant.id,
                       )!.innerText = applicant.email;
 
                       setEditorEmail("");
@@ -292,7 +291,7 @@ export default function AdminDashboard() {
                   className="hover:scale-[2] origin-bottom-left transition-all duration-200"
                   onClick={async () => {
                     setSelectedEmailEditor(
-                      selectedEmailEditor == applicant.id ? 0 : applicant.id
+                      selectedEmailEditor == applicant.id ? 0 : applicant.id,
                     );
 
                     if (selectedEmailEditor !== applicant.id) {
@@ -304,7 +303,7 @@ export default function AdminDashboard() {
                       // Select the text
                       const range = document.createRange();
                       range.selectNodeContents(
-                        document.getElementById("email_editor" + applicant.id)!
+                        document.getElementById("email_editor" + applicant.id)!,
                       );
                       const sel = window.getSelection();
                       sel?.removeAllRanges();
@@ -313,14 +312,14 @@ export default function AdminDashboard() {
                       // Unselect text
                       const range = document.createRange();
                       range.selectNodeContents(
-                        document.getElementById("email_editor" + applicant.id)!
+                        document.getElementById("email_editor" + applicant.id)!,
                       );
                       const sel = window.getSelection();
                       sel?.removeAllRanges();
 
                       // Try to Update the Email
                       const emailRegExp = new RegExp(
-                        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                       );
                       if (
                         emailRegExp.test(editorEmail) &&
@@ -344,8 +343,8 @@ export default function AdminDashboard() {
                             prevApplicants.map((prevApplicant) =>
                               prevApplicant.id === applicant.id
                                 ? { ...prevApplicant, email: editorEmail }
-                                : prevApplicant
-                            )
+                                : prevApplicant,
+                            ),
                           );
                         } else {
                           customAlert("Error updating email.");
@@ -356,7 +355,7 @@ export default function AdminDashboard() {
                       }
                       setEditorEmail("");
                       document.getElementById(
-                        "email_editor" + applicant.id
+                        "email_editor" + applicant.id,
                       )!.innerText = applicant.email;
                     }
 
@@ -429,7 +428,7 @@ export default function AdminDashboard() {
                                 id: applicant.id,
                                 type: type,
                               }),
-                            }
+                            },
                           );
 
                           if (response.ok) {
@@ -437,8 +436,8 @@ export default function AdminDashboard() {
                               prevApplicants.map((prevApplicant) =>
                                 prevApplicant.id === applicant.id
                                   ? { ...prevApplicant, ticket_type: type }
-                                  : prevApplicant
-                              )
+                                  : prevApplicant,
+                              ),
                             );
                             return true;
                           }
@@ -451,12 +450,12 @@ export default function AdminDashboard() {
                       applicant.ticket_type,
                       Object.values(TicketType).filter((value) => {
                         return !isGroup(value) && value != TicketType.SPEAKER;
-                      })
+                      }),
                     );
                 }}
               >
                 {getTicketTypeName(
-                  applicant.ticket_type as TicketType
+                  applicant.ticket_type as TicketType,
                 ).toUpperCase()}
               </span>
               <span>
@@ -521,16 +520,16 @@ export default function AdminDashboard() {
                         ? encodeURIComponent(
                             grpMsg.replace(
                               "{name}",
-                              applicant.full_name.split(" ")[0]
-                            )
+                              applicant.full_name.split(" ")[0],
+                            ),
                           )
                         : encodeURIComponent(
                             msg.replace(
                               "{name}",
-                              applicant.full_name.split(" ")[0]
-                            )
+                              applicant.full_name.split(" ")[0],
+                            ),
                           )
-                    }&type=phone_number&app_absent=0`
+                    }&type=phone_number&app_absent=0`,
                   )
                 }
               >
@@ -612,8 +611,8 @@ export default function AdminDashboard() {
                 ...applicant,
                 admitted_at: admitted ? new Date().toTimeString() : null,
               }
-            : applicant
-        )
+            : applicant,
+        ),
       );
     } else {
       customAlert("Failed to update admission status.");
@@ -631,11 +630,11 @@ export default function AdminDashboard() {
               addLoader();
               const response = await fetch(
                 `/api/admin/destructive/delete?verification=${encodeURIComponent(
-                  key
+                  key,
                 )}`,
                 {
                   method: "GET",
-                }
+                },
               );
               removeLoader();
 
@@ -666,6 +665,16 @@ export default function AdminDashboard() {
         <h1 style={{ ...title.style, fontWeight: 700, marginBottom: 0 }}>
           All Tickets
         </h1>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "1rem",
+          marginBottom: "0.5rem",
+        }}
+      >
         <button
           onClick={() => exportToCSV()}
           style={{
@@ -685,6 +694,27 @@ export default function AdminDashboard() {
         >
           {downloadIcon}
           Export CSV
+        </button>
+
+        <button
+          onClick={() => router.push("/admin/tickets/add")}
+          style={{
+            padding: "8px 16px",
+            borderRadius: "8px",
+            border: "none",
+            backgroundColor: "#000",
+            color: "#fff",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+          }}
+          title="Add New Ticket manually"
+        >
+          <span style={{ fontSize: "1.2rem", lineHeight: 1 }}>+</span>
+          Add Ticket
         </button>
       </div>
       <div
