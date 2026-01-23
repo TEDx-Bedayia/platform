@@ -175,6 +175,7 @@ async function submitOneTicket(
     );
   }
 
+  // Paymob specific implementation
   let paymentUrl = "";
   if (paymentMethod === "CARD") {
     let amount = price.getPrice(TicketType.INDIVIDUAL, new Date(), "CARD");
@@ -253,11 +254,21 @@ export async function GET() {
   let query2 = await sql`SELECT COUNT(*) FROM attendees WHERE paid = true;`;
   let query3 =
     await sql`SELECT COUNT(*) FROM attendees WHERE paid = true AND type NOT IN ('speaker', 'giveaway');`;
+
+  let totalDiscountedCodes =
+    await sql`SELECT COUNT(code) FROM rush_hour WHERE processed = TRUE`;
+
   return Response.json(
     {
-      total: query.rows[0].count,
-      paid: query2.rows[0].count,
-      actual: query3.rows[0].count,
+      total:
+        parseInt(query.rows[0].count) +
+        parseInt(totalDiscountedCodes.rows[0].count),
+      paid:
+        parseInt(query2.rows[0].count) +
+        parseInt(totalDiscountedCodes.rows[0].count),
+      actual:
+        parseInt(query3.rows[0].count) +
+        parseInt(totalDiscountedCodes.rows[0].count),
     },
     { status: 200 }
   );
