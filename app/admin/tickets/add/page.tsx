@@ -6,6 +6,7 @@ import { Poppins, Ubuntu } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { price } from "../../../api/tickets/prices";
 import { addLoader, removeLoader } from "../../../global_components/loader";
 import { getPaymentMethods } from "../../../payment-methods";
 import { TicketType, getTicketTypeName, isGroup } from "../../../ticket-types";
@@ -47,6 +48,8 @@ export default function AddTicketPage() {
   );
   const isGroupTicket = isGroup(ticketType);
   const attendeeCount = isGroupTicket ? GROUP_SIZE : 1;
+  const ticketPrice = price.getPrice(ticketType, new Date());
+  const totalPrice = ticketPrice * attendeeCount;
 
   const handleAttendeeChange = (
     index: number,
@@ -69,7 +72,9 @@ export default function AddTicketPage() {
       if (sameDetails) {
         // Replicate first attendee GROUP_SIZE times
         const base = attendees[0];
-        finalAttendees = Array.from({ length: GROUP_SIZE }, () => ({ ...base }));
+        finalAttendees = Array.from({ length: GROUP_SIZE }, () => ({
+          ...base,
+        }));
       } else {
         finalAttendees = attendees;
       }
@@ -319,6 +324,10 @@ export default function AddTicketPage() {
               <p className="text-xs text-green-600 mt-1">
                 This will generate UUIDs, send e-tickets immediately, and record
                 the payment in analytics.
+              </p>
+              <p className="text-sm font-bold text-gray-700 mt-2">
+                Total Price: {totalPrice} EGP ({ticketPrice} EGP x{" "}
+                {attendeeCount} ticket{attendeeCount > 1 ? "s" : ""})
               </p>
             </div>
           </div>
