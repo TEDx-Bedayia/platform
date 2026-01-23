@@ -7,6 +7,7 @@ export const IPN = "01012988103"; // Change to Instapay details
 
 export const INDIVIDUAL_TICKET_PRICE = 450; // Change to individual ticket price
 export const GROUP_TICKET_PRICE = 375; // Change to group ticket price per person
+export const TEACHER_TICKET_PRICE = 350; // Change to teacher ticket price
 
 export const DISCOUNTED_TICKET_PRICE = 400; // Change to rush hour ticket price
 

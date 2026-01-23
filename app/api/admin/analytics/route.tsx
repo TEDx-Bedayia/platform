@@ -5,6 +5,7 @@ import {
   GROUP_TICKET_PRICE,
   INDIVIDUAL_EARLY_PRICE,
   INDIVIDUAL_TICKET_PRICE,
+  TEACHER_TICKET_PRICE,
 } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
@@ -14,7 +15,7 @@ const TICKET_PRICES: Record<string, number> = {
   individual: INDIVIDUAL_TICKET_PRICE,
   group: GROUP_TICKET_PRICE,
   discounted: DISCOUNTED_TICKET_PRICE,
-  teacher: INDIVIDUAL_TICKET_PRICE * 0.5,
+  teacher: TEACHER_TICKET_PRICE,
   individual_early_bird: INDIVIDUAL_EARLY_PRICE,
   group_early_bird: GROUP_EARLY_PRICE,
   speaker: 0,
