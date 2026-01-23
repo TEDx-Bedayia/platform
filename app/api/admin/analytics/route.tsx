@@ -82,15 +82,29 @@ export async function GET(request: NextRequest) {
       ORDER BY hour ASC
     `;
 
+    let totalDiscountedCodes =
+      await sql`SELECT COUNT(code) FROM rush_hour WHERE processed = TRUE`;
+
     // Calculate revenue by ticket type
     const revenueByType = ticketsByType.rows.map((row) => ({
       ticketType: row.ticket_type,
-      paidCount: parseInt(row.paid_count),
-      totalCount: parseInt(row.total_count),
+      paidCount:
+        parseInt(row.paid_count) +
+        (row.ticket_type === "discounted"
+          ? parseInt(totalDiscountedCodes.rows[0].count)
+          : 0),
+      totalCount:
+        parseInt(row.total_count) +
+        (row.ticket_type === "discounted"
+          ? parseInt(totalDiscountedCodes.rows[0].count)
+          : 0),
       revenue: parseInt(row.paid_count) * (TICKET_PRICES[row.ticket_type] || 0),
     }));
 
-    const totalRevenue = revenueByType.reduce((sum, r) => sum + r.revenue, 0);
+    const totalRevenue =
+      revenueByType.reduce((sum, r) => sum + r.revenue, 0) +
+      parseInt(totalDiscountedCodes.rows[0].count) *
+        TICKET_PRICES["discounted"];
 
     // Calculate conversion rate
     const stats = overallStats.rows[0];
