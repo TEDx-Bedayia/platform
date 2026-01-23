@@ -98,7 +98,12 @@ export async function GET(request: NextRequest) {
         (row.ticket_type === "discounted"
           ? parseInt(totalDiscountedCodes.rows[0].count)
           : 0),
-      revenue: parseInt(row.paid_count) * (TICKET_PRICES[row.ticket_type] || 0),
+      revenue:
+        (parseInt(row.paid_count) +
+          (row.ticket_type === "discounted"
+            ? parseInt(totalDiscountedCodes.rows[0].count)
+            : 0)) *
+        (TICKET_PRICES[row.ticket_type] || 0),
     }));
 
     const totalRevenue =
