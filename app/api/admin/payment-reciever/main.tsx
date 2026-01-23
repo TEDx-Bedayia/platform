@@ -84,9 +84,9 @@ function formatPaymentSourceForStorage(source: PaymentSource): string {
  * Batch-generates unique UUIDs, checking against existing ones in DB.
  * Much faster than generating one at a time.
  */
-async function generateBatchUUIDs(
+export async function generateBatchUUIDs(
   client: VercelPoolClient,
-  count: number
+  count: number,
 ): Promise<string[]> {
   if (count === 0) return [];
 
@@ -104,7 +104,7 @@ async function generateBatchUUIDs(
     // Cast both sides to text to avoid type mismatch issues
     const existing = await client.query(
       `SELECT uuid FROM attendees WHERE uuid::text = ANY($1::text[])`,
-      [candidates]
+      [candidates],
     );
 
     const existingSet = new Set(existing.rows.map((r) => r.uuid));
@@ -127,7 +127,7 @@ async function fetchUnpaidAttendees(
   fullPaymentMethod: string,
   method: string,
   identifier: string | null,
-  paymentDate: Date
+  paymentDate: Date,
 ): Promise<UnpaidAttendee[]> {
   let query;
 
@@ -137,7 +137,7 @@ async function fetchUnpaidAttendees(
       `SELECT * FROM attendees 
        WHERE payment_method = $1 AND paid = false AND email = $2
        FOR UPDATE`,
-      [method, identifier]
+      [method, identifier],
     );
   } else {
     // Other payments query by full payment_method (e.g., "TLDA@username")
@@ -145,7 +145,7 @@ async function fetchUnpaidAttendees(
       `SELECT * FROM attendees 
        WHERE payment_method = $1 AND paid = false
        FOR UPDATE`,
-      [fullPaymentMethod]
+      [fullPaymentMethod],
     );
   }
 
@@ -166,7 +166,7 @@ async function fetchUnpaidByIds(
   client: VercelPoolClient,
   ids: number[],
   fullPaymentMethod: string,
-  paymentDate: Date
+  paymentDate: Date,
 ): Promise<UnpaidAttendee[]> {
   if (ids.length === 0) return [];
   if (fullPaymentMethod.startsWith("CASH")) {
@@ -177,7 +177,7 @@ async function fetchUnpaidByIds(
     `SELECT * FROM attendees 
      WHERE id = ANY($1::int[]) AND payment_method = $2 AND paid = false
      FOR UPDATE`,
-    [ids, fullPaymentMethod]
+    [ids, fullPaymentMethod],
   );
 
   return query.rows
@@ -194,7 +194,7 @@ async function fetchUnpaidByIds(
  */
 async function fetchGroupsForAttendees(
   client: VercelPoolClient,
-  attendeeIds: number[]
+  attendeeIds: number[],
 ): Promise<Map<number, GroupInfo>> {
   if (attendeeIds.length === 0) return new Map();
 
@@ -202,7 +202,7 @@ async function fetchGroupsForAttendees(
     `SELECT grpid, id1, id2, id3, id4 FROM groups 
      WHERE id1 = ANY($1::int[]) OR id2 = ANY($1::int[]) 
         OR id3 = ANY($1::int[]) OR id4 = ANY($1::int[])`,
-    [attendeeIds]
+    [attendeeIds],
   );
 
   const groupMap = new Map<number, GroupInfo>();
@@ -226,7 +226,7 @@ async function expandGroupMembers(
   client: VercelPoolClient,
   attendees: UnpaidAttendee[],
   fullPaymentMethod: string,
-  paymentDate: Date
+  paymentDate: Date,
 ): Promise<UnpaidAttendee[]> {
   const groupAttendeeIds = attendees
     .filter((a) => a.type === TicketType.GROUP)
@@ -256,7 +256,7 @@ async function expandGroupMembers(
     client,
     missingIds,
     fullPaymentMethod,
-    paymentDate
+    paymentDate,
   );
 
   return [...attendees, ...additionalMembers];
@@ -310,7 +310,7 @@ async function checkForAmbiguity(
   containsIndividual: boolean,
   containsGroup: boolean,
   paymentDate: Date,
-  fullPaymentMethod: string
+  fullPaymentMethod: string,
 ): Promise<AmbiguityResult | null> {
   const individualPrice = price.getPrice(TicketType.INDIVIDUAL, paymentDate);
 
@@ -346,7 +346,7 @@ async function checkForAmbiguity(
 
         // Get other group member IDs (excluding current attendee)
         const otherMemberIds = groupInfo.memberIds.filter(
-          (id) => id !== attendee.id
+          (id) => id !== attendee.id,
         );
 
         // Remove other group members from found list (show only one rep per group)
@@ -357,7 +357,7 @@ async function checkForAmbiguity(
           client,
           otherMemberIds,
           fullPaymentMethod,
-          paymentDate
+          paymentDate,
         );
 
         groupMembers[attendee.id] = otherMembers as unknown as Applicant[];
@@ -376,7 +376,7 @@ async function checkForAmbiguity(
  */
 async function collectUniqueGroups(
   client: VercelPoolClient,
-  groupAttendees: UnpaidAttendee[]
+  groupAttendees: UnpaidAttendee[],
 ): Promise<Map<number, number[]>> {
   if (groupAttendees.length === 0) return new Map();
 
@@ -402,7 +402,7 @@ async function processPayments(
   client: VercelPoolClient,
   unpaid: UnpaidAttendee[],
   amount: number,
-  paymentDate: Date
+  paymentDate: Date,
 ): Promise<ProcessedPayment> {
   const { individuals, groupAttendees } = analyzeUnpaidAttendees(unpaid);
   const isEarlyBird = EARLY_BIRD_UNTIL && paymentDate < EARLY_BIRD_UNTIL;
@@ -471,7 +471,7 @@ async function processPayments(
               unnest($3::text[]) AS type
      ) AS data
      WHERE attendees.id = data.id`,
-    [ids, uuidList, types]
+    [ids, uuidList, types],
   );
 
   // Assign UUIDs to paidAttendees for response
@@ -492,7 +492,7 @@ function sendEmails(paidAttendees: UnpaidAttendee[]) {
       email: attendee.email,
       id: String(attendee.id),
       uuid: attendee.uuid!,
-    }))
+    })),
   );
 }
 
@@ -512,13 +512,13 @@ export async function pay(
   from: string,
   amount: string,
   date: string,
-  id_if_needed: string
+  id_if_needed: string,
 ): Promise<NextResponse> {
   // Validate environment
   if (!process.env.JWT_SECRET) {
     return NextResponse.json(
       { message: "Key is not set. Contact the maintainer." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -530,7 +530,7 @@ export async function pay(
   if (isNaN(amountNum)) {
     return NextResponse.json(
       { message: "Invalid amount provided." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -546,7 +546,7 @@ export async function pay(
       `;
       return NextResponse.json(
         { refund: true, message: "Refund Inserted." },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -559,7 +559,7 @@ export async function pay(
       from, // Full payment method string (e.g., "TLDA@username")
       paymentSource.method,
       paymentSource.identifier,
-      paymentDate
+      paymentDate,
     );
 
     if (unpaid.length === 0) {
@@ -569,7 +569,7 @@ export async function pay(
           message:
             "Not found. Try Again or Refund (Ticket isn't marked as paid yet).",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -589,7 +589,7 @@ export async function pay(
         await client.query("ROLLBACK");
         return NextResponse.json(
           { message: "Nobody to pay for." },
-          { status: 400 }
+          { status: 400 },
         );
       }
     } else {
@@ -610,7 +610,7 @@ export async function pay(
         analysis.containsIndividual,
         analysis.containsGroup,
         paymentDate,
-        from
+        from,
       );
 
       if (ambiguity) {
@@ -622,7 +622,7 @@ export async function pay(
             found: ambiguity.found,
             groupMembers: ambiguity.groupMembers,
           },
-          { status: ResponseCode.TICKET_AMBIGUITY }
+          { status: ResponseCode.TICKET_AMBIGUITY },
         );
       }
     }
@@ -631,7 +631,7 @@ export async function pay(
     if (analysis.containsGroup && !analysis.containsIndividual) {
       const uniqueGroups = await collectUniqueGroups(
         client,
-        analysis.groupAttendees
+        analysis.groupAttendees,
       );
       const groupPrice =
         price.getPrice(TicketType.GROUP, paymentDate) * GROUP_SIZE;
@@ -650,7 +650,7 @@ export async function pay(
           if (rep) {
             found.push({ ...rep, ticket_type: rep.type });
             groupMembers[rep.id] = unpaid.filter(
-              (a) => memberIds.includes(a.id) && a.id !== rep.id
+              (a) => memberIds.includes(a.id) && a.id !== rep.id,
             ) as unknown as Applicant[];
           }
         }
@@ -663,7 +663,7 @@ export async function pay(
             found,
             groupMembers,
           },
-          { status: ResponseCode.TICKET_AMBIGUITY }
+          { status: ResponseCode.TICKET_AMBIGUITY },
         );
       }
     }
@@ -673,7 +673,7 @@ export async function pay(
       client,
       unpaid,
       amountNum,
-      paymentDate
+      paymentDate,
     );
 
     if (paidAmount === 0) {
@@ -682,7 +682,7 @@ export async function pay(
         {
           message: `Nothing was paid. To pay for all tickets: ${analysis.total} EGP. Paying for only one ticket (or an entire group ticket) is accepted as well.`,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -707,7 +707,7 @@ export async function pay(
         paid: paidAmount,
         accepted: paidAttendees,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (e) {
     await client.query("ROLLBACK").catch(() => {});
@@ -716,7 +716,7 @@ export async function pay(
       {
         message: "An error occurred processing the payment. Please try again.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   } finally {
     client.release();

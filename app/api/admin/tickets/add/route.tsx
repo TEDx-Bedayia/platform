@@ -10,16 +10,10 @@ import {
   verifyEmail,
 } from "../../../utils/input-sanitization";
 import { scheduleBackgroundEmails } from "../../payment-reciever/eTicketEmail";
-import { safeRandUUID } from "../../payment-reciever/main";
+import { generateBatchUUIDs, safeRandUUID } from "../../payment-reciever/main";
 
 // Constants
 const GROUP_SIZE = 4;
-
-interface AttendeeInput {
-  name: string;
-  email: string;
-  phone: string;
-}
 
 export async function POST(req: NextRequest) {
   // 1. Auth Check
@@ -127,14 +121,13 @@ export async function POST(req: NextRequest) {
       const insertedIds: number[] = [];
       const recipients = [];
 
+      let uuids: string[] = [];
+      if (isPaid) {
+        uuids = await generateBatchUUIDs(client, attendees.length);
+      }
+
       for (const attendee of attendees) {
         const { name, email, phone } = attendee;
-
-        // Generate UUID if paid
-        let uuid: string | null = null;
-        if (isPaid) {
-          uuid = await safeRandUUID();
-        }
 
         const res = await client.query(
           `INSERT INTO attendees (email, full_name, phone, type, payment_method, paid, uuid, sent)
@@ -147,7 +140,7 @@ export async function POST(req: NextRequest) {
             ticketType,
             fullPaymentMethod,
             isPaid,
-            uuid,
+            uuids.shift(),
             false,
           ], // sent defaults to false, logic below handles sending
         );
@@ -155,12 +148,12 @@ export async function POST(req: NextRequest) {
         const newId = res.rows[0].id;
         insertedIds.push(newId);
 
-        if (isPaid && uuid) {
+        if (isPaid && uuids.length > 0) {
           recipients.push({
             fullName: name,
             email: email,
             id: String(newId),
-            uuid: uuid,
+            uuid: uuids.shift()!,
           });
         }
       }
