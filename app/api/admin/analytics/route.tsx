@@ -106,10 +106,7 @@ export async function GET(request: NextRequest) {
         (TICKET_PRICES[row.ticket_type] || 0),
     }));
 
-    const totalRevenue =
-      revenueByType.reduce((sum, r) => sum + r.revenue, 0) +
-      parseInt(totalDiscountedCodes.rows[0].count) *
-        TICKET_PRICES["discounted"];
+    const totalRevenue = revenueByType.reduce((sum, r) => sum + r.revenue, 0);
 
     // Calculate conversion rate
     let stats = overallStats.rows[0];
