@@ -128,6 +128,7 @@ export async function POST(req: NextRequest) {
 
       for (const attendee of attendees) {
         const { name, email, phone } = attendee;
+        let uuid = uuids.shift()!;
 
         const res = await client.query(
           `INSERT INTO attendees (email, full_name, phone, type, payment_method, paid, uuid, sent)
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest) {
             ticketType,
             fullPaymentMethod,
             isPaid,
-            uuids.shift(),
+            uuid,
             false,
           ], // sent defaults to false, logic below handles sending
         );
@@ -153,7 +154,7 @@ export async function POST(req: NextRequest) {
             fullName: name,
             email: email,
             id: String(newId),
-            uuid: uuids.shift()!,
+            uuid: uuid,
           });
         }
       }
