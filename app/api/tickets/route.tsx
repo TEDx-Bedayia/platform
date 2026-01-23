@@ -221,9 +221,9 @@ async function submitOneTicket(
 
     return Response.json(
       {
-        message: `Ticket Booked Successfully! Please check your email to continue.${
+        message: `Ticket Booked Successfully!${
           paymentMethod === "CASH"
-            ? ` Your Attendee ID is ${id}. Use it to pay at the school office.`
+            ? ` Please check your email to continue. Your Attendee ID is ${id}. Use it to pay at the school office.`
             : ""
         }`,
         success: true,

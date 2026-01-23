@@ -31,7 +31,7 @@ export const PRICES = {
   GROUP_TOTAL: (isEarlyBird ? 300 : 350) * 4, // 1200 or 1400
   GROUP_EARLY_TOTAL: 300 * 4, // 1200
   DISCOUNTED: 300,
-  TEACHER: 200, // Fixed: 0.5 * 400 (always based on regular individual price)
+  TEACHER: 350, // Fixed teacher price (matches TEACHER_TICKET_PRICE in metadata.tsx)
   SPEAKER: 0,
   GIVEAWAY: 0,
 };

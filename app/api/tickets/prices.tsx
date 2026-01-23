@@ -5,6 +5,7 @@ import {
   GROUP_TICKET_PRICE,
   INDIVIDUAL_EARLY_PRICE,
   INDIVIDUAL_TICKET_PRICE,
+  TEACHER_TICKET_PRICE,
 } from "@/app/metadata";
 import { TicketType } from "../../ticket-types";
 
@@ -44,7 +45,7 @@ export const price = {
   individual: INDIVIDUAL_TICKET_PRICE,
   group: GROUP_TICKET_PRICE,
   discounted: DISCOUNTED_TICKET_PRICE,
-  teacher: 0.5 * INDIVIDUAL_TICKET_PRICE,
+  teacher: TEACHER_TICKET_PRICE,
   individual_early_bird: INDIVIDUAL_EARLY_PRICE,
   group_early_bird: GROUP_EARLY_PRICE,
   getPrice: getPrice,
