@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
         const newId = res.rows[0].id;
         insertedIds.push(newId);
 
-        if (isPaid && uuids.length > 0) {
+        if (isPaid && uuid != null) {
           recipients.push({
             fullName: name,
             email: email,
