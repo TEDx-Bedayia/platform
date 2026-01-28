@@ -71,6 +71,9 @@ async function sendEmailsWithRateLimit(
             contentType: "image/png",
           },
         ],
+        headers: {
+          "X-Entity-Ref-ID": recipient.uuid,
+        },
       });
 
       if (res.error) {
