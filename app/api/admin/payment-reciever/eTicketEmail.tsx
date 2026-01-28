@@ -38,7 +38,7 @@ async function setSentStatus(id?: string) {
  * Uses inline QR code attachments with CID for Gmail compatibility.
  */
 async function sendEmailsWithRateLimit(
-  recipients: EmailRecipient[]
+  recipients: EmailRecipient[],
 ): Promise<EmailRecipient[]> {
   let failed = [];
 
@@ -68,6 +68,7 @@ async function sendEmailsWithRateLimit(
             content: qrBuffer.toString("base64"),
             filename: "ticket-qr.png",
             contentId: `ticket-qr-${recipient.uuid}`,
+            contentType: "image/png",
           },
         ],
       });
@@ -151,7 +152,7 @@ async function sendEmailsWithRateLimit(
 export function scheduleBackgroundEmails(recipients: EmailRecipient[]): void {
   after(async () => {
     console.log(
-      `Background: Starting to send ${recipients.length} emails with rate limiting...`
+      `Background: Starting to send ${recipients.length} emails with rate limiting...`,
     );
     const result = await sendEmailsWithRateLimit(recipients);
     console.log("Background: Email sending completed. Result:", result);
@@ -164,7 +165,7 @@ export function scheduleBackgroundEmails(recipients: EmailRecipient[]): void {
  * For non-blocking background sending, use scheduleBackgroundEmails instead.
  */
 export async function sendBatchEmail(
-  recipients: EmailRecipient[]
+  recipients: EmailRecipient[],
 ): Promise<boolean> {
   const result = await sendEmailsWithRateLimit(recipients);
   return result.length === 0;
