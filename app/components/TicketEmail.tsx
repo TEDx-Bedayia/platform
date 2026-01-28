@@ -29,7 +29,7 @@ export const TicketEmail: React.FC<TicketEmailProps> = ({ name, uuid }) => {
           @media only screen and (max-width: 600px) {
             .responsive-content { padding: 8px 24px 24px !important; }
             .responsive-header { padding: 32px 24px 28px !important; }
-            .responsive-img { width: 240px !important; }
+            .responsive-img { width: 200px !important; height: 200px !important; }
           }
         `}</style>
       </Head>
