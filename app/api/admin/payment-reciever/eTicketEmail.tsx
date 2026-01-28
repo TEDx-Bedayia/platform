@@ -65,7 +65,7 @@ async function sendEmailsWithRateLimit(
         react: <TicketEmail name={recipient.fullName} uuid={recipient.uuid} />,
         attachments: [
           {
-            content: qrBuffer.toString("base64"),
+            content: qrBuffer,
             filename: "ticket-qr.png",
             contentId: `ticket-qr-${recipient.uuid}`,
             contentType: "image/png",
