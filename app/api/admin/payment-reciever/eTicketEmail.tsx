@@ -56,6 +56,7 @@ async function sendEmailsWithRateLimit(
         errorCorrectionLevel: "H",
         margin: 2,
         width: 300,
+        type: "png",
       });
 
       const res = await resend.emails.send({
