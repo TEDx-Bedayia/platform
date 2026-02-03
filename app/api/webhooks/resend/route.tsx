@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
 
   // Get the body
   const body = await request.text();
-  const payload = JSON.parse(body);
 
   const wh = new Webhook(webhookSecret);
   let evt: any;
