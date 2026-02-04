@@ -49,7 +49,15 @@ export async function POST(request: NextRequest) {
 
   if (eventType === "email.bounced" || eventType === "email.failed") {
     const { headers, to, created_at } = evt.data;
-    const uuid = headers["X-Entity-Ref-ID"];
+    const uuid = headers.filter(
+      (header: { name: string; value: string }) =>
+        header.name === "X-Entity-Ref-ID",
+    )[0]?.value;
+
+    if (!uuid) {
+      console.error("Error: No UUID found in headers");
+      return NextResponse.json({ error: "Error occured" }, { status: 400 });
+    }
 
     try {
       await sql`UPDATE attendees SET sent = false WHERE uuid = ${uuid}`;
