@@ -167,6 +167,23 @@ export default function AdminDashboard() {
 
   const [selectedEmailEditor, setSelectedEmailEditor] = useState(0);
   const [editorEmail, setEditorEmail] = useState("");
+  const [hasUnsentTickets, setHasUnsentTickets] = useState(false);
+
+  // Check for unsent tickets on mount
+  useEffect(() => {
+    const checkUnsent = async () => {
+      try {
+        const response = await fetch("/api/admin/check-unsent");
+        if (response.ok) {
+          const data = await response.json();
+          setHasUnsentTickets(data.hasUnsent);
+        }
+      } catch (err) {
+        console.error("Failed to check unsent tickets", err);
+      }
+    };
+    checkUnsent();
+  }, []);
 
   useEffect(() => {
     if (localStorage.getItem("admin-token") == "dev") {
@@ -342,7 +359,11 @@ export default function AdminDashboard() {
                           setApplicants((prevApplicants) =>
                             prevApplicants.map((prevApplicant) =>
                               prevApplicant.id === applicant.id
-                                ? { ...prevApplicant, email: editorEmail }
+                                ? {
+                                    ...prevApplicant,
+                                    email: editorEmail,
+                                    sent: true,
+                                  }
                                 : prevApplicant,
                             ),
                           );
@@ -501,7 +522,7 @@ export default function AdminDashboard() {
             )}
             {applicant.paid && !applicant.sent && (
               <button
-                className={styles.sendButton}
+                className={`${styles.sendButton} ${styles.sendButtonUnsent}`}
                 onClick={() => sendTicket(applicant.id, setApplicants)}
               >
                 Send Ticket
@@ -511,29 +532,9 @@ export default function AdminDashboard() {
             {applicant.sent && (
               <button
                 className={styles.sendButton}
-                onClick={() =>
-                  window.open(
-                    `https://web.whatsapp.com/send/?phone=${
-                      applicant.phone
-                    }&text=${
-                      isGroupString(applicant.ticket_type)
-                        ? encodeURIComponent(
-                            grpMsg.replace(
-                              "{name}",
-                              applicant.full_name.split(" ")[0],
-                            ),
-                          )
-                        : encodeURIComponent(
-                            msg.replace(
-                              "{name}",
-                              applicant.full_name.split(" ")[0],
-                            ),
-                          )
-                    }&type=phone_number&app_absent=0`,
-                  )
-                }
+                onClick={() => sendTicket(applicant.id, setApplicants)}
               >
-                Send WA Notice
+                Resend Ticket
               </button>
             )}
           </div>
@@ -652,6 +653,43 @@ export default function AdminDashboard() {
         >
           {destructiveIcon}
         </button>
+      )}
+
+      {/* Warning banner for unsent tickets */}
+      {hasUnsentTickets && (
+        <div
+          style={{
+            backgroundColor: "#fef3c7",
+            border: "1px solid #f59e0b",
+            borderRadius: "8px",
+            padding: "12px 16px",
+            marginBottom: "1rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            maxWidth: "900px",
+            width: "100%",
+          }}
+        >
+          <span style={{ fontSize: "1.5rem" }}>⚠️</span>
+          <div style={{ flex: 1 }}>
+            <span style={{ fontWeight: 600, color: "#92400e" }}>
+              Unsent Tickets Detected
+            </span>
+            <p
+              style={{
+                margin: "4px 0 0 0",
+                fontSize: "0.875rem",
+                color: "#78350f",
+              }}
+            >
+              There are paid tickets that haven&apos;t been sent. Please change
+              the search mode to <strong>&quot;Pending eTicket&quot;</strong>{" "}
+              and fix any misspelled email addresses (tickets get resent to the
+              new email automatically).
+            </p>
+          </div>
+        </div>
       )}
 
       <div
