@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
         header.name === "X-Entity-Ref-ID",
     )[0]?.value;
 
-    if (!uuid) {
-      console.error("Error: No UUID found in headers");
+    if (!uuid || typeof uuid !== "string" || uuid.trim().length === 0) {
+      console.error("Error: Invalid UUID found in headers");
       return NextResponse.json({ error: "Error occured" }, { status: 400 });
     }
 
