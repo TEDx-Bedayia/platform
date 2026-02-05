@@ -1,4 +1,5 @@
 import { canUserAccess, ProtectedResource } from "@/app/api/utils/auth";
+import { EmailRecipient } from "@/app/api/utils/email-helper";
 import { ResponseCode } from "@/app/api/utils/response-codes";
 import {
   DISCOUNTED_TICKET_PRICE,
@@ -19,13 +20,13 @@ export async function POST(request: NextRequest) {
     const { memberId, date, paid } = body;
 
     const dateObj = new Date(
-      `${date.slice(6, 10)}-${date.slice(3, 5)}-${date.slice(0, 2)}`
+      `${date.slice(6, 10)}-${date.slice(3, 5)}-${date.slice(0, 2)}`,
     );
 
     if (!memberId || !date || !paid) {
       return NextResponse.json(
         { message: "Member ID, Date, and Paid amount are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
           AND rh.created_at::date = $2 
           AND rh.processed = FALSE
   `,
-      [memberId, dateObj, DISCOUNTED_TICKET_PRICE, INDIVIDUAL_TICKET_PRICE]
+      [memberId, dateObj, DISCOUNTED_TICKET_PRICE, INDIVIDUAL_TICKET_PRICE],
     );
 
     // 2. Extract the sum (handle potential null if no rows found)
@@ -63,47 +64,58 @@ export async function POST(request: NextRequest) {
     if (paid !== totalDue) {
       return NextResponse.json(
         { message: `Insufficient payment. Total due is ${totalDue}.` },
-        { status: ResponseCode.MARKETING_ACTIVITY_OUT_OF_SYNC }
+        { status: ResponseCode.MARKETING_ACTIVITY_OUT_OF_SYNC },
       );
     }
 
     const result = await client.query(
       `UPDATE rush_hour SET processed = TRUE WHERE marketing_member_id = $1 AND created_at::date = $2 AND processed = FALSE RETURNING *`,
-      [memberId, dateObj]
+      [memberId, dateObj],
     );
 
     let stream = "Marketing@" + memberId;
 
     client.sql`INSERT INTO pay_backup (stream, incurred, recieved, recieved_at) VALUES (${stream}, ${paid}, ${paid}, NOW())`;
 
-    await Promise.all(
+    const results = await Promise.all(
       result.rows.map(async (row) => {
         try {
           const attendeeId = row.attendee_id;
-          if (attendeeId) {
-            const attendee = await client.query(
-              `UPDATE attendees SET paid = TRUE, uuid = $1, sent = TRUE WHERE id = $2 AND paid = FALSE RETURNING *`,
-              [randomUUID(), attendeeId]
+          if (!attendeeId) return null;
+          const attendee = await client.query(
+            `UPDATE attendees SET paid = TRUE, uuid = $1, sent = TRUE WHERE id = $2 AND paid = FALSE RETURNING *`,
+            [randomUUID(), attendeeId],
+          );
+          // Check if any rows were actually updated
+          if (attendee.rows.length === 0) {
+            console.log(
+              `[MANAGE MARKETING] Attendee ${attendeeId} already paid or not found`,
             );
-
-            scheduleBackgroundEmails([
-              {
-                fullName: attendee.rows[0].full_name,
-                email: attendee.rows[0].email,
-                id: attendeeId,
-                uuid: attendee.rows[0].uuid,
-              },
-            ]);
+            return null;
           }
+          return {
+            fullName: attendee.rows[0].full_name,
+            email: attendee.rows[0].email,
+            id: attendeeId,
+            uuid: attendee.rows[0].uuid,
+          };
         } catch (error) {
           console.error(
-            "[MANAGE MARKETNG] Error processing attendee ID:",
+            "[MANAGE MARKETING] Error processing attendee ID:",
             row.attendee_id,
-            error
+            error,
           );
+          return null;
         }
-      })
+      }),
     );
+
+    // Filter out nulls and collect valid recipients
+    const emailRecipients = results.filter(
+      (r): r is EmailRecipient => r !== null,
+    );
+
+    scheduleBackgroundEmails(emailRecipients);
 
     client.release();
 
