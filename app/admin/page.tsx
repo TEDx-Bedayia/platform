@@ -126,7 +126,9 @@ const sendTicket = async (
   if (response.ok) {
     setApplicants((prevApplicants) =>
       prevApplicants.map((applicant) =>
-        applicant.id === id ? { ...applicant, sent: true } : applicant,
+        applicant.id === id
+          ? { ...applicant, sent: applicant.paid }
+          : applicant,
       ),
     );
   }
