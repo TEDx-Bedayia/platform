@@ -9,7 +9,7 @@ export async function GET(
     params,
   }: {
     params: Promise<{ uuid: string }>;
-  }
+  },
 ) {
   // Set CORS headers to allow access from Usher App
   const headers = new Headers();
@@ -24,7 +24,7 @@ export async function GET(
   ) {
     return Response.json(
       { message: "Unauthorized" },
-      { status: 401, headers: headers }
+      { status: 401, headers: headers },
     );
   }
   const uuid = (await params).uuid; // Extract the 'uuid' parameter
@@ -41,65 +41,130 @@ export async function GET(
   ) {
     return NextResponse.json(
       { error: `Event not started yet. ${eventDate.toLocaleDateString()}` },
-      { status: 400, headers: headers }
+      { status: 400, headers: headers },
     );
   }
 
+  // Validate UUID length (minimum 8 characters for partial matching)
+  if (uuid.length < 8) {
+    return NextResponse.json(
+      { error: "UUID must be at least 8 characters." },
+      { status: 400, headers: headers },
+    );
+  }
+
+  // Check if this is a full UUID (36 chars with dashes) or partial
+  const isFullUUID = uuid.length === 36;
+
+  // Use postgres client with transaction and row-level locking
+  const client = await sql.connect();
+
   try {
-    // Update the admitted status for the specified applicant
-    const result = await sql.query(
-      "UPDATE attendees SET admitted_at = NOW(), admitted_by = $1 WHERE paid = true AND admitted_at IS NULL AND uuid = $2 RETURNING *",
-      [deviceUID, uuid]
+    // Start transaction
+    await client.query("BEGIN");
+
+    // Lock matching row(s) to prevent concurrent admission attempts
+    // Use exact match for full UUID, prefix match for partial
+    let lockResult;
+    if (isFullUUID) {
+      lockResult = await client.query(
+        `SELECT * FROM attendees WHERE uuid = $1 FOR UPDATE LIMIT 2`,
+        [uuid],
+      );
+    } else {
+      // Partial UUID: match prefix safely using LEFT(...) and limit locked rows
+      lockResult = await client.query(
+        `SELECT * FROM attendees
+           WHERE LEFT(uuid::text, $2) = $1
+           FOR UPDATE
+           LIMIT 2`,
+        [uuid, uuid.length],
+      );
+    }
+
+    if (lockResult.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { error: "Applicant not found." },
+        { status: 404, headers: headers },
+      );
+    }
+
+    // Check for multiple matches (only possible with partial UUID)
+    if (lockResult.rowCount && lockResult.rowCount > 1) {
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { error: "Multiple tickets found, please insert the full UUID." },
+        { status: 400, headers: headers },
+      );
+    }
+
+    const attendee = lockResult.rows[0];
+
+    // Check if attendee has paid
+    if (!attendee.paid) {
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { error: "Applicant has not even paid." },
+        { status: 400, headers: headers },
+      );
+    }
+
+    // Check if already admitted
+    if (attendee.admitted_at !== null) {
+      // Grace period: allow same device to re-fetch within 2.5 seconds
+      const admittedTime = new Date(attendee.admitted_at).getTime();
+      if (
+        Date.now() - admittedTime < 2.5 * 1000 &&
+        attendee.admitted_by === deviceUID
+      ) {
+        await client.query("COMMIT");
+        return NextResponse.json(
+          { success: true, applicant: attendee },
+          { status: 200, headers: headers },
+        );
+      }
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { error: "Applicant already admitted." },
+        { status: 400, headers: headers },
+      );
+    }
+
+    // Admit the attendee (use attendee.uuid from locked row for partial UUID support)
+    const result = await client.query(
+      `UPDATE attendees 
+       SET admitted_at = NOW(), admitted_by = $1 
+       WHERE uuid = $2 
+         AND paid = TRUE 
+         AND admitted_at IS NULL
+       RETURNING *`,
+      [deviceUID, attendee.uuid],
     );
 
     if (result.rowCount === 0) {
-      let query = await sql`SELECT * FROM attendees WHERE uuid = ${uuid}`;
-      if (query.rowCount === 0) {
-        return NextResponse.json(
-          { error: "Applicant not found." },
-          { status: 404, headers: headers }
-        );
-      } else if (query.rows[0].admitted_at !== null && query.rows[0].paid) {
-        if (
-          Date.now() - query.rows[0].admitted_at < 2.5 * 1000 &&
-          query.rows[0].admitted_by === deviceUID
-        ) {
-          const res = await sql.query(
-            "SELECT * FROM attendees WHERE uuid = $1",
-            [uuid]
-          );
-          return NextResponse.json(
-            { success: true, applicant: res.rows[0] },
-            { status: 200, headers: headers }
-          );
-        }
-        return NextResponse.json(
-          { error: "Applicant already admitted." },
-          { status: 400, headers: headers }
-        );
-      } else if (!query.rows[0].paid) {
-        return NextResponse.json(
-          { error: "Applicant has not even paid." },
-          { status: 400, headers: headers }
-        );
-      } else {
-        return NextResponse.json(
-          { error: "Applicant already admitted." },
-          { status: 400, headers: headers }
-        );
-      }
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { error: "Applicant is not eligible for admission." },
+        { status: 400, headers: headers },
+      );
     }
+    // Commit transaction
+    await client.query("COMMIT");
 
     return NextResponse.json(
       { success: true, applicant: result.rows[0] },
-      { status: 200, headers: headers }
+      { status: 200, headers: headers },
     );
   } catch (error) {
+    await client.query("ROLLBACK").catch(() => {});
     console.error("Error:", error);
     return NextResponse.json(
       { error: "An Error Occurred." },
-      { status: 502, headers: headers }
+      { status: 502, headers: headers },
     );
+  } finally {
+    client.release();
   }
 }
 
