@@ -68,14 +68,17 @@ export async function GET(
     let lockResult;
     if (isFullUUID) {
       lockResult = await client.query(
-        `SELECT * FROM attendees WHERE uuid = $1 FOR UPDATE`,
+        `SELECT * FROM attendees WHERE uuid = $1 FOR UPDATE LIMIT 2`,
         [uuid],
       );
     } else {
-      // Partial UUID: match prefix using LIKE
+      // Partial UUID: match prefix safely using LEFT(...) and limit locked rows
       lockResult = await client.query(
-        `SELECT * FROM attendees WHERE uuid::text LIKE $1 FOR UPDATE`,
-        [`${uuid}%`],
+        `SELECT * FROM attendees
+           WHERE LEFT(uuid::text, $2) = $1
+           FOR UPDATE
+           LIMIT 2`,
+        [uuid, uuid.length],
       );
     }
 
