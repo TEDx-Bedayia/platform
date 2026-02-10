@@ -136,10 +136,19 @@ export async function GET(
       `UPDATE attendees 
        SET admitted_at = NOW(), admitted_by = $1 
        WHERE uuid = $2 
+         AND paid = TRUE 
+         AND admitted_at IS NULL
        RETURNING *`,
       [deviceUID, attendee.uuid],
     );
 
+    if (result.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { error: "Applicant is not eligible for admission." },
+        { status: 400, headers: headers },
+      );
+    }
     // Commit transaction
     await client.query("COMMIT");
 
