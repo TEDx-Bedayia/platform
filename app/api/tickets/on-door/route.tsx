@@ -39,11 +39,9 @@ export async function POST(request: NextRequest) {
   const device = body.device?.toString().trim() || "unknown";
   let paymentMethod =
     body.paymentMethod?.toString().trim().toUpperCase() || "CASH";
-  const username = body.username?.toString().trim();
+  const username = body.senderUsername?.toString().trim() || "ON_DOOR";
 
-  if (username) {
-    paymentMethod += "@" + username;
-  }
+  paymentMethod += "@" + username;
 
   if (paymentMethod === "TELDA") {
     paymentMethod = "TLDA";
