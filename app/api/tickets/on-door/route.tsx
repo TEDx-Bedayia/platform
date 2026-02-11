@@ -2,6 +2,11 @@ import { EVENT_DATE, INDIVIDUAL_TICKET_PRICE } from "@/app/metadata";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 import { safeRandUUID } from "../../admin/payment-reciever/main";
+import {
+  checkPhone,
+  checkSafety,
+  verifyEmail,
+} from "../../utils/input-sanitization";
 
 // CORS headers for Usher App access
 function corsHeaders(): Headers {
@@ -29,7 +34,7 @@ export async function POST(request: NextRequest) {
 
   const name = body.name?.toString().trim();
   const email = body.email?.toString().trim().toLowerCase();
-  const phone = body.phone?.toString().trim();
+  let phone = body.phone?.toString().trim();
   const key = body.key?.toString().trim();
   const device = body.device?.toString().trim() || "unknown";
   let paymentMethod =
@@ -60,6 +65,21 @@ export async function POST(request: NextRequest) {
       { error: "Missing required fields: name, email, phone." },
       { status: 400, headers },
     );
+  }
+
+  if (!checkSafety(name) || !verifyEmail(email) || !checkPhone(phone)) {
+    return NextResponse.json(
+      { error: "Invalid input." },
+      { status: 400, headers },
+    );
+  }
+
+  // remove the plus from phone and add 2 if it starts with 01
+  if (phone.startsWith("+2")) {
+    phone = phone.substring(1);
+  }
+  if (phone.startsWith("01")) {
+    phone = "2" + phone;
   }
 
   // Event date threshold check (36 hours)
