@@ -15,7 +15,7 @@ export async function GET(
   const headers = new Headers();
   headers.set("Access-Control-Allow-Origin", "*"); // Allow all origins
   headers.set("Access-Control-Allow-Methods", "GET"); // Allow specific methods
-  headers.set("Access-Control-Allow-Headers", "Content-Type, key"); // Allow specific headers
+  headers.set("Access-Control-Allow-Headers", "Content-Type, key, X-Client"); // Allow specific headers
 
   // Check if the request is coming from official app.
   if (
