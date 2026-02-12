@@ -13,7 +13,7 @@ function corsHeaders(): Headers {
   const headers = new Headers();
   headers.set("Access-Control-Allow-Origin", "*");
   headers.set("Access-Control-Allow-Methods", "POST");
-  headers.set("Access-Control-Allow-Headers", "Content-Type");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, X-Client");
   return headers;
 }
 
