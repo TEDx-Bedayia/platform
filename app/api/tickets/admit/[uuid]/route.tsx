@@ -173,7 +173,10 @@ export async function OPTIONS() {
   const headers = new Headers();
   headers.set("Access-Control-Allow-Origin", "*"); // Allow all origins
   headers.set("Access-Control-Allow-Methods", "GET"); // Allow specific methods
-  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allow specific headers
+  headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-Client",
+  ); // Allow specific headers
 
   return new Response(null, {
     status: 204, // No content
