@@ -1,4 +1,5 @@
 import { EVENT_DATE, INDIVIDUAL_TICKET_PRICE } from "@/app/metadata";
+import { PaymentMethodKey, paymentOptions } from "@/app/payment-methods";
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
 import { safeRandUUID } from "../../admin/payment-reciever/main";
@@ -12,9 +13,31 @@ import {
 function corsHeaders(): Headers {
   const headers = new Headers();
   headers.set("Access-Control-Allow-Origin", "*");
-  headers.set("Access-Control-Allow-Methods", "POST");
+  headers.set("Access-Control-Allow-Methods", "GET, POST");
   headers.set("Access-Control-Allow-Headers", "Content-Type, X-Client");
   return headers;
+}
+
+// Handler for GET requests — return ticket prices and payment methods
+export async function GET() {
+  const headers = corsHeaders();
+
+  return NextResponse.json(
+    {
+      prices: INDIVIDUAL_TICKET_PRICE,
+      paymentMethods: Object.keys(paymentOptions)
+        .filter((key) => !["CASH", "CARD", "VFCASH"].includes(key))
+        .map((key) => {
+          const methodKey = key as PaymentMethodKey;
+          const option = paymentOptions[methodKey];
+          return {
+            identifier: key,
+            to: option.to,
+          };
+        }),
+    },
+    { status: 200, headers },
+  );
 }
 
 // Handler for POST requests — register and immediately admit a walk-in attendee
