@@ -32,6 +32,7 @@ export async function GET() {
           const option = paymentOptions[methodKey];
           return {
             identifier: key,
+            displayName: option.displayName,
             to: option.to,
           };
         }),
