@@ -11,12 +11,11 @@ jobs:
   check-access:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write # <--- Needed to post comments
+      pull-requests: write
       contents: read
     steps:
       - uses: actions/checkout@v6
 
-      # 1. Check which files changed
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -25,7 +24,6 @@ jobs:
               - '.github/workflows/deploy.yml'
               - '.github/workflows/bouncer.yml'
 
-      # 2. The Logic: If restricted file changed AND user is NOT you -> Comment & Fail
       - name: Enforce Permissions
         if: steps.filter.outputs.restricted == 'true'
         uses: actions/github-script@v8
