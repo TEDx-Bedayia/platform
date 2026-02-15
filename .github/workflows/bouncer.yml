@@ -1,0 +1,47 @@
+name: Security Bouncer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-access:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # <--- Needed to post comments
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      # 1. Check which files changed
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            restricted:
+              - '.github/workflows/deploy.yml'
+              - '.github/workflows/bouncer.yml'
+
+      # 2. The Logic: If restricted file changed AND user is NOT you -> Comment & Fail
+      - name: Enforce Permissions
+        if: steps.filter.outputs.restricted == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const actor = context.actor;
+            const owner = 'AlyMobarak';
+
+            if (actor !== owner) {
+              // 1. Post the Comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `### ⛔ Access Denied\n\n@${actor}, you are not authorized to modify **.github/workflows/deploy.yml** or **.github/workflows/bouncer.yml**.\n\nThese files control the deployment infrastructure and are locked. Please revert changes to this specific file to proceed.`
+              });
+
+              // 2. Fail the Check (Block the Merge)
+              core.setFailed('⛔ User ' + actor + ' is not allowed to edit deployment config.');
+            } else {
+              console.log('✅ Access Granted.');
+            }
