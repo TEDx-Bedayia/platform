@@ -1,0 +1,59 @@
+name: Vercel Build Check
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verify-build:
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_URL: "postgresql://user:password@localhost:5432/dbname"
+      POSTGRES_PRISMA_URL: "postgresql://user:password@localhost:5432/dbname"
+      POSTGRES_URL_NO_SSL: "postgresql://user:password@localhost:5432/dbname"
+      POSTGRES_URL_NON_POOLING: "postgresql://user:password@localhost:5432/dbname"
+      POSTGRES_USER: "user"
+      POSTGRES_HOST: "localhost"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DATABASE: "dbname"
+      EMAIL: "test@example.com"
+      CLIENT_ID: "dummy_client_id"
+      CLIENT_SECRET: "dummy_client_secret"
+      REFRESH_TOKEN: "dummy_refresh_token"
+      RESEND_API_KEY: "re_123456789"
+      RESEND_WEBHOOK_SECRET: "dummy_webhook_secret"
+      PAYMOB_VFCASH_INT_ID: "123456"
+      PAYMOB_CARD_INT_ID: "123456"
+      PAYMOB_BASE_API_URL: "https://accept.paymob.com/api"
+      PAYMOB_BASE_URL: "https://accept.paymob.com"
+      PAYMOB_SECRET_KEY: "dummy_secret_key"
+      PAYMOB_PUBLIC_KEY: "dummy_public_key"
+      PAYMOB_HMAC_SECRET: "dummy_hmac_secret"
+      PAYMOB_TEST_MODE: "true"
+      MAINTAINER: "dummy_maintainer"
+      ADMIN_USERNAME: "admin"
+      ADMIN_PASSWORD: "password"
+      SKLOFFICE: "dummy_skloffice"
+      SKLOFFICEPASS: "dummy_pass"
+      MARKETING_USERNAME: "marketing"
+      MARKETING_PASSWORD: "password"
+      MARKETING_MEMBER_PASSWORD_GEN: "dummy_gen"
+      JWT_SECRET: "dummy_jwt_secret_32_chars_long_string"
+      APP_KEY: "dummy_app_key"
+      DESTRUCTIVE_KEY: "dummy_destructive_key"
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - run: npm ci
+      - run: npm run build

@@ -1,139 +1,568 @@
 # TEDx Bedayia
 
-> Welcome to the main documentation for TEDx at Bedayia School.
+> Welcome to the main documentation for TEDx at Bedayia School!
 
 **Author**: Aly Mobarak.
 
-# Sections
+---
 
-1. General Notes
-2. eTicket System
-3. Styling Guide
+# Table of Contents
+
+1. [General Notes](#1-general-notes)
+2. [Tech Stack](#2-tech-stack)
+3. [Architecture Overview](#3-architecture-overview)
+4. [eTicket System](#4-eticket-system)
+5. [Admin Portal](#5-admin-portal)
+6. [Marketing System](#6-marketing-system)
+7. [Email System](#7-email-system)
+8. [Security](#8-security)
+9. [Things to Maintain](#9-things-to-maintain)
+10. [For the Future](#10-for-the-future)
+
+---
 
 # 1. General Notes
 
 > You are generally supposed to keep the HTML structure relatively the same, with only changing the styles in the different CSS files scattered around the project and the text to be related to the new theme and event.
 
-> If you'd like to add functionality, you can do so using [NextJS Documentation](https://nextjs.org/docs/getting-started), adding typescript files, etc.
+> If you'd like to add functionality, you can do so using the [Next.js Documentation](https://nextjs.org/docs/getting-started), adding TypeScript files, etc.
 
 ## Quick Start a New Event
 
-I may try to make a dashboard for simplifying this process, but for now here are the manual steps:
-
-1. Start by editing `app/metadata.tsx` and providing event data, ticket window, etc.
-2. In the admin dashboard, there will be a shield X button when the event is concluded. Press it to reset the data (after downloading if you would like to use it next year for marketing).
-3. To edit payment methods, add or remove variables from the `app/api/tickets/payment-methods/payment-methods.tsx`. Make sure you don't hardcode usernames for the receivers. You also need to edit the email template in `app/api/tickets/route.tsx` and `app/api/tickets/group/route.tsx` to reflect the new payment methods.
-4. Create a Design on Figma (for the non-admin areas) with the team that relates to the theme and is asthetically appealing.
-5. After creating a powerful, compelling design, update the various CSS files found in `app` without changing the class names to avoid errors and clashes. For adding elements or functionality to the base HTML, make sure you correctly set their `className` field to `styles.{yourNewClassName}`.
+1. Edit `app/metadata.tsx` and provide event data — ticket window dates, event date, pricing, contact numbers, early bird deadline, year, etc.
+2. Edit `app/payment-methods.tsx` to update payment receiver contacts (Telda username, InstaPay number, VF Cash number, card redirect links, etc.). Payment methods have a structured schema: `displayName`, `identifier`, `to`, `instructions`, `field`, `icon`, and optional `redirectLinks` and `hidden` flag.
+3. In the admin dashboard, there will be a shield ✕ button when the event is concluded. Press it to reset the data (after downloading if you would like to keep it for next year's marketing).
+4. Create a Design on Figma (for the non-admin areas) with the team that relates to the theme and is aesthetically appealing.
+5. After creating a compelling design, update the CSS files found in `app/styles/` and `app/book/` without changing the class names to avoid errors. For adding elements, make sure you correctly set their `className` field to `styles.{yourNewClassName}`.
 6. Have fun!!
 
-## Things to Maintain
+---
 
-- Domain Name: <https://tedxbedayia.com> renew around 31st of December.
-- Vercel Hosting: make sure everything is set up and running and linked to a GitHub Repository and Domain. (I may keep it under my account for simlicity but give the head full permissions)
-- Database: make sure you clear it after last year's event and after testing.
-- GMail Account: We no longer need to turn on less secure apps for v1.1.
+# 2. Tech Stack
 
-# 2. eTicket System 1.0 & 1.1
+| Component      | Technology                                        |
+| -------------- | ------------------------------------------------- |
+| Framework      | **Next.js 16** (App Router)                       |
+| Language       | **TypeScript**                                    |
+| Database       | **Vercel Postgres** (`@vercel/postgres`)          |
+| Primary Email  | **Resend** (React Email components, rate-limited) |
+| Fallback Email | **Nodemailer** (Gmail OAuth2)                     |
+| Payments       | **Paymob** (card payments via unified checkout)   |
+| Auth           | **JWT** (jsonwebtoken, 7-day expiry)              |
+| Charts         | **Recharts**                                      |
+| Styling        | **Tailwind CSS** + CSS Modules                    |
+| Hosting        | **Vercel**                                        |
+| QR Codes       | **qrcode** (Node library)                         |
+| Webhooks       | **Svix** (Resend webhook verification)            |
+| Animations     | **Framer Motion**, **Swiper**                     |
 
-This section will describe the flow of events in this current system while including comments and suggestions for future revisions of the system.
+---
 
-## Booking a Ticket
+# 3. Architecture Overview
 
-1. Attendees fill in their name, email address, payment method, and phone number.
-2. An email is sent guiding them to pay and how much to pay.
-3. They send the payment following the procedures sent by mail which currently are sending to telda, vodafone cash, instapay, or cash at the school office. In all cases, the user should provide his attendee ID, to ensure the payment is linked to the correct ticket in case there are multiple tickets with the same payment method.
+## Central Configuration (`app/metadata.tsx`)
 
-### Related Accessible Routes
+All event-specific configuration is centralized here:
 
-- Book One Ticket `/book/`
-- Book a Group Ticket (4 People) `/book/group/`
+- **Pricing**: `INDIVIDUAL_TICKET_PRICE`, `GROUP_TICKET_PRICE`, `TEACHER_TICKET_PRICE`, `DISCOUNTED_TICKET_PRICE`, `INDIVIDUAL_EARLY_PRICE`, `GROUP_EARLY_PRICE`
+- **Dates**: `TICKET_WINDOW` (booking open/close), `EARLY_BIRD_UNTIL`, `EVENT_DATE`
+- **Contact**: `PHONE`, `VFCASH`, `TELDA`, `IPN`
+- **Other**: `YEAR`, `HOST`, `EVENT_DESC`, `SPEAKER_FREE_TICKETS`, `support`, `paymentProcessor`
 
-- Submit One Ticket `POST /api/tickets/`
-- Submit a Group Ticket `POST /api/tickets/group/`
-- Retrieve Available Payment Methods `GET /api/tickets/payment-methods/`
-- Retrieve Prices `GET /api/tickets/price/?type={ticket_type}`
+## Ticket Types (`app/ticket-types.tsx`)
 
-### Related Files
+Eight ticket types are supported:
 
-- Email Template `/public/booked.html`
-- Check Safety and Validity of Inputs `/api/tickets/utils.tsx`
-- Different Payment Methods Available `/api/tickets/payment-methods/payment-methods.tsx`
+| Type                   | Enum Value              | Notes                                                     |
+| ---------------------- | ----------------------- | --------------------------------------------------------- |
+| Individual             | `individual`            | Standard single ticket                                    |
+| Group                  | `group`                 | 4-person group, linked via `groups` table                 |
+| Speaker                | `speaker`               | Free, admin-generated invitations                         |
+| Giveaway               | `giveaway`              | Free promotional tickets, generated through the dashboard |
+| Discounted (Rush Hour) | `discounted`            | Marketing rush hour codes                                 |
+| Teacher                | `teacher`               | Fixed price for teachers                                  |
+| Individual Early Bird  | `individual_early_bird` | Early bird pricing                                        |
+| Group Early Bird       | `group_early_bird`      | Early bird group pricing                                  |
+
+## Payment Methods (`app/payment-methods.tsx`)
+
+Five payment methods with structured definitions:
+
+| Key      | Display Name         | Notes                                                          |
+| -------- | -------------------- | -------------------------------------------------------------- |
+| `TLDA`   | Telda                | Requires Telda username                                        |
+| `IPN`    | InstaPay             | Requires InstaPay address (IPA)                                |
+| `VFCASH` | eWallet              | Requires phone number                                          |
+| `CASH`   | School Office (Cash) | No additional field                                            |
+| `CARD`   | Credit/Debit Card    | Redirects to Bedayia's Custom Portal (or PayMob in the future) |
+
+Payment method strings are stored as `METHOD@identifier` (e.g., `TLDA@username`, `CASH@email@domain.com`, `CARD@orderId`).
+
+## Price Calculation (`app/api/tickets/prices.tsx`)
+
+The `getPrice(type, receivedAt, method)` function calculates the correct price considering:
+
+- Ticket type
+- Early bird deadline (if `receivedAt < EARLY_BIRD_UNTIL`)
+- Speaker and giveaway tickets are always free (return `0`)
+
+## Database Tables
+
+| Table        | Purpose                                                                                                                |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `attendees`  | Main ticket records (email, name, phone, type, payment_method, paid, uuid, sent, admitted_at, admitted_by, created_at) |
+| `groups`     | Links 4 attendees (id1–id4) for group tickets                                                                          |
+| `pay_backup` | Payment audit log (stream, incurred, received, received_at)                                                            |
+| `rush_hour`  | Marketing rush hour codes (code, attendee_id, processed)                                                               |
+
+---
+
+# 4. eTicket System
+
+## 4.1 Booking a Ticket
+
+1. Attendees fill in their name, email address, phone number, and choose a payment method.
+2. **For cash**: An email is sent guiding them to pay at the school office with their Attendee ID.
+3. **For Telda/InstaPay/eWallet**: The attendee provides their payment identifier. They are instructed to send the payment and a screenshot to the WhatsApp number.
+4. **For card**: The attendee is redirected to Paymob's unified checkout. Payment is processed automatically via webhook callback.
+5. **For rush hour codes**: If a valid code is provided and already processed, an eTicket is immediately sent. Otherwise, the ticket waits for payment confirmation.
+
+### Routes
+
+| Route                     | Method | Description                                      |
+| ------------------------- | ------ | ------------------------------------------------ |
+| `/book/`                  | Page   | Book an individual ticket                        |
+| `/book/group/`            | Page   | Book a group ticket (4 people)                   |
+| `/book/success/`          | Page   | Post-payment success page                        |
+| `/book/failure/`          | Page   | Post-payment failure page                        |
+| `/api/tickets/`           | `POST` | Submit an individual ticket booking              |
+| `/api/tickets/`           | `GET`  | Get ticket counts (total, paid, actual)          |
+| `/api/tickets/group/`     | `POST` | Submit a group ticket booking                    |
+| `/api/tickets/prices.tsx` | –      | Price calculation module (imported, not a route) |
+
+### Key Files
+
+| File                                   | Purpose                                                                       |
+| -------------------------------------- | ----------------------------------------------------------------------------- |
+| `app/book/page.tsx`                    | Individual booking form                                                       |
+| `app/book/group/page.tsx`              | Group booking form                                                            |
+| `app/payment-methods.tsx`              | Payment method definitions, instructions UI, and field schemas                |
+| `app/ticket-types.tsx`                 | Ticket type enum and helper functions                                         |
+| `app/api/tickets/route.tsx`            | Individual ticket submission + rush hour code handling                        |
+| `app/api/tickets/group/route.tsx`      | Group ticket submission                                                       |
+| `app/api/tickets/prices.tsx`           | Centralized price calculation                                                 |
+| `app/api/utils/input-sanitization.tsx` | Email verification, misspelling correction, payment method & phone validation |
+| `app/api/utils/card-payment.tsx`       | Paymob card payment initiation                                                |
+| `public/booked.html`                   | Booking confirmation email template                                           |
 
 ### Styling Files
 
-- All CSS Related to Booking an individual or group Ticket `/book/book.module.css`
-- All CSS Related to the shared Navigation Bar `/book/booking_nav.module.css`
+| File                              | Covers                                   |
+| --------------------------------- | ---------------------------------------- |
+| `app/book/book.module.css`        | Booking form styles (individual & group) |
+| `app/book/booking_nav.module.css` | Booking navigation bar                   |
 
-## Accepting the Payment
+---
 
-1. School Office has a special portal where it can input an attendee ID or an email address and the amount of money received.
-2. Admins holding other payment methods have access to everything else (should be updated in the future if finance department will handle this part such that finance can accept payments but not see all tickets, etc.). Once these admins receive a payment, they try to accept it from the admin dashboard using only the username of the sender, and if duplicate tickets are found, a popout of different tickets to choose from is shown. The admins use the provided attendee ID to identify the correct tickets.
-3. An email is sent with a randomly generated unique UUID (long string) in a QR code. This UUID is what identifies the attendee and allows only one entry at the event.
+## 4.2 Accepting Payments
 
-### Related Accessible Routes
+1. **School Office** has a portal to accept cash payments by entering an attendee's email and the amount received.
+2. **Payment handlers** (admins or assigned users with specific payment method access) accept payments from their dashboard. They search by the sender's username/identifier. If multiple unpaid tickets match, the system returns an ambiguity response (HTTP 431) with a list of candidates for the admin to choose from.
+3. Upon successful payment acceptance, the system generates a unique UUID, assigns it to the ticket, records the payment in `pay_backup`, and sends an eTicket email with a QR code.
+4. **Card payments** are processed automatically via Paymob webhook — no manual acceptance needed.
 
-- Form for Accepting Payments `/admin/payments/`
+### Routes
 
-- API for Accepting Payments `GET /api/payment-reciever/{method_id}/?from={email/username/phone}&amount={recieved_amount}&date={date}&email_id={email_if_multiple_tickets_found}`
-- API for returning QR Code Image for GMail `GET /api/qr/?uuid={text_to_put_in_qr}` \*\* **NOTE**: This API Route is public so you should NOT introduce any SQL checks in it checking whether the UUID is valid or not since that could allow for bruteforcing UUIDs into the event.
+| Route                                      | Method | Description                                                                                 |
+| ------------------------------------------ | ------ | ------------------------------------------------------------------------------------------- |
+| `/admin/payments/`                         | Page   | Payment acceptance form                                                                     |
+| `/api/admin/payment-reciever/{method_id}/` | `GET`  | Accept payment (params: `from`, `amount`, `date`, `email_id`)                               |
+| `/api/admin/payment-reciever/cash/`        | –      | Cash-specific payment route                                                                 |
+| `/api/admin/payment-reciever/tlda/`        | –      | Telda payment route                                                                         |
+| `/api/admin/payment-reciever/ipn/`         | –      | InstaPay payment route                                                                      |
+| `/api/admin/payment-reciever/vfcash/`      | –      | eWallet payment route                                                                       |
+| `/api/payment_processed/`                  | `POST` | Paymob webhook callback (HMAC SHA-512 verified)                                             |
+| `/api/payment_processed/`                  | `GET`  | Client redirect after Paymob payment (success → `/book/success`, failure → `/book/failure`) |
+| `/api/qr/?uuid={uuid}`                     | `GET`  | QR code image generator                                                                     |
 
-### Related Files
+> **⚠️ SECURITY NOTE**: The `/api/qr/` route is public — do NOT introduce any SQL checks verifying UUID validity, as that would enable brute-force attacks.
 
-- Email Template `/public/eTicket-template.html`
-- Payment Processor `/api/admin/payment-reciever/main.tsx`
-- eTicket Email Sender `/api/admin/payment-reciever/eTicketEmail.tsx`
+### Key Files
+
+| File                                              | Purpose                                                                                                                        |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `app/api/admin/payment-reciever/main.tsx`         | Core payment processing logic (row-level locking, batch UUID generation, group expansion, ambiguity resolution, email sending) |
+| `app/api/admin/payment-reciever/eTicketEmail.tsx` | eTicket email sender (Resend primary + Gmail fallback, rate-limited, background scheduling via `after()`)                      |
+| `app/api/utils/card-payment.tsx`                  | Paymob API integration for card payment initiation                                                                             |
+| `app/api/payment_processed/route.tsx`             | Paymob webhook handler with HMAC verification                                                                                  |
+| `public/eTicket-template.html`                    | Gmail fallback eTicket email template                                                                                          |
+| `app/components/TicketEmail.tsx`                  | Primary eTicket as a React Email component (used with Resend)                                                                  |
 
 ### Styling Files
 
-- Form's CSS Stylesheet `/admin/payments/payments.module.css`
+| File                                     | Covers                         |
+| ---------------------------------------- | ------------------------------ |
+| `app/admin/payments/payments.module.css` | Payment acceptance form styles |
 
-## Admitting into the Event
+---
+
+## 4.3 Admitting into the Event
 
 1. People come in with their unique QR codes in print or on phone.
-2. Gate Ushers have access to a website that scans this QR code and with an API Key, makes a call to admit the person.
-3. If the QR code has been already used, wasn't paid for (impossible since uuid is only generated when a user pays but hey we should account for all possibilities including the "impossible"), or doesn't even exist on the system (made up QR Code), the usher would receive a message to further investigate and send them to the head who has access to the full database. The head would just make sure the guy is completely faking it and that it was not a technical error of some sort by manually checking the database from the dashboard.
-4. Otherwise, the name of the attendee is shown and the usher is instructed to admit them normally into the event.
+2. Gate Ushers have access to a separate **Ushers App** (PWA) that scans QR codes and calls the admit API with an `APP_KEY`.
+3. The system supports both **full UUID** (36 chars) and **partial UUID** (minimum 8 chars, prefix match) for admission.
+4. If the QR code has been already used, isn't paid for, or doesn't exist, the usher receives an error message. The head usher has access to the full admin dashboard for manual investigation.
+5. On success, the attendee's name is shown and the usher admits them.
+6. **Row-level locking** (`SELECT ... FOR UPDATE`) prevents race conditions from concurrent scans.
+7. A **2.5-second grace window** allows the same device to re-scan without triggering a duplicate admission error (prevents iPhone double-scan glitches).
+8. The API enforces a **36-hour time window** around the event date — admission is only possible within 36 hours of the event.
 
-> P.S. There is a 2.5 second window for scanning QR codes since for the event'2025 some codes were double scanned from the same phone due to iPhone weird glitches with the ushers website.
+### Routes
 
-### Related Accessible Routes
+| Route                        | Method | Description                                 |
+| ---------------------------- | ------ | ------------------------------------------- |
+| `/api/tickets/admit/{uuid}/` | `GET`  | Admit an attendee (params: `key`, `device`) |
 
-- API accessible to Ushers `GET /api/tickets/admin/{UUID}/?key={APP_KEY}` (**security: this API can only admit and can't deadmit since ushers shouldn't have this authority**)
+> **Security**: This API can only admit — it cannot de-admit, since ushers shouldn't have that authority.
 
-### Related Files
+---
 
-### Styling Files
+## 4.4 On-Door Ticket Sales
 
-- Styles and Usher's App Code are present in the usher website at `AlyMobarak/PWA`... request access from me if you don't have access.
+Walk-in attendees can be registered and immediately admitted during the event. This is used by ushers via the Ushers App.
 
-## Dashboard and Credentials (/admin)
+1. **GET**: Returns current ticket price and available payment methods (filtered to exclude CASH, CARD, and VFCASH from the list).
+2. **POST**: Creates a new attendee record that is immediately marked as **paid**, **sent**, and **admitted**. Records the payment in `pay_backup`. Uses database transactions for atomicity.
+3. The endpoint is only available within a **36-hour window** around the event date.
+4. CORS headers are set for the Ushers App.
 
-1. Full Power Admin or whoever is responsible (roles should be created in the future, each with specific usernames and passwords) should review the tickets booked frequently for any weird entries and act accordingly.
-2. School Office
-3. Marketing Head
+### Routes
 
-### Related Accessible Routes
+| Route                   | Method | Description                                                                                                                |
+| ----------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `/api/tickets/on-door/` | `GET`  | Get ticket price and payment methods                                                                                       |
+| `/api/tickets/on-door/` | `POST` | Register and admit a walk-in attendee (body: `name`, `email`, `phone`, `key`, `device`, `paymentMethod`, `senderUsername`) |
 
-- Login as Full Power Admin or School Office or Marketing Head (with credentials saved in .env) `/admin/login/`
-- Logout `/admin/logout/`
-- Dashboard where All Tickets are Shown `/admin/`
+---
 
-## Marketing System
+# 5. Admin Portal
 
-Basically, this system is made to simplify the hectic process associated with the sale of rush hour tickets, where event'2025 had missing money and missing emails. This system simplifies the process and even allows marketing members to sell rush hour tickets to people who don't have an email memorized through random code generation. To understand more, there is a tutorials page on the site at tedxbedayia.com/tutorials.
+## 5.1 Authentication & Roles
 
-## For the Future
+The admin portal uses **JWT-based authentication** with role-based access control (RBAC).
 
-- Classify Portal into different roles.
+### User Roles
 
-  - Maintaner (Web Design Head)
-  - Payment Acceptor (Finance Department or TEDx Head)
-  - Cash Acceptor (School Office)
-  - Speaker Ticket Generator (Curation Department)
+| Role              | Description                             |
+| ----------------- | --------------------------------------- |
+| `admin`           | Full access to everything               |
+| `marketing_head`  | Analytics + Marketing Dashboard         |
+| `payment_handler` | Payment acceptance for assigned methods |
+| `school_office`   | Cash payments + ticket querying         |
 
-- Fix Spelling Error in `payment-reciever`.
-- Optimize Receiving Payments in `main.tsx` since it takes some time to process payments where multiple group and individual tickets are found.
-- Always use sql.connect() for multiple sql queries to save time and bandwidth.
+### Protected Resources
 
-# 3. Styling Guide
+| Resource                 | Accessible By                         |
+| ------------------------ | ------------------------------------- |
+| `super_admin`            | Admin only                            |
+| `ticket_dashboard`       | Admin only                            |
+| `analytics`              | Admin, Marketing Head                 |
+| `marketing_dashboard`    | Admin, Marketing Head                 |
+| `payment_dashboard`      | Admin, Payment Handler, School Office |
+| `payment_logs`           | Admin only                            |
+| `query_tickets`          | Admin, School Office                  |
+| `invitations`            | Admin only                            |
+| `manage_account_holders` | Admin only                            |
+
+### Auth Files
+
+| File                     | Purpose                                                                                      |
+| ------------------------ | -------------------------------------------------------------------------------------------- |
+| `app/api/utils/auth.tsx` | JWT signing/verification, RBAC logic (`canUserAccess`), marketing member password generation |
+| `app/api/admin/auth/`    | Login/auth API routes                                                                        |
+
+### Auth Routes
+
+| Route            | Description |
+| ---------------- | ----------- |
+| `/admin/login/`  | Login page  |
+| `/admin/logout/` | Logout page |
+
+---
+
+## 5.2 Ticket Dashboard (`/admin/`)
+
+The main admin dashboard displays all tickets with search, filtering, and management capabilities.
+
+### Features
+
+- View all tickets with pagination
+- Search by partial UUID or attendee first name
+- Copy attendee email
+- **Add Ticket** button — manually create tickets (individual or group) with any ticket type, payment method, and optional immediate payment marking
+- **Export CSV** — download all tickets as JSON for CSV export
+- **Reset Data** — destructive action to clear the database after the event
+
+### Routes
+
+| Route                             | Method | Description                                |
+| --------------------------------- | ------ | ------------------------------------------ |
+| `/admin/`                         | Page   | Main dashboard                             |
+| `/api/admin/tickets/`             | `GET`  | Fetch unpaid ticket emails (for marketing) |
+| `/api/admin/tickets/add/`         | `POST` | Create tickets programmatically            |
+| `/api/admin/tickets/export/`      | `GET`  | Export all tickets                         |
+| `/api/admin/tickets/[index]/`     | –      | Individual ticket operations               |
+| `/api/admin/tickets/admit/`       | –      | Admin-side admission                       |
+| `/api/admin/tickets/update-type/` | –      | Update ticket type                         |
+| `/api/admin/destructive/`         | –      | Destructive database operations (reset)    |
+| `/api/admin/query-ticket/`        | –      | Query individual tickets                   |
+| `/api/admin/send-ticket/`         | –      | Manually send/resend eTicket               |
+| `/api/admin/update-email/`        | –      | Update attendee email                      |
+| `/api/admin/check-unsent/`        | –      | Check for unsent tickets                   |
+
+---
+
+## 5.3 Analytics Dashboard (`/admin/analytics/`)
+
+A real-time analytics dashboard for admins and marketing heads.
+
+### Data Provided
+
+- **Sales over time** (daily counts for last 30 days)
+- **Revenue by ticket type** (with price mapping)
+- **Overall stats** (total bookings, paid, sent, admitted, conversion rate)
+- **Payment method distribution**
+- **Recent activity** (hourly counts for last 7 days)
+- Includes rush hour discounted code counts in all metrics
+
+### Routes
+
+| Route                   | Method | Description                                      |
+| ----------------------- | ------ | ------------------------------------------------ |
+| `/admin/analytics/`     | Page   | Analytics dashboard with Recharts visualizations |
+| `/api/admin/analytics/` | `GET`  | Server-side data aggregation                     |
+
+---
+
+## 5.4 Speaker Tickets (`/admin/speaker-tickets/`)
+
+Generate free invitation tickets for speakers/vendors/etc.
+
+- Creates `N` tickets (default: `SPEAKER_FREE_TICKETS` from metadata) per speaker
+- Uses rotating email addresses (`speaker+invitation1@domain.com`, etc.)
+- Sends eTickets directly to the speaker's email using the `public/speaker-eticket.html` template
+
+### Routes
+
+| Route                         | Method     | Description                                                                   |
+| ----------------------------- | ---------- | ----------------------------------------------------------------------------- |
+| `/admin/speaker-tickets/`     | Page       | Speaker ticket generation form                                                |
+| `/api/admin/speaker-tickets/` | `GET/POST` | Create and email speaker/vendor tickets (params: `speaker`, `name`, `number`) |
+
+---
+
+## 5.5 Other Admin Features
+
+| Page                               | Description                           |
+| ---------------------------------- | ------------------------------------- |
+| `/admin/payments/`                 | Payment acceptance form               |
+| `/admin/pay-history/`              | Payment history log                   |
+| `/admin/manage-account-holders/`   | Manage admin/payment handler accounts |
+| `/admin/manage-marketing-members/` | Manage marketing member accounts      |
+
+### Related API Routes
+
+| Route                                  | Description                |
+| -------------------------------------- | -------------------------- |
+| `/api/admin/payments-history/`         | Fetch payment history      |
+| `/api/admin/payments-total/`           | Fetch payment totals       |
+| `/api/admin/manage-account-holders/`   | CRUD for account holders   |
+| `/api/admin/manage-marketing-members/` | CRUD for marketing members |
+
+---
+
+# 6. Marketing System
+
+The marketing system simplifies rush hour ticket sales. Marketing members can generate discount codes and submit rush hour tickets for people — even if they don't have an email memorized (via random code generation).
+
+### Routes
+
+| Route                      | Description                          |
+| -------------------------- | ------------------------------------ |
+| `/marketing/`              | Marketing dashboard                  |
+| `/marketing/login/`        | Marketing member login               |
+| `/marketing/logout/`       | Marketing member logout              |
+| `/api/marketing/auth/`     | Marketing authentication             |
+| `/api/marketing/gen-code/` | Generate rush hour codes             |
+| `/api/marketing/submit/`   | Submit rush hour tickets             |
+| `/tutorials/`              | Tutorials page for marketing members |
+
+### Styling
+
+| File                                           | Covers                     |
+| ---------------------------------------------- | -------------------------- |
+| `app/marketing/marketing-dashboard.module.css` | Marketing dashboard styles |
+
+---
+
+# 7. Email System
+
+The system uses a **dual-provider email architecture**:
+
+### Primary: Resend
+
+- Uses React Email components (`app/components/TicketEmail.tsx`) for eTickets
+- Rate-limited at 600ms between sends (~1.67 req/s, safely under Resend's 2 req/s limit)
+- Inline QR code attachments via CID for Gmail client compatibility
+- Background sending via Vercel's `after()` API (fluid compute)
+- Webhook listener at `/api/webhooks/resend/` to handle bounced/failed emails (marks `sent = false`)
+
+### Fallback: Gmail (Nodemailer + OAuth2)
+
+- Automatically used if any Resend emails fail
+- Uses HTML templates from `public/` directory
+- Uses Gmail OAuth2 authentication (no "less secure apps" needed)
+
+### Booking Confirmations
+
+- Sent via Gmail (Nodemailer) for cash payment tickets, done to save on Resend usage
+- Uses `public/booked.html` template
+- Handled by `app/api/utils/email-helper.tsx`
+
+### Email Templates
+
+| File                             | Purpose                                                   |
+| -------------------------------- | --------------------------------------------------------- |
+| `app/components/TicketEmail.tsx` | React Email eTicket component (primary, used with Resend) |
+| `public/booked.html`             | Booking confirmation email                                |
+| `public/eTicket-template.html`   | Gmail fallback eTicket template                           |
+| `public/speaker-eticket.html`    | Speaker invitation eTicket template                       |
+
+---
+
+# 8. Security
+
+### CSRF Protection (`app/api/utils/csrf.tsx`)
+
+- **Strict mode** (`validateCsrf`): Requires valid `Origin` or `Referer` header matching allowed origins. Used on admin endpoints.
+- **Lenient mode** (`validateCsrfLenient`): Allows requests without headers (for mobile app compatibility). Used on public-facing booking endpoints.
+- Allowed origins: production hostname + www variant, Vercel preview URL, localhost (dev only), plus any `ALLOWED_ORIGINS` env variable.
+
+### Authentication
+
+- JWT tokens with 7-day expiry stored in cookies
+- Role-based access control with method-scoped permissions
+- Marketing member passwords generated via HMAC-SHA256 deterministic hashing
+
+### Input Sanitization (`app/api/utils/input-sanitization.tsx`)
+
+- Email format validation and common misspelling auto-correction (e.g., `@gamil` → `@gmail`, `@bedaya` → `@bedayia`, `.xom` → `.com`)
+- Payment method validation with method-specific rules (Telda: alphanumeric, InstaPay: alphanumeric + `.` `-` `_`, eWallet: phone format)
+- Name safety check (alphanumeric + Arabic characters + symbols)
+- Phone number validation (minimum 10 digits)
+
+### Database Security
+
+- Row-level locking (`SELECT ... FOR UPDATE`) on admission and payment processing to prevent race conditions
+- Database transactions (`BEGIN`/`COMMIT`/`ROLLBACK`) for atomicity
+- Parameterized SQL queries throughout
+
+### Payment Security
+
+- Paymob HMAC SHA-512 verification on webhook callbacks
+- APP_KEY validation on usher endpoints
+- 36-hour event time window enforcement on admission and on-door endpoints
+
+---
+
+# 9. Things to Maintain
+
+- **Domain Name**: [tedxbedayia.com](https://tedxbedayia.com) — renew around 31st of December.
+- **Vercel Hosting**: Ensure everything is linked to the GitHub repository and domain.
+- **Database**: Clear after last year's event and after testing.
+- **Resend Account**: Ensure the API key and webhook secret are configured.
+- **Gmail Account**: OAuth2 credentials must be valid (used as email fallback + booking confirmations + speaker invitations).
+- **Paymob Account**: Keep API keys, HMAC secret, and integration IDs updated for card payments.
+
+### Environment Variables
+
+The following are required in `.env` (or Vercel environment configuration, which are already fully configured):
+
+| Variable                                                       | Purpose                                           |
+| -------------------------------------------------------------- | ------------------------------------------------- |
+| `POSTGRES_*`                                                   | Database connection (managed by Vercel Postgres)  |
+| `JWT_SECRET`                                                   | JWT token signing                                 |
+| `APP_KEY`                                                      | Usher app authentication                          |
+| `RESEND_API_KEY`                                               | Resend email service                              |
+| `RESEND_WEBHOOK_SECRET`                                        | Resend webhook verification (Svix)                |
+| `EMAIL`                                                        | Gmail sender address                              |
+| `CLIENT_ID`, `CLIENT_SECRET`, `REFRESH_TOKEN`                  | Gmail OAuth2                                      |
+| `PAYMOB_SECRET_KEY`, `PAYMOB_PUBLIC_KEY`, `PAYMOB_HMAC_SECRET` | Paymob card payments                              |
+| `PAYMOB_CARD_INT_ID`, `PAYMOB_VFCASH_INT_ID`                   | Paymob integration IDs                            |
+| `PAYMOB_BASE_API_URL`, `PAYMOB_BASE_URL`                       | Paymob API endpoints                              |
+| `PAYMOB_TEST_MODE`                                             | Set to `"true"` to bypass time window checks      |
+| `MARKETING_MEMBER_PASSWORD_GEN`                                | Secret for generating marketing member passwords  |
+| `ALLOWED_ORIGINS`                                              | Additional CSRF-allowed origins (comma-separated) |
+
+P.S. If you ever need to add another environment variable, mention me (@AlyMobarak) on the pull request that uses it or contact me on WhatsApp if you have my number.
+
+---
+
+# 10. For the Future
+
+- [x] ~~Classify Portal into different roles~~ (Implemented: Admin, Marketing Head, Payment Handler, School Office)
+- [x] ~~Always use `sql.connect()` for multiple SQL queries~~ (Implemented on critical paths with row-level locking)
+- [ ] Upgrade Account Holders Portal to include Marketing Heads and School Office for easy password regeneration.
+- [ ] Add a settings tab to set ticket window, event date, and other important things for the head.
+- [ ] Add a way to refresh the Usher App Key each year.
+- [ ] Implement Refresh Tokens for All Accounts for better security.
+- [ ] Fix spelling error in `payment-reciever` (should be `payment-receiver`).
+- [ ] Add audit logging for admin actions (table exists in design but not yet implemented).
+
+---
+
+# Appendix: Styling Files
+
+| File                                           | Covers                                          |
+| ---------------------------------------------- | ----------------------------------------------- |
+| `app/styles/globals.css`                       | Global styles, design tokens                    |
+| `app/styles/theme.css`                         | Theme-specific styles                           |
+| `app/styles/hero.css`                          | Hero section                                    |
+| `app/styles/info.css`                          | Info section                                    |
+| `app/styles/navigation.css`                    | Navigation                                      |
+| `app/styles/Policy.module.css`                 | Policy pages (privacy, refund, terms, delivery) |
+| `app/globals.css`                              | Root CSS                                        |
+| `app/book/book.module.css`                     | Booking form                                    |
+| `app/book/booking_nav.module.css`              | Booking navigation                              |
+| `app/admin/admin.module.css`                   | Admin layout                                    |
+| `app/admin/dashboard.module.css`               | Admin dashboard                                 |
+| `app/marketing/marketing-dashboard.module.css` | Marketing dashboard                             |
+
+---
+
+# Appendix: Public Routes
+
+| Route                    | Description               |
+| ------------------------ | ------------------------- |
+| `/`                      | Landing page              |
+| `/book/`                 | Individual ticket booking |
+| `/book/group/`           | Group ticket booking      |
+| `/book/success/`         | Payment success page      |
+| `/book/failure/`         | Payment failure page      |
+| `/pay-online/`           | Online payment info       |
+| `/counter/`              | Live ticket counter       |
+| `/tutorials/`            | Marketing tutorials       |
+| `/privacy-policy/`       | Privacy policy            |
+| `/refund-policy/`        | Refund policy             |
+| `/terms-and-conditions/` | Terms and conditions      |
+| `/delivery-policy/`      | Delivery policy           |
+
+---
+
+# Appendix: Ushers App
+
+The Ushers App is a separate **PWA** project at `AlyMobarak/PWA` — request access from the author if needed. It communicates with:
+
+- `GET /api/tickets/admit/{uuid}/` — scan and admit attendees
+- `GET /api/tickets/on-door/` — fetch pricing and payment methods
+- `POST /api/tickets/on-door/` — register walk-in attendees
