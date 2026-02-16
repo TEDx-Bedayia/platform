@@ -1,5 +1,5 @@
 # TEDxBedayia
-Official Repository for the TEDxBedayia Event Webpage.
+This is the Official Repository for the TEDxBedayia Event Webpage.
 
 ## ⚠️ Legal Notice: Proprietary Code
 
