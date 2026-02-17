@@ -13,6 +13,8 @@ permissions:
 jobs:
   invite-member:
     runs-on: ubuntu-latest
+    # 🔒 SECURITY: Only run this on the main branch
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Verify User is a Head
         uses: actions/github-script@v6
