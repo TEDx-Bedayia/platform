@@ -1,0 +1,68 @@
+name: Recruit New Member
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: "Email of the new member"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  invite-member:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify User is a Head
+        uses: actions/github-script@v6
+        env:
+          ORG_TOKEN: ${{ secrets.ORG_ADMIN_TOKEN }}
+        with:
+          github-token: ${{ secrets.ORG_ADMIN_TOKEN }}
+          script: |
+            const user = context.actor;
+            const org = context.repo.owner;
+            const team_slug = 'heads';
+
+            console.log(`Checking if @${user} is in the "${team_slug}" team...`);
+
+            try {
+              // This API call fails (404) if the user is NOT in the team
+              await github.rest.teams.getMembershipForUserInOrg({
+                org: org,
+                team_slug: team_slug,
+                username: user,
+              });
+              console.log(`✅ Verified: @${user} is a Head.`);
+              
+            } catch (error) {
+              console.log(`❌ Access Denied. @${user} is not in the team.`);
+              core.setFailed(`⛔ Permission Denied: You must be a member of the @${org}/${team_slug} team to run this.`);
+            }
+
+      - name: Send Organization Invite
+        uses: actions/github-script@v6
+        env:
+          ORG_TOKEN: ${{ secrets.ORG_ADMIN_TOKEN }}
+          NEW_EMAIL: ${{ inputs.email }}
+        with:
+          github-token: ${{ secrets.ORG_ADMIN_TOKEN }}
+          script: |
+            const org = context.repo.owner;
+            const email = process.env.NEW_EMAIL;
+
+            console.log(`Inviting ${email} to ${org}...`);
+
+            try {
+              await github.rest.orgs.createInvitation({
+                org: org,
+                email: email,
+                role: 'direct_member'
+              });
+              console.log("✅ Invitation sent successfully!");
+            } catch (error) {
+              console.log("❌ Failed to send invite.");
+              console.log(error);
+              core.setFailed(error.message);
+            }
