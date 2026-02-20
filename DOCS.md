@@ -500,7 +500,7 @@ The following are required in `.env` (or Vercel environment configuration, which
 | `PAYMOB_SECRET_KEY`, `PAYMOB_PUBLIC_KEY`, `PAYMOB_HMAC_SECRET` | Paymob card payments                              |
 | `PAYMOB_CARD_INT_ID`, `PAYMOB_VFCASH_INT_ID`                   | Paymob integration IDs                            |
 | `PAYMOB_BASE_API_URL`, `PAYMOB_BASE_URL`                       | Paymob API endpoints                              |
-| `PAYMOB_TEST_MODE`                                             | Set to `"true"` to bypass time window checks      |
+| `PAYMOB_TEST_MODE`                                             | Set to `"true"` only if PayMob keys are test keys |
 | `MARKETING_MEMBER_PASSWORD_GEN`                                | Secret for generating marketing member passwords  |
 | `ALLOWED_ORIGINS`                                              | Additional CSRF-allowed origins (comma-separated) |
 

@@ -20,10 +20,13 @@ export async function POST(request: NextRequest) {
   if (csrfError) return csrfError;
 
   if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
-    if (process.env.PAYMOB_TEST_MODE !== "true")
+    if (
+      process.env.PAYMOB_TEST_MODE !== "true" &&
+      process.env.NODE_ENV !== "development"
+    )
       return Response.json(
         { message: "Ticket sales are currently closed." },
-        { status: 400 }
+        { status: 400 },
       );
   }
 
@@ -33,7 +36,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return Response.json(
       { message: "Please provide a valid JSON body." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -58,14 +61,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return Response.json(
       { message: "Please fill out all required fields." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (phone === undefined || paymentMethod === undefined) {
     return Response.json(
       { message: "Please fill out all required fields." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -91,7 +94,7 @@ export async function POST(request: NextRequest) {
         email1,
         amount,
         "group",
-        ids.join(",")
+        ids.join(","),
       );
 
       if (!initiateCardPaymentResponse.ok) {
@@ -112,7 +115,7 @@ export async function POST(request: NextRequest) {
           message:
             "Error submitting group. Please try again or contact us for help.",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -125,7 +128,7 @@ export async function POST(request: NextRequest) {
           emails[0],
           ids[0],
           TicketType.GROUP,
-          paymentUrl
+          paymentUrl,
         );
       }
 
@@ -135,20 +138,20 @@ export async function POST(request: NextRequest) {
             paymentUrl,
             success: true,
           },
-          { status: 200 }
+          { status: 200 },
         );
       }
     } catch (e) {
       console.error(
         "[CRITICAL ERROR] CONFIRMATION EMAIL NOT SENT TO GROUP LEADER",
-        e
+        e,
       );
       return Response.json(
         {
           message:
             "Error Occurred. Please contact us for help and provide this code: SMTP_LSA_502.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -161,7 +164,7 @@ export async function POST(request: NextRequest) {
         }`,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error(error);
@@ -170,7 +173,7 @@ export async function POST(request: NextRequest) {
         message:
           "Error submitting group. Please try again or contact us for help.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -180,12 +183,12 @@ async function submitTickets(
   emails: any,
   names: any,
   phone: string | undefined,
-  paymentMethod: string | undefined
+  paymentMethod: string | undefined,
 ) {
   if (!names || !emails || !phone || !paymentMethod || emails.length != 4) {
     return Response.json(
       { message: "Please fill out all required fields." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -193,7 +196,7 @@ async function submitTickets(
   if (paymentMethod === undefined || paymentMethod.split("@").length > 2) {
     return Response.json(
       { message: "Please enter a valid payment method." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -201,7 +204,7 @@ async function submitTickets(
     if (emails[i] === undefined || names[i] === undefined) {
       return Response.json(
         { message: "Please fill out all required fields." },
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (!verifyEmail(emails[i])) {
@@ -209,14 +212,14 @@ async function submitTickets(
         {
           message: "Please enter a valid email address for " + names[i] + ".",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!checkSafety(names[i])) {
       return Response.json(
         { message: "Invalid Name: " + names[i] + "." },
-        { status: 400 }
+        { status: 400 },
       );
     }
   }
