@@ -22,10 +22,13 @@ export async function POST(request: NextRequest) {
   if (csrfError) return csrfError;
 
   if (new Date() < TICKET_WINDOW[0] || new Date() > TICKET_WINDOW[1]) {
-    if (process.env.PAYMOB_TEST_MODE !== "true")
+    if (
+      process.env.PAYMOB_TEST_MODE !== "true" &&
+      process.env.NODE_ENV !== "development"
+    )
       return Response.json(
         { message: "Ticket sales are currently closed." },
-        { status: 400 }
+        { status: 400 },
       );
   }
   let body: any;
@@ -34,7 +37,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return Response.json(
       { message: "Please provide a valid JSON body." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -48,7 +51,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return Response.json(
       { message: "Please fill out all required fields." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -56,7 +59,7 @@ export async function POST(request: NextRequest) {
   if (paymentMethod === undefined || paymentMethod.split("@").length > 2) {
     return Response.json(
       { message: "Please enter a valid payment method." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -72,7 +75,7 @@ async function submitOneTicket(
   name: string,
   phone: string,
   paymentMethod: string | undefined,
-  code: string | undefined = undefined
+  code: string | undefined = undefined,
 ) {
   email = handleMisspelling(email);
   if (!verifyEmail(email)) {
@@ -80,7 +83,7 @@ async function submitOneTicket(
       {
         message: "Please enter a valid email address.",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -92,7 +95,7 @@ async function submitOneTicket(
   ) {
     return Response.json(
       { message: "Please fill out all required fields." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -118,7 +121,7 @@ async function submitOneTicket(
       {
         message: "Please enter a valid email address.",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -132,7 +135,7 @@ async function submitOneTicket(
         paymentMethod,
         phone,
         code ? TicketType.DISCOUNTED : TicketType.INDIVIDUAL,
-      ]
+      ],
     );
     id = res.rows[0].id;
   } catch (error) {
@@ -140,7 +143,7 @@ async function submitOneTicket(
       {
         message: "Error occurred. Please try again or contact us for help.",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -154,7 +157,7 @@ async function submitOneTicket(
       await sql`SELECT setval('attendees_id_seq', (SELECT MAX(id) FROM attendees));`;
       return Response.json(
         { message: "Invalid rush hour code. Please try again." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -171,7 +174,7 @@ async function submitOneTicket(
           : `Our team is reviewing rush hour payments at this moment. Your ticket will be sent to your email once the payment is confirmed.`,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
 
@@ -185,7 +188,7 @@ async function submitOneTicket(
       email,
       amount,
       "individual",
-      id
+      id,
     );
 
     if (!initiateCardPaymentResponse.ok) {
@@ -202,7 +205,7 @@ async function submitOneTicket(
         paymentUrl: paymentUrl,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
 
@@ -215,7 +218,7 @@ async function submitOneTicket(
         email,
         id,
         TicketType.INDIVIDUAL,
-        paymentUrl
+        paymentUrl,
       );
     }
 
@@ -228,14 +231,14 @@ async function submitOneTicket(
         }`,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     // failed to send confirmation.. delete email so person can try again.
     await sql`DELETE FROM attendees WHERE id = ${id}`;
     await sql`SELECT setval('attendees_id_seq', (SELECT MAX(id) FROM attendees));`;
     console.error(
-      "[CRITICAL ERROR] Sending email failed. Deleting attendee record."
+      "[CRITICAL ERROR] Sending email failed. Deleting attendee record.",
     );
     console.error(error);
     return Response.json(
@@ -243,7 +246,7 @@ async function submitOneTicket(
         message:
           "Error Occurred. Please try again or contact us for help: SMTP_ERR_001.",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }
@@ -270,6 +273,6 @@ export async function GET() {
         parseInt(query3.rows[0].count) +
         parseInt(totalDiscountedCodes.rows[0].count),
     },
-    { status: 200 }
+    { status: 200 },
   );
 }
