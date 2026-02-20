@@ -44,11 +44,11 @@
 | -------------- | ------------------------------------------------- |
 | Framework      | **Next.js 16** (App Router)                       |
 | Language       | **TypeScript**                                    |
-| Database       | **Vercel Postgres** (`@vercel/postgres`)          |
+| Database       | **Neon Postgres** (`@neondatabase/serverless`)    |
 | Primary Email  | **Resend** (React Email components, rate-limited) |
 | Fallback Email | **Nodemailer** (Gmail OAuth2)                     |
-| Payments       | **Paymob** (card payments via unified checkout)   |
-| Auth           | **JWT** (jsonwebtoken, 7-day expiry)              |
+| Payments       | **Manual** (card payments via school website)     |
+| Auth           | **JWT** (jsonwebtoken)                            |
 | Charts         | **Recharts**                                      |
 | Styling        | **Tailwind CSS** + CSS Modules                    |
 | Hosting        | **Vercel**                                        |
