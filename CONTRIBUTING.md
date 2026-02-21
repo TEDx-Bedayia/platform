@@ -1,5 +1,7 @@
 # CONTRIBUTING GUIDELINES - READ BEFORE YOU START
 
+Hey, congratulations for making it onto the team! Quick reminder to use `npm run dev` while developing to check your changes in real time and fix any bugs before opening a pull request. Don't forget to use the .env file provided by your head.
+
 ### 🚨 CRITICAL WARNING FOR FUTURE TEAMS
 **DO NOT CREATE A NEW REPOSITORY FOR THIS PROJECT.**
 
