@@ -1,4 +1,4 @@
-# CONTRIBUTING GUIDELINES - READ BEFORE YOU START
+7# CONTRIBUTING GUIDELINES - READ BEFORE YOU START
 
 Hey, congratulations for making it onto the team! Quick reminder to use `npm run dev` while developing to check your changes in real time and fix any bugs before opening a pull request. Don't forget to use the .env file provided by your head.
 
@@ -32,7 +32,7 @@ The `main` branch is the **Live Website**.
     * Create a new PR from your branch to `main`.
     * **Request Review:** Assign the Team Head to review your code.
 
-#### 4. Merging
+#### 3. Merging
 * Once approved, the Team Head will merge your PR.
 * **Vercel will automatically deploy** the new version to the live site immediately.
 
