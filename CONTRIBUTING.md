@@ -63,4 +63,8 @@ This is a local program, to be installed on your computer so that you save your 
 3. Press Enter to accept the default file location.
 4. Optionally, enter a passphrase (but this may break VSCode's git integration, so you can press enter twice without entering a password).
 5. Copy the public key. On Windows, run `clip ~/.ssh/id_ed25519.pub`. On MacOS, run `pbcopy ~/.ssh/id_ed25519.pub`. This automatically copies the public key. If any errors arise you could ask AI to help you download those tools.
-6. Add your Public SSH Key to [GitHub SSH Settings]() by simply pasting ctrl+V or command+V.
+6. Add your Public SSH Key to [GitHub SSH Settings](https://github.com/settings/ssh/new) by simply pasting ctrl+V or command+V. Leave it as an authentication key. and save.
+7. Test the connection by running `ssh -T git@github.com` in your terminal or command prompt. It should say success.
+
+
+Check out [common SSH problems](https://docs.github.com/authentication/troubleshooting-ssh) for more help.
